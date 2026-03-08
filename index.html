@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>learn.surkar.in</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #060a12;
+      --surface: #0b1220;
+      --border:  #1c2e4a;
+      --border2: #243550;
+      --cyan:    #00e5ff;
+      --green:   #00ff88;
+      --orange:  #ff7043;
+      --purple:  #bf5af2;
+      --yellow:  #ffd60a;
+      --text:    #c0d4ec;
+      --muted:   #486080;
+      --dim:     #2a3d55;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.012) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 5rem 2rem 4rem;
+    }
+
+    /* Header */
+    .site-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-bottom: 0.8rem;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.025em;
+      line-height: 1;
+    }
+    h1 span { color: var(--cyan); }
+    .tagline {
+      margin-top: 0.9rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 480px;
+    }
+
+    /* Category filter */
+    .filters {
+      display: flex;
+      gap: 0.4rem;
+      margin: 2.5rem 0 1.5rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.8rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .filter-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+    .filter-btn.active { background: rgba(0,229,255,0.08); border-color: var(--cyan); color: var(--cyan); }
+
+    /* Cards grid */
+    .cards { display: flex; flex-direction: column; gap: 0; }
+
+    .card {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      transition: background 0.15s;
+      border-radius: 3px;
+      padding-left: 0.8rem;
+      margin-left: -0.8rem;
+    }
+    .card:first-child { border-top: 1px solid var(--border); }
+    .card:hover { background: rgba(255,255,255,0.02); }
+
+    .card-num {
+      font-size: 0.58rem;
+      color: var(--dim);
+      letter-spacing: 0.1em;
+    }
+
+    .card-body {}
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+    .card:hover .card-title { color: var(--cyan); }
+    .card-desc {
+      font-size: 0.63rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.3rem;
+    }
+    .card-tag {
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.18rem 0.45rem;
+      border-radius: 2px;
+      border: 1px solid;
+      white-space: nowrap;
+    }
+    .tag-crypto  { color: var(--purple); border-color: var(--purple); background: rgba(191,90,242,0.06); }
+    .tag-network { color: var(--cyan);   border-color: var(--cyan);   background: rgba(0,229,255,0.06); }
+    .tag-systems { color: var(--orange); border-color: var(--orange); background: rgba(255,112,67,0.06); }
+    .tag-infra   { color: var(--yellow); border-color: var(--yellow); background: rgba(255,214,10,0.06); }
+    .tag-db      { color: var(--green);  border-color: var(--green);  background: rgba(0,255,136,0.06); }
+
+    .card-arrow {
+      font-size: 0.7rem;
+      color: var(--dim);
+      transition: color 0.15s, transform 0.15s;
+    }
+    .card:hover .card-arrow { color: var(--cyan); transform: translateX(3px); }
+
+    /* Empty state */
+    .empty {
+      padding: 3rem 0;
+      text-align: center;
+      color: var(--dim);
+      font-size: 0.7rem;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.6rem;
+      color: var(--dim);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--cyan); }
+
+    @media (max-width: 600px) {
+      .card { grid-template-columns: 40px 1fr; }
+      .card-meta { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="site-label">surkar.in / learn</div>
+  <h1>learn<span>.</span></h1>
+  <p class="tagline">Notes, visualizations, and interactive explainers on things I find worth understanding deeply.</p>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="filter('all')">All</button>
+    <button class="filter-btn" onclick="filter('cryptography')">Cryptography</button>
+    <button class="filter-btn" onclick="filter('networking')">Networking</button>
+    <button class="filter-btn" onclick="filter('systems')">Systems</button>
+    <button class="filter-btn" onclick="filter('infra')">Infra</button>
+    <button class="filter-btn" onclick="filter('databases')">Databases</button>
+  </div>
+
+  <div class="cards" id="cards">
+    <!-- each card: data-category matches filter -->
+    <a class="card" href="/hmac-sha256" data-category="cryptography">
+      <span class="card-num">001</span>
+      <div class="card-body">
+        <div class="card-title">HMAC-SHA256</div>
+        <div class="card-desc">How Hash-based Message Authentication Codes work — step-by-step with live computation, XOR visualizations, and real intermediate values.</div>
+      </div>
+      <div class="card-meta">
+        <span class="card-tag tag-crypto">Cryptography</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- Future entries go here -->
+  </div>
+
+  <div class="empty" id="empty" style="display:none">Nothing here yet for this category.</div>
+
+  <footer>
+    <span>learn.surkar.in</span>
+    <a href="https://surkar.in">← surkar.in</a>
+  </footer>
+
+</div>
+<script>
+  function filter(cat) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    const cards = document.querySelectorAll('.card');
+    let visible = 0;
+    cards.forEach(c => {
+      const show = cat === 'all' || c.dataset.category === cat;
+      c.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    document.getElementById('empty').style.display = visible === 0 ? 'block' : 'none';
+  }
+</script>
+</body>
+</html>

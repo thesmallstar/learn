@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HMAC-SHA256 — Visual Explainer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #060a12;
+      --surface:  #0b1220;
+      --surface2: #101929;
+      --border:   #1c2e4a;
+      --border2:  #243550;
+      --cyan:     #00e5ff;
+      --green:    #00ff88;
+      --orange:   #ff7043;
+      --purple:   #bf5af2;
+      --yellow:   #ffd60a;
+      --red:      #ff4560;
+      --text:     #c0d4ec;
+      --muted:    #486080;
+      --dim:      #2a3d55;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.015) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 3rem 2rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .header-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+      opacity: 0.7;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    h1 span { color: var(--cyan); }
+    .header-sub {
+      margin-top: 0.8rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2rem 3rem 4rem;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* ── INPUT PANEL ── */
+    .input-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      position: sticky;
+      top: 1.5rem;
+    }
+    .panel-title {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .field { margin-bottom: 1.2rem; }
+    label {
+      display: block;
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+    input[type="text"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: 3px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 1px rgba(0,229,255,0.15);
+    }
+    .field-note {
+      margin-top: 0.3rem;
+      font-size: 0.58rem;
+      color: var(--muted);
+    }
+
+    /* Mode toggle */
+    .mode-toggle {
+      display: flex;
+      gap: 0;
+      margin-bottom: 0.8rem;
+      border: 1px solid var(--border2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .mode-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .mode-btn.active {
+      background: rgba(0,229,255,0.1);
+      color: var(--cyan);
+    }
+    .mode-btn:hover:not(.active) { background: rgba(255,255,255,0.03); }
+
+    button#computeBtn {
+      width: 100%;
+      background: var(--cyan);
+      color: var(--bg);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    button#computeBtn:hover { opacity: 0.88; }
+    button#computeBtn:active { transform: scale(0.98); }
+    button#computeBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* overview mini-diagram */
+    .overview {
+      margin-top: 1.6rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--border);
+    }
+    .ov-title {
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .ov-flow { display: flex; flex-direction: column; gap: 0; }
+    .ov-node {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.45rem 0.6rem;
+      border-radius: 3px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .ov-node:hover { background: rgba(255,255,255,0.03); }
+    .ov-node.active-node { background: rgba(0,229,255,0.06); }
+    .ov-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1px solid currentColor;
+      transition: background 0.3s;
+    }
+    .ov-connector {
+      width: 1px; height: 12px;
+      background: var(--border2);
+      margin-left: calc(0.6rem + 4px);
+    }
+    .ov-label { color: var(--muted); transition: color 0.3s; }
+    .ov-node.done .ov-dot { background: currentColor; }
+    .ov-node.done .ov-label { color: var(--text); }
+    .ov-node.current-ov .ov-label { color: var(--cyan) !important; }
+
+    /* ── STEPS PANEL ── */
+    .steps-panel { display: flex; flex-direction: column; gap: 1rem; }
+
+    /* Interactive controls bar */
+    .interactive-bar {
+      display: none;
+      align-items: center;
+      gap: 0.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.8rem 1rem;
+    }
+    .interactive-bar.show { display: flex; }
+    .step-counter {
+      font-size: 0.7rem;
+      color: var(--cyan);
+      flex: 1;
+    }
+    .step-counter span { color: var(--muted); }
+    .step-hint {
+      font-size: 0.58rem;
+      color: var(--dim);
+      letter-spacing: 0.05em;
+    }
+    .nav-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      padding: 0.4rem 0.8rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-btn.primary {
+      background: rgba(0,229,255,0.1);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+    .nav-btn.primary:disabled { opacity: 0.3; }
+
+    /* progress bar */
+    .progress-track {
+      height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--cyan);
+      border-radius: 1px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.3s;
+    }
+    .step-card.visible { opacity: 1; transform: translateY(0); }
+    .step-card.active {
+      border-color: var(--cyan);
+      box-shadow: 0 0 20px rgba(0,229,255,0.06);
+    }
+    /* interactive mode: hide non-current cards */
+    .step-card.hidden-step {
+      display: none;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .step-num {
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      min-width: 48px;
+    }
+    .step-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: #fff;
+      flex: 1;
+    }
+    .step-badge {
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      border: 1px solid;
+    }
+    .badge-xor    { color: var(--orange); border-color: var(--orange); background: rgba(255,112,67,0.07); }
+    .badge-hash   { color: var(--purple); border-color: var(--purple); background: rgba(191,90,242,0.07); }
+    .badge-pad    { color: var(--yellow); border-color: var(--yellow); background: rgba(255,214,10,0.07); }
+    .badge-concat { color: var(--green);  border-color: var(--green);  background: rgba(0,255,136,0.07); }
+    .badge-out    { color: var(--cyan);   border-color: var(--cyan);   background: rgba(0,229,255,0.07); }
+
+    .step-body { padding: 1.2rem; }
+
+    .step-desc {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+    .step-desc code {
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      padding: 0.1em 0.3em;
+      border-radius: 2px;
+      font-size: 0.85em;
+    }
+
+    /* WHY callout — more prominent */
+    .why-box {
+      background: rgba(0,229,255,0.03);
+      border: 1px solid rgba(0,229,255,0.12);
+      border-left: 3px solid var(--cyan);
+      border-radius: 0 3px 3px 0;
+      padding: 0.8rem 1rem;
+      margin: 0.9rem 0;
+    }
+    .why-box-title {
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .why-box p {
+      font-size: 0.68rem;
+      color: var(--text);
+      line-height: 1.8;
+    }
+    .why-box p + p { margin-top: 0.4rem; }
+    .why-box strong { color: var(--cyan); font-weight: 500; }
+    .why-box code {
+      color: var(--green);
+      background: rgba(0,255,136,0.06);
+      padding: 0.1em 0.3em;
+      border-radius: 2px;
+      font-size: 0.85em;
+    }
+
+    /* attack box */
+    .attack-box {
+      background: rgba(255,69,96,0.04);
+      border: 1px solid rgba(255,69,96,0.15);
+      border-left: 3px solid var(--red);
+      border-radius: 0 3px 3px 0;
+      padding: 0.8rem 1rem;
+      margin: 0.9rem 0;
+    }
+    .attack-box-title {
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .attack-box p {
+      font-size: 0.68rem;
+      color: var(--text);
+      line-height: 1.8;
+    }
+    .attack-box strong { color: var(--red); font-weight: 500; }
+    .attack-box code {
+      color: var(--orange);
+      background: rgba(255,112,67,0.06);
+      padding: 0.1em 0.3em;
+      border-radius: 2px;
+      font-size: 0.85em;
+    }
+
+    /* data rows */
+    .data-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 0.4rem;
+      align-items: start;
+      margin-bottom: 0.6rem;
+      font-size: 0.68rem;
+    }
+    .data-label {
+      color: var(--muted);
+      padding-top: 0.15rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .data-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text);
+      word-break: break-all;
+      line-height: 1.6;
+    }
+    .data-val.cyan   { color: var(--cyan); }
+    .data-val.green  { color: var(--green); }
+    .data-val.orange { color: var(--orange); }
+    .data-val.purple { color: var(--purple); }
+    .data-val.yellow { color: var(--yellow); }
+
+    /* hex XOR grid */
+    .xor-visual {
+      margin: 1rem 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.8rem;
+    }
+    .xor-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.63rem;
+    }
+    .xor-row-label { width: 68px; color: var(--muted); flex-shrink: 0; font-size: 0.56rem; }
+    .xor-bytes { display: flex; flex-wrap: wrap; gap: 2px; }
+    .xor-byte {
+      width: 22px; text-align: center;
+      padding: 2px 0; border-radius: 2px;
+      font-size: 0.6rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .xor-byte.key-byte { color: var(--cyan);   background: rgba(0,229,255,0.07); }
+    .xor-byte.pad-byte { color: var(--orange); background: rgba(255,112,67,0.07); }
+    .xor-byte.res-byte { color: var(--green);  background: rgba(0,255,136,0.07); }
+    .xor-divider { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; }
+    .xor-op-label { width: 68px; color: var(--orange); font-size: 0.65rem; flex-shrink: 0; font-weight: 500; }
+
+    /* formula box */
+    .formula {
+      background: var(--bg);
+      border-left: 2px solid var(--cyan);
+      padding: 0.6rem 0.8rem;
+      margin: 0.8rem 0;
+      font-size: 0.72rem;
+      color: var(--text);
+      font-style: italic;
+    }
+    .formula strong { color: var(--cyan); font-style: normal; }
+
+    /* final output */
+    .final-output {
+      background: var(--bg);
+      border: 1px solid var(--green);
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      margin-top: 0.6rem;
+      box-shadow: 0 0 24px rgba(0,255,136,0.06);
+    }
+    .final-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .final-val {
+      font-size: 0.8rem;
+      color: var(--green);
+      word-break: break-all;
+      line-height: 1.7;
+    }
+
+    /* generic callout */
+    .callout {
+      background: rgba(0,229,255,0.04);
+      border: 1px solid rgba(0,229,255,0.15);
+      border-radius: 3px;
+      padding: 0.7rem 0.9rem;
+      margin-top: 0.8rem;
+      font-size: 0.67rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .callout strong { color: var(--cyan); font-weight: 500; }
+
+    /* real-world uses */
+    .uses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.4rem;
+      margin-top: 0.8rem;
+    }
+    .use-chip {
+      background: rgba(0,255,136,0.05);
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 3px;
+      padding: 0.35rem 0.6rem;
+      font-size: 0.6rem;
+      color: var(--green);
+      text-align: center;
+    }
+
+    /* placeholder */
+    .placeholder {
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--dim);
+      font-size: 0.72rem;
+      line-height: 1.8;
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+    }
+    .placeholder .ph-icon { font-size: 2rem; display: block; margin-bottom: 0.8rem; opacity: 0.4; }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2), transparent);
+      margin: 0.6rem 0;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+    .computing { animation: pulse 1s infinite; color: var(--cyan); font-size: 0.72rem; padding: 2rem; text-align: center; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    /* ── THEORY SECTION ── */
+    .theory-wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 3rem;
+    }
+    .theory-section {
+      padding: 2.5rem 0;
+    }
+    .theory-tag {
+      font-size: 0.58rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      opacity: 0.6;
+      margin-bottom: 0.7rem;
+    }
+    .theory-h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+    .theory-p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.9;
+      max-width: 640px;
+      margin-bottom: 0.7rem;
+    }
+    .theory-p strong { color: var(--text); font-weight: 500; }
+    .theory-p em { color: var(--cyan); font-style: normal; }
+    .theory-divider {
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent 60%);
+    }
+    .demo-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      padding: 1.2rem 0 0.5rem;
+    }
+
+    /* two-col grid */
+    .theory-grid.two-col {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    /* formula block */
+    .theory-formula-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      margin-top: 1.2rem;
+    }
+    .tf-label {
+      font-size: 0.56rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .tf-body {
+      font-size: 0.9rem;
+      color: var(--cyan);
+      line-height: 1.6;
+      margin-bottom: 0.8rem;
+    }
+    .tf-dim { color: var(--muted); }
+    .tf-vars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 0.6rem;
+      color: var(--muted);
+    }
+
+    /* comparison table */
+    .theory-compare {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.2rem;
+    }
+    .tc-title {
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+    }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.65rem;
+    }
+    .compare-table th {
+      color: var(--muted);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-table th:first-child { text-align: left; }
+    .compare-table td {
+      padding: 0.35rem 0.5rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      color: var(--muted);
+      font-size: 0.63rem;
+    }
+    .compare-table td:first-child { text-align: left; color: var(--text); }
+    .compare-table td.yes { color: var(--green); }
+    .compare-table td.no  { color: var(--red); opacity: 0.7; }
+
+    /* use cases */
+    .use-cases-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+      margin-top: 1.2rem;
+    }
+    .uc-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem 1.1rem;
+      transition: border-color 0.2s;
+    }
+    .uc-card:hover { border-color: var(--border2); }
+    .uc-icon { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .uc-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 0.82rem;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .uc-desc {
+      font-size: 0.65rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 0.6rem;
+    }
+    .uc-detail {
+      font-size: 0.58rem;
+      color: var(--dim);
+      font-family: 'JetBrains Mono', monospace;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+
+    /* code tabs */
+    .code-tabs {
+      margin-top: 1.2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .ct-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .ct-tab {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      padding: 0.6rem 1.2rem;
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      transition: color 0.2s, background 0.2s;
+    }
+    .ct-tab.active { color: var(--cyan); background: rgba(0,229,255,0.05); }
+    .ct-tab:hover:not(.active) { color: var(--text); }
+    .ct-panels { padding: 0; }
+    .ct-panel {
+      display: none;
+      padding: 1.2rem 1.5rem;
+      font-size: 0.7rem;
+      line-height: 1.9;
+      color: var(--text);
+      overflow-x: auto;
+      white-space: pre;
+      margin: 0;
+    }
+    .ct-panel.active { display: block; }
+    .ct-panel code { font-family: 'JetBrains Mono', monospace; }
+    .ck { color: var(--purple); }
+    .cs { color: var(--green); }
+    .cc { color: var(--muted); font-style: italic; }
+
+    /* security notes */
+    .security-notes {
+      margin-top: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.2rem 1.4rem;
+    }
+    .sn-title {
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .sn-item {
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-start;
+    }
+    .sn-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 0.35rem;
+    }
+    .sn-item strong {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+      font-weight: 500;
+    }
+    .sn-item p {
+      font-size: 0.63rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .sn-item code {
+      color: var(--orange);
+      background: rgba(255,112,67,0.06);
+      padding: 0.1em 0.3em;
+      border-radius: 2px;
+      font-size: 0.85em;
+    }
+    .sn-item em { color: var(--red); font-style: normal; }
+
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; padding: 1.5rem; }
+      header { padding: 1.5rem; }
+      .input-panel { position: static; }
+      .theory-wrap { padding: 0 1.5rem; }
+      .theory-grid.two-col { grid-template-columns: 1fr; }
+      .use-cases-grid { grid-template-columns: 1fr 1fr; }
+      .sn-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .use-cases-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">Cryptography / Message Authentication</div>
+  <h1>HMAC<span>-SHA256</span></h1>
+  <div class="header-sub">Hash-based Message Authentication Code · Interactive Step-by-Step Visualization</div>
+</header>
+
+<!-- ── THEORY SECTION ── -->
+<div class="theory-wrap">
+
+  <!-- What is HMAC -->
+  <section class="theory-section">
+    <div class="theory-tag">01 / What is HMAC</div>
+    <div class="theory-grid two-col">
+      <div>
+        <h2 class="theory-h2">A keyed fingerprint for your data</h2>
+        <p class="theory-p">
+          HMAC (Hash-based Message Authentication Code) is a construction that turns any
+          cryptographic hash function into a <strong>message authenticator</strong>. It takes two inputs —
+          a <em>secret key</em> and a <em>message</em> — and produces a fixed-size tag that proves
+          both who created the message and that it hasn't been tampered with.
+        </p>
+        <p class="theory-p">
+          Unlike a plain hash (which anyone can compute), an HMAC can only be verified by
+          someone who holds the secret key. This makes it the standard tool for
+          <strong>API authentication, signed tokens, and webhook verification</strong>.
+        </p>
+        <div class="theory-formula-block">
+          <div class="tf-label">Full formula</div>
+          <div class="tf-body">HMAC(K, m) = H<span class="tf-dim">( </span>(K′ ⊕ opad)<span class="tf-dim"> ∥ </span>H<span class="tf-dim">( </span>(K′ ⊕ ipad)<span class="tf-dim"> ∥ </span>m<span class="tf-dim"> ) )</span></div>
+          <div class="tf-vars">
+            <span>K′ = key padded to block size</span>
+            <span>ipad = 0x36 × 64</span>
+            <span>opad = 0x5C × 64</span>
+            <span>H = SHA-256</span>
+          </div>
+        </div>
+      </div>
+      <div class="theory-compare">
+        <div class="tc-title">How it compares</div>
+        <table class="compare-table">
+          <thead>
+            <tr><th></th><th>Plain Hash</th><th>HMAC</th><th>Digital Sig</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Needs secret key</td><td class="no">No</td><td class="yes">Yes (shared)</td><td class="yes">Yes (private)</td></tr>
+            <tr><td>Verifiable by anyone</td><td class="yes">Yes</td><td class="no">Only key holders</td><td class="yes">Yes (public key)</td></tr>
+            <tr><td>Tamper detection</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+            <tr><td>Non-repudiation</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td></tr>
+            <tr><td>Length-extension safe</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+            <tr><td>Speed</td><td class="yes">Fast</td><td class="yes">Fast</td><td class="no">Slow</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="theory-divider"></div>
+
+  <!-- When it's used -->
+  <section class="theory-section">
+    <div class="theory-tag">02 / When it's used</div>
+    <h2 class="theory-h2">Real-world use cases</h2>
+    <div class="use-cases-grid">
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--cyan)">⬡</div>
+        <div class="uc-name">JWT HS256</div>
+        <div class="uc-desc">JSON Web Tokens signed with HMAC-SHA256. The server signs the header+payload with a secret; any tampering invalidates the signature.</div>
+        <div class="uc-detail">Header.Payload → HMAC → Signature</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--orange)">⬡</div>
+        <div class="uc-name">AWS Signature V4</div>
+        <div class="uc-desc">Every AWS API request is signed using a chain of HMAC-SHA256 operations over the date, region, service, and request body.</div>
+        <div class="uc-detail">HMAC(HMAC(HMAC(HMAC(key, date), region), service), request)</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--purple)">⬡</div>
+        <div class="uc-name">Webhook Verification</div>
+        <div class="uc-desc">Stripe, GitHub, Shopify all send an HMAC of the payload in the request header. Your server recomputes and compares to confirm origin.</div>
+        <div class="uc-detail">X-Stripe-Signature: HMAC(secret, timestamp.body)</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--green)">⬡</div>
+        <div class="uc-name">TOTP / HOTP</div>
+        <div class="uc-desc">One-time passwords (RFC 4226 / 6238) are derived from HMAC-SHA1 of a shared secret and a counter or timestamp — the basis of every authenticator app.</div>
+        <div class="uc-detail">OTP = Truncate(HMAC(secret, counter))</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--yellow)">⬡</div>
+        <div class="uc-name">TLS 1.2 PRF</div>
+        <div class="uc-desc">TLS 1.2 uses HMAC-SHA256 inside its Pseudorandom Function to derive session keys from the master secret and random nonces.</div>
+        <div class="uc-detail">PRF(secret, label, seed) = P_SHA256(secret, label ∥ seed)</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--red)">⬡</div>
+        <div class="uc-name">Cookie / Session Signing</div>
+        <div class="uc-desc">Frameworks like Express and Django sign session cookies with HMAC so the server can detect if a client has tampered with the cookie value.</div>
+        <div class="uc-detail">cookie = value + "." + HMAC(secret, value)</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="theory-divider"></div>
+
+  <!-- How it's used in code -->
+  <section class="theory-section">
+    <div class="theory-tag">03 / How it's used in code</div>
+    <h2 class="theory-h2">Implementation in 3 languages</h2>
+    <div class="code-tabs">
+      <div class="ct-tabs">
+        <button class="ct-tab active" onclick="showTab('node')">Node.js</button>
+        <button class="ct-tab" onclick="showTab('python')">Python</button>
+        <button class="ct-tab" onclick="showTab('go')">Go</button>
+      </div>
+      <div class="ct-panels">
+        <pre class="ct-panel active" id="tab-node"><code><span class="ck">import</span> { createHmac } <span class="ck">from</span> <span class="cs">'crypto'</span>;
+
+<span class="cc">// Sign a message</span>
+<span class="ck">const</span> key     = <span class="cs">'my-secret-key'</span>;
+<span class="ck">const</span> message = <span class="cs">'Hello, HMAC!'</span>;
+
+<span class="ck">const</span> hmac = createHmac(<span class="cs">'sha256'</span>, key)
+  .update(message)
+  .digest(<span class="cs">'hex'</span>);
+
+console.log(hmac);
+<span class="cc">// → 64-char hex string</span>
+
+<span class="cc">// Verify (timing-safe comparison)</span>
+<span class="ck">import</span> { timingSafeEqual } <span class="ck">from</span> <span class="cs">'crypto'</span>;
+
+<span class="ck">function</span> verify(key, message, expected) {
+  <span class="ck">const</span> actual = createHmac(<span class="cs">'sha256'</span>, key)
+    .update(message).digest();
+  <span class="ck">return</span> timingSafeEqual(actual, Buffer.from(expected, <span class="cs">'hex'</span>));
+}</code></pre>
+
+        <pre class="ct-panel" id="tab-python"><code><span class="ck">import</span> hmac, hashlib
+
+key     = <span class="cs">b'my-secret-key'</span>
+message = <span class="cs">b'Hello, HMAC!'</span>
+
+<span class="cc"># Sign a message</span>
+tag = hmac.new(key, message, hashlib.sha256).hexdigest()
+print(tag)
+<span class="cc"># → 64-char hex string</span>
+
+<span class="cc"># Verify (timing-safe comparison)</span>
+<span class="ck">def</span> verify(key, message, expected_hex):
+    actual = hmac.new(key, message, hashlib.sha256).digest()
+    expected = bytes.fromhex(expected_hex)
+    <span class="cc"># hmac.compare_digest prevents timing attacks</span>
+    <span class="ck">return</span> hmac.compare_digest(actual, expected)</code></pre>
+
+        <pre class="ct-panel" id="tab-go"><code><span class="ck">import</span> (
+    <span class="cs">"crypto/hmac"</span>
+    <span class="cs">"crypto/sha256"</span>
+    <span class="cs">"encoding/hex"</span>
+)
+
+<span class="cc">// Sign a message</span>
+<span class="ck">func</span> Sign(key, message []byte) string {
+    mac := hmac.New(sha256.New, key)
+    mac.Write(message)
+    <span class="ck">return</span> hex.EncodeToString(mac.Sum(nil))
+}
+
+<span class="cc">// Verify (timing-safe)</span>
+<span class="ck">func</span> Verify(key, message []byte, expected string) bool {
+    tag, _ := hex.DecodeString(expected)
+    mac := hmac.New(sha256.New, key)
+    mac.Write(message)
+    actual := mac.Sum(nil)
+    <span class="cc">// hmac.Equal uses constant-time comparison</span>
+    <span class="ck">return</span> hmac.Equal(actual, tag)
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="security-notes">
+      <div class="sn-title">Critical security notes</div>
+      <div class="sn-grid">
+        <div class="sn-item">
+          <div class="sn-dot" style="background:var(--red)"></div>
+          <div>
+            <strong>Always use timing-safe comparison</strong>
+            <p>Never compare HMAC tags with <code>==</code>. A naive string comparison short-circuits on the first mismatched byte, leaking timing information that can be used to forge tags byte-by-byte.</p>
+          </div>
+        </div>
+        <div class="sn-item">
+          <div class="sn-dot" style="background:var(--orange)"></div>
+          <div>
+            <strong>Key must be secret and random</strong>
+            <p>The security of HMAC is entirely in the key. Use a cryptographically random key of at least 32 bytes. Never reuse the same key for different purposes (e.g. signing tokens vs verifying webhooks).</p>
+          </div>
+        </div>
+        <div class="sn-item">
+          <div class="sn-dot" style="background:var(--yellow)"></div>
+          <div>
+            <strong>HMAC is not encryption</strong>
+            <p>HMAC proves integrity and authenticity but does <em>not</em> hide the message content. The message is visible to anyone who receives it — use HMAC alongside encryption (e.g. AES-GCM) if confidentiality is needed.</p>
+          </div>
+        </div>
+        <div class="sn-item">
+          <div class="sn-dot" style="background:var(--cyan)"></div>
+          <div>
+            <strong>Include a timestamp or nonce</strong>
+            <p>HMAC alone doesn't prevent replay attacks. In production (webhooks, APIs) always include a timestamp in the signed payload and reject messages older than a few minutes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="theory-divider"></div>
+  <div class="demo-label">// Interactive Demo — step through the algorithm with your own values</div>
+</div>
+
+<main>
+  <aside>
+    <div class="input-panel">
+      <div class="panel-title">// Input Parameters</div>
+
+      <div class="field">
+        <label>Secret Key</label>
+        <input type="text" id="keyInput" value="my-secret-key" placeholder="enter secret key" autocomplete="off">
+        <div class="field-note">If len &gt; 64 bytes, key is hashed first.</div>
+      </div>
+
+      <div class="field">
+        <label>Message</label>
+        <input type="text" id="msgInput" value="Hello, HMAC!" placeholder="enter message" autocomplete="off">
+        <div class="field-note">The data to authenticate.</div>
+      </div>
+
+      <div class="field">
+        <label>Mode</label>
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="modeAuto" onclick="setMode('auto')">Auto Play</button>
+          <button class="mode-btn" id="modeStep" onclick="setMode('step')">Step by Step</button>
+        </div>
+        <div class="field-note" id="modeNote">All steps reveal automatically.</div>
+      </div>
+
+      <button id="computeBtn" onclick="runCompute()">Compute HMAC</button>
+
+      <div class="overview">
+        <div class="ov-title">// Algorithm Flow</div>
+        <div class="ov-flow" id="ovFlow"></div>
+      </div>
+    </div>
+  </aside>
+
+  <section>
+    <!-- Interactive controls bar (step mode only) -->
+    <div class="interactive-bar" id="interactiveBar">
+      <div style="flex:1">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="step-counter">Step <strong id="currentStepNum">1</strong><span> / <span id="totalSteps">7</span></span></div>
+      </div>
+      <span class="step-hint">← → keys</span>
+      <button class="nav-btn" id="prevBtn" onclick="navStep(-1)" disabled>← Prev</button>
+      <button class="nav-btn primary" id="nextBtn" onclick="navStep(1)">Next →</button>
+    </div>
+
+    <div class="steps-panel" id="stepsPanel">
+      <div class="placeholder" id="placeholder">
+        <span class="ph-icon">⬡</span>
+        Enter a key and message, then click <strong>Compute HMAC</strong> to visualize every step of the algorithm with real values.
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+// ── STATE ──────────────────────────────────────────────
+let currentMode = 'auto';
+let interactiveSteps = [];
+let currentStepIndex = 0;
+
+function setMode(m) {
+  currentMode = m;
+  document.getElementById('modeAuto').classList.toggle('active', m === 'auto');
+  document.getElementById('modeStep').classList.toggle('active', m === 'step');
+  document.getElementById('modeNote').textContent =
+    m === 'auto' ? 'All steps reveal automatically.' : 'You control each step manually.';
+}
+
+// ── HELPERS ────────────────────────────────────────────
+function toHex(bytes) {
+  return Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function toHexSpaced(bytes, maxBytes = 32) {
+  const slice = Array.from(bytes).slice(0, maxBytes);
+  const hex = slice.map(b => b.toString(16).padStart(2,'0')).join(' ');
+  return bytes.length > maxBytes ? hex + ` … (+${bytes.length - maxBytes} more)` : hex;
+}
+async function sha256(data) {
+  return new Uint8Array(await crypto.subtle.digest('SHA-256', data));
+}
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── HMAC COMPUTATION ────────────────────────────────────
+async function computeHMACSteps(keyStr, messageStr) {
+  const enc = new TextEncoder();
+  const keyRaw = enc.encode(keyStr);
+  const msg    = enc.encode(messageStr);
+  const BLOCK = 64, IPAD = 0x36, OPAD = 0x5c;
+
+  let keyProcessed = keyRaw, keyWasHashed = false;
+  if (keyRaw.length > BLOCK) { keyProcessed = await sha256(keyRaw); keyWasHashed = true; }
+
+  const keyPadded = new Uint8Array(BLOCK);
+  keyPadded.set(keyProcessed);
+
+  const innerKey = new Uint8Array(BLOCK);
+  const outerKey = new Uint8Array(BLOCK);
+  for (let i = 0; i < BLOCK; i++) { innerKey[i] = keyPadded[i] ^ IPAD; outerKey[i] = keyPadded[i] ^ OPAD; }
+
+  const innerMsg = new Uint8Array(BLOCK + msg.length);
+  innerMsg.set(innerKey); innerMsg.set(msg, BLOCK);
+
+  const innerHash = await sha256(innerMsg);
+
+  const outerMsg = new Uint8Array(BLOCK + 32);
+  outerMsg.set(outerKey); outerMsg.set(innerHash, BLOCK);
+
+  const hmac = await sha256(outerMsg);
+
+  return { keyRaw, keyWasHashed, keyProcessed, keyPadded, innerKey, outerKey,
+           innerMsg, innerHash, outerMsg, hmac, IPAD, OPAD, msg };
+}
+
+// ── XOR VISUAL ─────────────────────────────────────────
+function buildXORVisual(keyBytes, padByte, resultBytes, label, maxShow = 22) {
+  const kS = Array.from(keyBytes).slice(0, maxShow);
+  const padHex = padByte.toString(16).padStart(2,'0');
+  const more = keyBytes.length > maxShow
+    ? `<span style="color:var(--muted);font-size:0.58rem;padding:2px 4px">+${keyBytes.length - maxShow}</span>` : '';
+  const rS = Array.from(resultBytes).slice(0, maxShow);
+
+  return `<div class="xor-visual">
+    <div class="xor-row">
+      <span class="xor-row-label">key_padded</span>
+      <div class="xor-bytes">${kS.map(b=>`<span class="xor-byte key-byte">${b.toString(16).padStart(2,'0')}</span>`).join('')}${more}</div>
+    </div>
+    <div class="xor-row">
+      <span class="xor-op-label">XOR</span>
+      <div class="xor-bytes">
+        ${kS.map(()=>`<span class="xor-byte pad-byte">${padHex}</span>`).join('')}
+        <span style="color:var(--muted);font-size:0.56rem;padding:2px 6px">(0x${padHex} × 64 = ${label})</span>
+      </div>
+    </div>
+    <hr class="xor-divider">
+    <div class="xor-row">
+      <span class="xor-row-label">= result</span>
+      <div class="xor-bytes">${rS.map(b=>`<span class="xor-byte res-byte">${b.toString(16).padStart(2,'0')}</span>`).join('')}${more}</div>
+    </div>
+  </div>`;
+}
+
+// ── OVERVIEW ───────────────────────────────────────────
+const OV_NODES = [
+  { id:'ov1', label:'Key Preparation', color:'var(--yellow)' },
+  { id:'ov2', label:'Key XOR ipad',    color:'var(--orange)' },
+  { id:'ov3', label:'Key XOR opad',    color:'var(--orange)' },
+  { id:'ov4', label:'Inner Hash',      color:'var(--purple)' },
+  { id:'ov5', label:'Outer Hash',      color:'var(--purple)' },
+  { id:'ov6', label:'HMAC Output',     color:'var(--green)'  },
+];
+
+function buildOverview() {
+  document.getElementById('ovFlow').innerHTML = OV_NODES.map((n,i) => `
+    <div class="ov-node" id="${n.id}" style="color:${n.color}">
+      <div class="ov-dot"></div><span class="ov-label">${n.label}</span>
+    </div>
+    ${i < OV_NODES.length-1 ? '<div class="ov-connector"></div>' : ''}
+  `).join('');
+}
+
+function markOvDone(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('done','active-node');
+}
+function setOvCurrent(id) {
+  OV_NODES.forEach(n => document.getElementById(n.id)?.classList.remove('current-ov'));
+  if (id) document.getElementById(id)?.classList.add('current-ov');
+}
+
+// ── STEP BUILDERS ──────────────────────────────────────
+function makeStep(num, name, badge, badgeClass, bodyHTML) {
+  return `<div class="step-card" id="step${num}">
+    <div class="step-header">
+      <span class="step-num">STEP ${num}</span>
+      <span class="step-name">${name}</span>
+      <span class="step-badge ${badgeClass}">${badge}</span>
+    </div>
+    <div class="step-body">${bodyHTML}</div>
+  </div>`;
+}
+function dr(label, val, cls='') {
+  return `<div class="data-row"><span class="data-label">${label}</span><span class="data-val ${cls}">${val}</span></div>`;
+}
+function why(title, ...paras) {
+  return `<div class="why-box"><div class="why-box-title">${title}</div>${paras.map(p=>`<p>${p}</p>`).join('')}</div>`;
+}
+function attack(title, ...paras) {
+  return `<div class="attack-box"><div class="attack-box-title">${title}</div>${paras.map(p=>`<p>${p}</p>`).join('')}</div>`;
+}
+
+function buildSteps(s) {
+  const { keyRaw, keyWasHashed, keyProcessed, keyPadded, innerKey, outerKey,
+          innerMsg, innerHash, outerMsg, hmac, IPAD, OPAD, msg } = s;
+  const dec = new TextDecoder();
+  const steps = [];
+
+  // STEP 1
+  let s1 = `<p class="step-desc">The secret key must be normalized to exactly <code>64 bytes</code> — the SHA-256 block size. Keys longer than 64 bytes are first hashed; keys shorter are zero-padded on the right.</p>
+    ${dr('key (text)', keyRaw.length <= 64 ? `"${dec.decode(keyRaw)}"` : `(${keyRaw.length} bytes)`, 'cyan')}
+    ${dr('key length', keyRaw.length + ' bytes')}`;
+  if (keyWasHashed) {
+    s1 += `<div class="callout"><strong>Long key:</strong> ${keyRaw.length} bytes &gt; 64 — SHA-256 hashed first → 32 bytes.</div>
+    ${dr('hashed key', toHexSpaced(keyProcessed), 'yellow')}`;
+  }
+  s1 += `<div class="divider"></div>${dr('padded key', toHexSpaced(keyPadded), 'yellow')}`;
+  s1 += why('Why normalize to 64 bytes?',
+    'SHA-256 is a <strong>block cipher-based</strong> hash function that processes data in <strong>512-bit (64-byte) chunks</strong>. Normalizing the key to exactly one block means both the inner and outer hash passes begin with a cleanly-aligned, key-derived block.',
+    'If a long key were used directly it would span multiple blocks and produce inconsistent behavior across implementations. <strong>Hashing it first</strong> collapses arbitrary key length into 32 bytes while preserving all entropy.',
+    'Padding short keys with zeros is safe because the XOR steps that follow (ipad/opad) will "activate" all 64 bytes regardless — zero bytes just pass through the XOR unchanged.'
+  );
+  steps.push(makeStep(1,'Key Preparation','PADDING','badge-pad', s1));
+
+  // STEP 2
+  let s2 = `<p class="step-desc">XOR every byte of the padded key with <code>ipad = 0x36</code> to produce the <em>inner key</em>. This is the key material used for the first hash pass.</p>
+    ${buildXORVisual(keyPadded, IPAD, innerKey, 'ipad')}
+    <div class="divider"></div>${dr('inner key', toHexSpaced(innerKey, 20), 'orange')}`;
+  s2 += why('Why XOR with ipad?',
+    'XOR with a constant <strong>domain-separates</strong> the inner key from the outer key. If both hash passes used the raw key, they would be algebraically related — an attacker who observes the output of one pass could potentially manipulate the other.',
+    'The constant <code>0x36</code> was chosen by HMAC\'s designers (Bellare, Canetti, Krawczyk, 1996) to maximize the <strong>Hamming distance</strong> between the two derived keys: <code>0x36 XOR 0x5C = 0x6A</code> — every bit position differs between ipad and opad.',
+    'This makes the inner key and outer key <strong>completely independent</strong> from any algebraic standpoint — knowing one gives you no information about the other without knowing the original key.'
+  );
+  s2 += attack('Attack prevented: Related-key attack',
+    'Without domain separation, both passes share the same key context. A related-key attack exploits algebraic structure between two keys used in the same cipher — an attacker could craft pairs of messages with <strong>predictable HMAC relationships</strong>.',
+    'The ipad/opad separation severs this relationship entirely.'
+  );
+  steps.push(makeStep(2,'Key XOR ipad → inner key','XOR','badge-xor', s2));
+
+  // STEP 3
+  let s3 = `<p class="step-desc">XOR every byte of the padded key with <code>opad = 0x5C</code> to produce the <em>outer key</em>. This is used only in the second hash pass — it never touches the message directly.</p>
+    ${buildXORVisual(keyPadded, OPAD, outerKey, 'opad')}
+    <div class="divider"></div>${dr('outer key', toHexSpaced(outerKey, 20), 'orange')}`;
+  s3 += why('Why a separate outer key?',
+    'HMAC deliberately uses <strong>two different derived keys</strong> for two independent hash passes. The outer key is only used in the final "wrapping" hash — it never sees the message plaintext.',
+    'This two-key design is what gives HMAC its security proof: even if an attacker learns the inner hash value, they cannot compute the outer hash without knowing the outer key (derived from the secret).',
+    'The separation between inner and outer key also means <strong>compromising one layer doesn\'t compromise the other</strong>.'
+  );
+  steps.push(makeStep(3,'Key XOR opad → outer key','XOR','badge-xor', s3));
+
+  // STEP 4
+  let s4 = `<p class="step-desc">Prepend the inner key to the message. The concatenation <code>inner_key ∥ message</code> is the exact byte sequence that will be fed into SHA-256.</p>
+    ${dr('inner key', innerKey.length + ' bytes', 'orange')}
+    ${dr('message', `"${dec.decode(msg)}" (${msg.length} bytes)`, 'cyan')}
+    <div class="formula"><strong>inner_msg</strong> = inner_key ∥ message</div>
+    ${dr('total', `${innerMsg.length} bytes`, '')}
+    ${dr('hex preview', toHexSpaced(innerMsg, 18), '')}`;
+  s4 += why('Why prepend the key (not append)?',
+    'The key is placed <strong>before</strong> the message so that SHA-256\'s compression function is keyed from the very first block. The hash state is already "colored" by the secret key before any message bytes are processed.',
+    'Appending the key (<code>H(msg ∥ key)</code>) is insecure because SHA-256 is a <strong>Merkle–Damgård construction</strong> — if you know <code>H(msg)</code>, you can compute <code>H(msg ∥ extra)</code> without knowing <code>msg</code>. With the key appended, a forger could extend messages at will.'
+  );
+  s4 += attack('Attack prevented: Length-extension on naive H(msg ∥ key)',
+    'Merkle–Damgård hashes like SHA-256 expose their internal state in the output digest. Given <code>H(X)</code>, an attacker can compute <code>H(X ∥ padding ∥ extra)</code> for any <code>extra</code> — <strong>without knowing X</strong>.',
+    'If HMAC were just <code>SHA256(msg ∥ key)</code>, an attacker could forge MACs for extended messages. Prepending the key and then wrapping in a second hash eliminates this surface entirely.'
+  );
+  steps.push(makeStep(4,'Concatenate: inner_key ∥ message','CONCAT','badge-concat', s4));
+
+  // STEP 5
+  let s5 = `<p class="step-desc">Compute SHA-256 over the inner message. The result is a 32-byte digest that binds both the secret key and the message into a single fixed-size value.</p>
+    <div class="formula"><strong>inner_hash</strong> = SHA256(inner_key ∥ message)</div>
+    ${dr('input', `${innerMsg.length} bytes`, '')}
+    <div class="divider"></div>
+    ${dr('inner hash', toHex(innerHash), 'purple')}`;
+  s5 += why('What does the inner hash give us?',
+    'The inner hash is an <strong>authenticated digest</strong> — it encodes both the secret (via inner_key) and the message in an inseparable 32-byte fingerprint. Any change to either the key or message produces a completely different hash.',
+    'However, this 32-byte value <strong>cannot be the final HMAC</strong>. SHA-256\'s Merkle–Damgård structure means the inner hash leaks information about its internal state — specifically, an attacker knowing it could mount a length-extension attack.'
+  );
+  s5 += attack('Why inner_hash alone is insufficient',
+    'SHA-256 outputs its full compression state as the digest. An adversary who sees <code>SHA256(inner_key ∥ message)</code> can compute <code>SHA256(inner_key ∥ message ∥ padding ∥ extra)</code> for any suffix <code>extra</code> — forging valid MACs for longer messages.',
+    'This is why the inner hash must be <strong>wrapped in another keyed hash pass</strong> before being output.'
+  );
+  steps.push(makeStep(5,'SHA256(inner_key ∥ message)','HASH','badge-hash', s5));
+
+  // STEP 6
+  let s6 = `<p class="step-desc">Prepend the outer key to the inner hash. This builds the input for the final outer SHA-256 — the outer key wraps the authenticated inner digest in a second layer of key material.</p>
+    ${dr('outer key', outerKey.length + ' bytes', 'orange')}
+    ${dr('inner hash', '32 bytes', 'purple')}
+    <div class="formula"><strong>outer_msg</strong> = outer_key ∥ inner_hash</div>
+    ${dr('total', `${outerMsg.length} bytes`, '')}`;
+  s6 += why('Why wrap inner_hash with outer_key?',
+    'The outer key acts as a <strong>second independent secret</strong>. By prepending it to the inner hash, we create an input that an attacker cannot predict or manipulate without knowing the original key.',
+    'Crucially, the outer key never mixes directly with the message — it only ever sees the <strong>already-compressed inner hash</strong>. This breaks the length-extension attack surface: there is no way to extend <code>inner_hash</code> by appending to the message, because the outer hash takes only the fixed 32-byte digest as its "message" component.',
+    'The 96-byte outer_msg (64 outer_key + 32 inner_hash) is a clean, fixed-size, key-dependent input to a final hash.'
+  );
+  steps.push(makeStep(6,'Concatenate: outer_key ∥ inner_hash','CONCAT','badge-concat', s6));
+
+  // STEP 7
+  let s7 = `<p class="step-desc">The final SHA-256 of the outer message is the HMAC. This second hash pass eliminates all remaining attack surfaces and produces the cryptographically strong authenticator.</p>
+    <div class="formula"><strong>HMAC</strong> = SHA256( outer_key ∥ SHA256(inner_key ∥ message) )</div>
+    <div class="divider"></div>
+    <div class="final-output">
+      <div class="final-label">// HMAC-SHA256 Output (256 bits)</div>
+      <div class="final-val">${toHex(hmac)}</div>
+    </div>`;
+  s7 += why('Why is the full double-hash construction secure?',
+    'HMAC\'s security proof (Bellare 1996, strengthened 2006) shows that HMAC is a <strong>pseudorandom function (PRF)</strong> as long as the underlying compression function is a PRF — a much weaker assumption than collision resistance.',
+    'This means HMAC-SHA256 remains secure <strong>even if SHA-256 collisions were found</strong>, because forging an HMAC requires inverting the PRF, not finding collisions.',
+    'The double-hash structure means an attacker must break both the inner pass (which hides the key-message binding behind a compressed hash) and the outer pass (which wraps everything with a second independent key derivation) simultaneously — with no known shortcut.'
+  );
+  s7 += `<div class="why-box" style="border-left-color:var(--green)">
+    <div class="why-box-title" style="color:var(--green)">Security Properties Delivered</div>
+    <p><strong style="color:var(--green)">Integrity:</strong> Any modification to the message changes the HMAC completely (avalanche effect).</p>
+    <p><strong style="color:var(--green)">Authenticity:</strong> Only someone with the secret key can compute or verify the HMAC.</p>
+    <p><strong style="color:var(--green)">Non-repudiation (shared key):</strong> The HMAC proves the message came from a party holding the key.</p>
+    <p><strong style="color:var(--green)">Length-extension resistance:</strong> The outer hash wrapping prevents all Merkle–Damgård extension attacks.</p>
+  </div>
+  <div class="uses-grid">
+    <div class="use-chip">JWT HS256</div>
+    <div class="use-chip">AWS SigV4</div>
+    <div class="use-chip">TLS 1.2 PRF</div>
+    <div class="use-chip">Stripe Webhooks</div>
+    <div class="use-chip">TOTP / HOTP</div>
+    <div class="use-chip">Cookie signing</div>
+    <div class="use-chip">API auth keys</div>
+    <div class="use-chip">OAuth 1.0</div>
+  </div>`;
+  steps.push(makeStep(7,'SHA256(outer_key ∥ inner_hash) = HMAC','FINAL','badge-out', s7));
+
+  return steps;
+}
+
+// ── OVERVIEW NODE → STEP MAP ────────────────────────────
+const OV_MAP = ['ov1','ov2','ov3', null, 'ov4', null, 'ov5'];
+// step 7 = ov6
+
+// ── INTERACTIVE MODE CONTROLS ──────────────────────────
+function updateInteractiveUI() {
+  const total = interactiveSteps.length;
+  const idx   = currentStepIndex;
+
+  document.getElementById('currentStepNum').textContent = idx + 1;
+  document.getElementById('totalSteps').textContent = total;
+  document.getElementById('progressFill').style.width = `${((idx + 1) / total) * 100}%`;
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx === total - 1;
+  document.getElementById('nextBtn').textContent = idx === total - 1 ? 'Done' : 'Next →';
+
+  // show/hide cards
+  interactiveSteps.forEach((_, i) => {
+    const card = document.getElementById(`step${i+1}`);
+    if (!card) return;
+    if (i === idx) {
+      card.classList.remove('hidden-step');
+      card.classList.add('visible','active');
+    } else {
+      card.classList.add('hidden-step');
+      card.classList.remove('active');
+    }
+  });
+
+  // update overview
+  OV_NODES.forEach(n => document.getElementById(n.id)?.classList.remove('done','active-node','current-ov'));
+  for (let i = 0; i <= idx; i++) {
+    if (OV_MAP[i]) markOvDone(OV_MAP[i]);
+  }
+  if (idx === total - 1) markOvDone('ov6');
+  const curOv = idx === total - 1 ? 'ov6' : OV_MAP[idx];
+  if (curOv) setOvCurrent(curOv);
+
+  // scroll card into view
+  const card = document.getElementById(`step${idx+1}`);
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function navStep(dir) {
+  const newIdx = currentStepIndex + dir;
+  if (newIdx < 0 || newIdx >= interactiveSteps.length) return;
+  currentStepIndex = newIdx;
+  updateInteractiveUI();
+}
+
+document.addEventListener('keydown', e => {
+  if (currentMode !== 'step' || !interactiveSteps.length) return;
+  if (e.key === 'ArrowRight') navStep(1);
+  if (e.key === 'ArrowLeft')  navStep(-1);
+});
+
+// ── AUTO MODE ANIMATION ────────────────────────────────
+async function animateSteps(htmlSteps) {
+  const panel = document.getElementById('stepsPanel');
+  OV_NODES.forEach(n => document.getElementById(n.id)?.classList.remove('done','active-node','current-ov'));
+
+  for (let i = 0; i < htmlSteps.length; i++) {
+    panel.insertAdjacentHTML('beforeend', htmlSteps[i]);
+    const card = document.getElementById(`step${i+1}`);
+    await delay(60);
+    card.classList.add('visible');
+    if (i < htmlSteps.length - 1) card.classList.add('active');
+    if (OV_MAP[i]) markOvDone(OV_MAP[i]);
+    await delay(280);
+    if (i > 0) document.getElementById(`step${i}`)?.classList.remove('active');
+  }
+  const last = document.getElementById(`step${htmlSteps.length}`);
+  if (last) last.classList.add('active');
+  markOvDone('ov6');
+}
+
+// ── MAIN RUN ───────────────────────────────────────────
+buildOverview();
+
+async function runCompute() {
+  const key = document.getElementById('keyInput').value.trim();
+  const msg = document.getElementById('msgInput').value;
+  if (!key) { alert('Please enter a secret key.'); return; }
+
+  const btn   = document.getElementById('computeBtn');
+  const panel = document.getElementById('stepsPanel');
+  const bar   = document.getElementById('interactiveBar');
+
+  btn.disabled = true;
+  btn.textContent = 'Computing…';
+  bar.classList.remove('show');
+  interactiveSteps = [];
+  currentStepIndex = 0;
+
+  OV_NODES.forEach(n => document.getElementById(n.id)?.classList.remove('done','active-node','current-ov'));
+  panel.innerHTML = '<div class="computing">// computing HMAC-SHA256…</div>';
+
+  await delay(300);
+
+  try {
+    const data = await computeHMACSteps(key, msg);
+    const htmlSteps = buildSteps(data);
+
+    panel.innerHTML = '';
+
+    if (currentMode === 'step') {
+      // pre-render all steps hidden
+      interactiveSteps = htmlSteps;
+      htmlSteps.forEach(h => panel.insertAdjacentHTML('beforeend', h));
+      // hide all first
+      htmlSteps.forEach((_, i) => {
+        const card = document.getElementById(`step${i+1}`);
+        if (card) { card.classList.add('hidden-step'); card.classList.remove('visible','active'); }
+      });
+      // show bar and first step
+      bar.classList.add('show');
+      currentStepIndex = 0;
+      const first = document.getElementById('step1');
+      if (first) { first.classList.remove('hidden-step'); first.classList.add('visible'); }
+      updateInteractiveUI();
+    } else {
+      await animateSteps(htmlSteps);
+    }
+  } catch(e) {
+    panel.innerHTML = `<div class="placeholder"><span class="ph-icon">!</span>Error: ${e.message}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Compute HMAC';
+}
+
+window.addEventListener('load', () => setTimeout(runCompute, 400));
+
+// ── CODE TABS ──────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.ct-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ct-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[onclick="showTab('${name}')"]`).classList.add('active');
+  document.getElementById(`tab-${name}`).classList.add('active');
+}
+</script>
+</body>
+</html>
