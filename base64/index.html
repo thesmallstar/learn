@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base64 Encoding — Visual Explainer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #060a12;
+      --surface:  #0b1220;
+      --surface2: #101929;
+      --border:   #1c2e4a;
+      --border2:  #243550;
+      --cyan:     #00e5ff;
+      --green:    #00ff88;
+      --orange:   #ff7043;
+      --purple:   #bf5af2;
+      --yellow:   #ffd60a;
+      --red:      #ff4560;
+      --text:     #c0d4ec;
+      --muted:    #486080;
+      --dim:      #2a3d55;
+
+      /* Base64-specific byte colors */
+      --b1: #00e5ff;   /* byte 1 = cyan  */
+      --b2: #ff7043;   /* byte 2 = orange */
+      --b3: #bf5af2;   /* byte 3 = purple */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      background-image:
+        linear-gradient(rgba(255,214,10,0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,214,10,0.012) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 3rem 2rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .header-label { font-size: 0.65rem; letter-spacing: 0.25em; color: var(--yellow); text-transform: uppercase; margin-bottom: 0.6rem; opacity: 0.7; }
+    h1 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: #fff; letter-spacing: -0.02em; line-height: 1; }
+    h1 span { color: var(--yellow); }
+    .header-sub { margin-top: 0.8rem; font-size: 0.78rem; color: var(--muted); letter-spacing: 0.05em; }
+
+    /* ── THEORY ── */
+    .theory-wrap { max-width: 1280px; margin: 0 auto; padding: 0 3rem; }
+    .theory-section { padding: 2.5rem 0; }
+    .theory-tag { font-size: 0.58rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--yellow); opacity: 0.65; margin-bottom: 0.7rem; }
+    .theory-h2 { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 1rem; letter-spacing: -0.01em; }
+    .theory-p { font-size: 0.75rem; color: var(--muted); line-height: 1.9; max-width: 640px; margin-bottom: 0.7rem; }
+    .theory-p strong { color: var(--text); font-weight: 500; }
+    .theory-p em { color: var(--yellow); font-style: normal; }
+    .theory-divider { height: 1px; background: linear-gradient(90deg, var(--border), transparent 60%); }
+    .demo-label { font-size: 0.62rem; letter-spacing: 0.15em; color: var(--muted); padding: 1.2rem 0 0.5rem; }
+
+    .theory-grid.two-col { display: grid; grid-template-columns: 1fr 420px; gap: 2.5rem; align-items: start; }
+
+    .theory-formula-block { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.2rem; margin-top: 1.2rem; }
+    .tf-label { font-size: 0.56rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .tf-body { font-size: 0.85rem; color: var(--yellow); line-height: 1.8; margin-bottom: 0.8rem; }
+    .tf-dim { color: var(--muted); }
+    .tf-vars { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.6rem; color: var(--muted); }
+
+    .theory-compare { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.2rem; }
+    .tc-title { font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.8rem; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
+    .compare-table th { color: var(--muted); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.5rem; text-align: center; border-bottom: 1px solid var(--border); }
+    .compare-table th:first-child { text-align: left; }
+    .compare-table td { padding: 0.35rem 0.5rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--muted); font-size: 0.63rem; }
+    .compare-table td:first-child { text-align: left; color: var(--text); }
+    .compare-table td.yes { color: var(--green); }
+    .compare-table td.no  { color: var(--red); opacity: 0.7; }
+    .compare-table td.mid { color: var(--yellow); }
+
+    .use-cases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-top: 1.2rem; }
+    .uc-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.1rem; transition: border-color 0.2s; }
+    .uc-card:hover { border-color: var(--border2); }
+    .uc-icon { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .uc-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.82rem; color: #fff; margin-bottom: 0.4rem; }
+    .uc-desc { font-size: 0.65rem; color: var(--muted); line-height: 1.7; margin-bottom: 0.6rem; }
+    .uc-detail { font-size: 0.58rem; color: var(--dim); font-family: 'JetBrains Mono', monospace; word-break: break-all; line-height: 1.5; }
+
+    .code-tabs { margin-top: 1.2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .ct-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--surface2); }
+    .ct-tab { background: transparent; border: none; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; padding: 0.6rem 1.2rem; cursor: pointer; border-right: 1px solid var(--border); transition: color 0.2s, background 0.2s; }
+    .ct-tab.active { color: var(--yellow); background: rgba(255,214,10,0.05); }
+    .ct-tab:hover:not(.active) { color: var(--text); }
+    .ct-panel { display: none; padding: 1.2rem 1.5rem; font-size: 0.7rem; line-height: 1.9; color: var(--text); overflow-x: auto; white-space: pre; margin: 0; }
+    .ct-panel.active { display: block; }
+    .ck { color: var(--purple); } .cs { color: var(--green); } .cc { color: var(--muted); font-style: italic; }
+
+    .security-notes { margin-top: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.2rem 1.4rem; }
+    .sn-title { font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+    .sn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .sn-item { display: flex; gap: 0.8rem; align-items: flex-start; }
+    .sn-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 0.35rem; }
+    .sn-item strong { display: block; font-size: 0.68rem; color: var(--text); margin-bottom: 0.3rem; font-weight: 500; }
+    .sn-item p { font-size: 0.63rem; color: var(--muted); line-height: 1.7; }
+    .sn-item code { color: var(--orange); background: rgba(255,112,67,0.06); padding: 0.1em 0.3em; border-radius: 2px; font-size: 0.85em; }
+
+    /* ── MAIN DEMO LAYOUT ── */
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2rem 3rem 4rem;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* ── SIDEBAR ── */
+    .input-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; position: sticky; top: 1.5rem; }
+    .panel-title { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border); }
+    .field { margin-bottom: 1.2rem; }
+    label { display: block; font-size: 0.62rem; letter-spacing: 0.15em; color: var(--yellow); text-transform: uppercase; margin-bottom: 0.4rem; }
+    input[type="text"], select {
+      width: 100%; background: var(--bg); border: 1px solid var(--border2); color: var(--text);
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; padding: 0.6rem 0.8rem;
+      border-radius: 3px; outline: none; transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, select:focus { border-color: var(--yellow); box-shadow: 0 0 0 1px rgba(255,214,10,0.15); }
+    select option { background: var(--surface); }
+    .field-note { margin-top: 0.3rem; font-size: 0.58rem; color: var(--muted); }
+
+    button#encodeBtn {
+      width: 100%; background: var(--yellow); color: var(--bg);
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8rem;
+      letter-spacing: 0.12em; text-transform: uppercase; border: none;
+      padding: 0.75rem; border-radius: 3px; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    button#encodeBtn:hover { opacity: 0.85; }
+    button#encodeBtn:active { transform: scale(0.98); }
+
+    /* triplet overview */
+    .triplet-overview { margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
+    .ov-title { font-size: 0.58rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.8rem; }
+    .ov-triplets { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .ov-triplet {
+      font-size: 0.62rem; padding: 0.2rem 0.4rem; border-radius: 2px;
+      border: 1px solid var(--border); color: var(--muted); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ov-triplet:hover { border-color: var(--yellow); color: var(--yellow); }
+    .ov-triplet.active { border-color: var(--yellow); color: var(--bg); background: var(--yellow); }
+    .ov-triplet.done { border-color: var(--green); color: var(--green); }
+
+    /* ── MAIN AREA ── */
+    .demo-area { display: flex; flex-direction: column; gap: 1rem; }
+
+    /* nav bar */
+    .nav-bar {
+      display: none;
+      align-items: center;
+      gap: 0.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.8rem 1rem;
+    }
+    .nav-bar.show { display: flex; }
+    .progress-track { flex: 1; }
+    .progress-label { font-size: 0.65rem; color: var(--yellow); margin-bottom: 0.3rem; }
+    .progress-label span { color: var(--muted); }
+    .progress-rail { height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--yellow); border-radius: 1px; transition: width 0.4s ease; width: 0%; }
+    .nav-btn {
+      background: var(--surface2); border: 1px solid var(--border2); color: var(--text);
+      font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em;
+      padding: 0.4rem 0.8rem; border-radius: 3px; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--yellow); color: var(--yellow); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-btn.primary { background: rgba(255,214,10,0.1); border-color: var(--yellow); color: var(--yellow); }
+
+    /* triplet visualizer card */
+    .visualizer-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.35s, transform 0.35s;
+    }
+    .visualizer-card.visible { opacity: 1; transform: translateY(0); }
+
+    .vis-header {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.85rem 1.2rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .vis-triplet-num { font-size: 0.58rem; letter-spacing: 0.15em; color: var(--muted); }
+    .vis-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.85rem; color: #fff; flex: 1; }
+    .vis-chars-preview { display: flex; gap: 0.3rem; }
+    .vis-char-box {
+      width: 28px; height: 28px; border-radius: 3px; border: 1px solid;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+
+    .vis-body { padding: 1.4rem; }
+
+    /* bytes → bits → sextets visualization */
+    .bit-viz { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .bv-row { display: flex; align-items: center; gap: 0.8rem; }
+    .bv-label { width: 64px; font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; flex-shrink: 0; }
+    .bv-bytes { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .bv-byte-group { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .bv-byte-label { font-size: 0.58rem; color: var(--muted); }
+    .bv-bits { display: flex; gap: 1px; }
+    .bv-bit {
+      width: 18px; height: 22px; border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.62rem; font-weight: 500;
+      transition: background 0.4s, color 0.4s, transform 0.4s;
+    }
+    .bv-bit.b1 { background: rgba(0,229,255,0.12); color: var(--b1); }
+    .bv-bit.b2 { background: rgba(255,112,67,0.12); color: var(--b2); }
+    .bv-bit.b3 { background: rgba(191,90,242,0.12); color: var(--b3); }
+    .bv-bit.pad { background: rgba(255,255,255,0.04); color: var(--dim); }
+
+    .bv-divider { display: flex; align-items: center; gap: 0.8rem; margin: 0.2rem 0; }
+    .bv-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .bv-divider-label { font-size: 0.58rem; color: var(--muted); letter-spacing: 0.1em; white-space: nowrap; }
+
+    /* sextets row */
+    .bv-sextets { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .bv-sextet-group { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .bv-sextet-label { font-size: 0.58rem; color: var(--muted); }
+    .bv-sextet-bits { display: flex; gap: 1px; }
+    .bv-sextet-val {
+      font-size: 0.65rem; color: var(--text);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 2px; padding: 0.15rem 0.4rem; min-width: 32px; text-align: center;
+    }
+    .bv-sextet-char {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 1rem; border: 1px solid; border-radius: 3px;
+      padding: 0.15rem 0.5rem; min-width: 32px; text-align: center;
+      transition: all 0.3s;
+    }
+    .bv-sextet-char.pad-char { color: var(--dim); border-color: var(--dim); background: transparent; }
+
+    .why-box { background: rgba(255,214,10,0.03); border: 1px solid rgba(255,214,10,0.12); border-left: 3px solid var(--yellow); border-radius: 0 3px 3px 0; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .why-box-title { font-size: 0.58rem; letter-spacing: 0.2em; color: var(--yellow); text-transform: uppercase; margin-bottom: 0.5rem; }
+    .why-box p { font-size: 0.68rem; color: var(--text); line-height: 1.8; }
+    .why-box p + p { margin-top: 0.4rem; }
+    .why-box strong { color: var(--yellow); font-weight: 500; }
+    .why-box code { color: var(--green); background: rgba(0,255,136,0.06); padding: 0.1em 0.3em; border-radius: 2px; font-size: 0.85em; }
+
+    .note-box { background: rgba(0,229,255,0.03); border: 1px solid rgba(0,229,255,0.12); border-radius: 3px; padding: 0.7rem 0.9rem; margin-top: 0.8rem; font-size: 0.67rem; color: var(--muted); line-height: 1.7; }
+    .note-box strong { color: var(--cyan); font-weight: 500; }
+
+    /* alphabet table */
+    .alphabet-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .alphabet-header { padding: 0.85rem 1.2rem; background: var(--surface2); border-bottom: 1px solid var(--border); }
+    .alphabet-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.85rem; color: #fff; }
+    .alphabet-sub { font-size: 0.6rem; color: var(--muted); margin-top: 0.2rem; }
+    .alphabet-grid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 2px; padding: 1rem; }
+    .alpha-cell {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0.25rem 0; border-radius: 2px; cursor: default;
+      transition: background 0.2s;
+    }
+    .alpha-char { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.7rem; color: var(--muted); }
+    .alpha-idx { font-size: 0.45rem; color: var(--dim); }
+    .alpha-cell.highlighted .alpha-char { color: var(--yellow); }
+    .alpha-cell.highlighted { background: rgba(255,214,10,0.08); }
+    .alpha-cell.active-char .alpha-char { color: var(--bg); }
+    .alpha-cell.active-char { background: var(--yellow); border-radius: 2px; }
+
+    /* output display */
+    .output-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .output-header { padding: 0.85rem 1.2rem; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; }
+    .output-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.85rem; color: #fff; flex: 1; }
+    .output-body { padding: 1.2rem; }
+    .output-string { display: flex; flex-wrap: wrap; gap: 1px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+    .out-char { padding: 2px 1px; border-radius: 1px; transition: background 0.3s; }
+    .out-char.triplet-0 { color: var(--cyan); }
+    .out-char.triplet-1 { color: var(--orange); }
+    .out-char.triplet-2 { color: var(--purple); }
+    .out-char.triplet-3 { color: var(--yellow); }
+    .out-char.triplet-4 { color: var(--green); }
+    .out-char.active-triplet { background: rgba(255,214,10,0.15); border-radius: 2px; }
+    .out-char.pad { color: var(--dim); }
+
+    /* mode toggle in sidebar */
+    .mode-toggle { display: flex; gap: 0; margin-bottom: 0.8rem; border: 1px solid var(--border2); border-radius: 3px; overflow: hidden; }
+    .mode-btn { flex: 1; background: transparent; border: none; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem; cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .mode-btn.active { background: rgba(255,214,10,0.1); color: var(--yellow); }
+    .mode-btn:hover:not(.active) { background: rgba(255,255,255,0.03); }
+    .field-note-mode { margin-top: 0.3rem; font-size: 0.58rem; color: var(--muted); }
+
+    .placeholder { padding: 3rem 2rem; text-align: center; color: var(--dim); font-size: 0.72rem; line-height: 1.8; border: 1px dashed var(--border); border-radius: 4px; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; padding: 1.5rem; }
+      header, .theory-wrap { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .theory-grid.two-col { grid-template-columns: 1fr; }
+      .use-cases-grid { grid-template-columns: 1fr 1fr; }
+      .sn-grid { grid-template-columns: 1fr; }
+      .input-panel { position: static; }
+      .alphabet-grid { grid-template-columns: repeat(8, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .use-cases-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">Encoding / Data Representation</div>
+  <h1>Base<span>64</span></h1>
+  <div class="header-sub">Binary-to-text encoding · Interactive triplet-by-triplet visualization</div>
+</header>
+
+<!-- ── THEORY ── -->
+<div class="theory-wrap">
+
+  <section class="theory-section">
+    <div class="theory-tag">01 / What is Base64</div>
+    <div class="theory-grid two-col">
+      <div>
+        <h2 class="theory-h2">Binary data in a text-safe suit</h2>
+        <p class="theory-p">
+          Base64 is an <em>encoding scheme</em> that converts arbitrary binary data into a sequence of
+          <strong>64 printable ASCII characters</strong>. It was created to safely transmit binary content
+          through systems — like email — that only handle text.
+        </p>
+        <p class="theory-p">
+          The core trick: take <strong>3 bytes (24 bits)</strong>, split them into <strong>4 groups of 6 bits</strong>,
+          and map each 6-bit value (0–63) to a character from the Base64 alphabet
+          (A–Z, a–z, 0–9, +, /). Every 3 bytes of input become exactly 4 characters of output —
+          a <strong>33% size overhead</strong>.
+        </p>
+        <p class="theory-p">
+          Base64 is <strong>not encryption</strong>. It provides no confidentiality — anyone can decode it instantly.
+          Its purpose is purely representational: making binary data safe to embed in text contexts.
+        </p>
+        <div class="theory-formula-block">
+          <div class="tf-label">Core transformation</div>
+          <div class="tf-body">3 bytes → split 24 bits → 4 × 6-bit groups → 4 Base64 chars</div>
+          <div class="tf-vars">
+            <span>alphabet = A–Z (0–25), a–z (26–51), 0–9 (52–61), + (62), / (63)</span>
+            <span>padding = "=" appended when input length % 3 ≠ 0</span>
+            <span>overhead = ⌈n/3⌉ × 4 bytes output for n bytes input (~33%)</span>
+          </div>
+        </div>
+      </div>
+      <div class="theory-compare">
+        <div class="tc-title">Base64 vs alternatives</div>
+        <table class="compare-table">
+          <thead>
+            <tr><th></th><th>Base64</th><th>Hex</th><th>Base58</th><th>URL%enc</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Overhead</td><td class="mid">33%</td><td class="no">100%</td><td class="mid">~37%</td><td class="no">up to 200%</td></tr>
+            <tr><td>URL-safe variant</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Native</td></tr>
+            <tr><td>Human readable</td><td class="no">No</td><td class="mid">Partial</td><td class="mid">Partial</td><td class="no">No</td></tr>
+            <tr><td>Padding chars</td><td class="mid">= (1–2)</td><td class="yes">None</td><td class="yes">None</td><td class="yes">None</td></tr>
+            <tr><td>Whitespace safe</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>Common use</td><td class="yes">Widely</td><td class="mid">Debug</td><td class="mid">Crypto</td><td class="mid">URLs</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="theory-divider"></div>
+
+  <section class="theory-section">
+    <div class="theory-tag">02 / When it's used</div>
+    <h2 class="theory-h2">Real-world use cases</h2>
+    <div class="use-cases-grid">
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--yellow)">⬡</div>
+        <div class="uc-name">Data URIs</div>
+        <div class="uc-desc">Embed images, fonts, and files directly in HTML/CSS without a separate HTTP request. The browser decodes inline.</div>
+        <div class="uc-detail">src="data:image/png;base64,iVBORw0KGgo..."</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--cyan)">⬡</div>
+        <div class="uc-name">JWT Tokens</div>
+        <div class="uc-desc">All three parts of a JWT (header, payload, signature) are Base64URL encoded — making the token a safe single-line string.</div>
+        <div class="uc-detail">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIn0.sig</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--orange)">⬡</div>
+        <div class="uc-name">HTTP Basic Auth</div>
+        <div class="uc-desc">Credentials in HTTP Basic Auth are Base64-encoded (not encrypted!) and sent in the Authorization header.</div>
+        <div class="uc-detail">Authorization: Basic dXNlcjpwYXNzd29yZA==</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--purple)">⬡</div>
+        <div class="uc-name">Email Attachments</div>
+        <div class="uc-desc">MIME email encodes binary attachments as Base64 so they survive the text-only SMTP protocol intact.</div>
+        <div class="uc-detail">Content-Transfer-Encoding: base64</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--green)">⬡</div>
+        <div class="uc-name">API Keys & Tokens</div>
+        <div class="uc-desc">Random bytes from a CSPRNG are Base64-encoded to produce the printable API keys and secrets you copy from dashboards.</div>
+        <div class="uc-detail">sk_live_4dF3...  ← 32 random bytes → Base64</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-icon" style="color:var(--red)">⬡</div>
+        <div class="uc-name">JSON Payloads</div>
+        <div class="uc-desc">Binary blobs (images, certificates, keys) embedded in JSON must be Base64 since JSON has no native binary type.</div>
+        <div class="uc-detail">{ "cert": "MIIBIjANBgkqhkiG9w0B..." }</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="theory-divider"></div>
+
+  <section class="theory-section">
+    <div class="theory-tag">03 / How it's used in code</div>
+    <h2 class="theory-h2">Implementation in 3 languages</h2>
+    <div class="code-tabs">
+      <div class="ct-tabs">
+        <button class="ct-tab active" onclick="showTab('node')">Node.js</button>
+        <button class="ct-tab" onclick="showTab('python')">Python</button>
+        <button class="ct-tab" onclick="showTab('go')">Go</button>
+      </div>
+      <div>
+        <pre class="ct-panel active" id="tab-node"><code><span class="cc">// Standard Base64</span>
+<span class="ck">const</span> encoded = Buffer.from(<span class="cs">'Hello, World!'</span>).toString(<span class="cs">'base64'</span>);
+<span class="cc">// → 'SGVsbG8sIFdvcmxkIQ=='</span>
+
+<span class="ck">const</span> decoded = Buffer.from(encoded, <span class="cs">'base64'</span>).toString(<span class="cs">'utf8'</span>);
+<span class="cc">// → 'Hello, World!'</span>
+
+<span class="cc">// URL-safe Base64 (no + / or padding)</span>
+<span class="ck">const</span> urlSafe = Buffer.from(<span class="cs">'Hello, World!'</span>)
+  .toString(<span class="cs">'base64url'</span>);
+<span class="cc">// → 'SGVsbG8sIFdvcmxkIQ'</span>
+
+<span class="cc">// Encode binary (e.g. random bytes for an API key)</span>
+<span class="ck">import</span> { randomBytes } <span class="ck">from</span> <span class="cs">'crypto'</span>;
+<span class="ck">const</span> apiKey = randomBytes(<span class="cs">32</span>).toString(<span class="cs">'base64url'</span>);</code></pre>
+
+        <pre class="ct-panel" id="tab-python"><code><span class="ck">import</span> base64
+
+<span class="cc"># Standard Base64</span>
+encoded = base64.b64encode(<span class="cs">b'Hello, World!'</span>)
+<span class="cc"># → b'SGVsbG8sIFdvcmxkIQ=='</span>
+
+decoded = base64.b64decode(encoded).decode(<span class="cs">'utf-8'</span>)
+<span class="cc"># → 'Hello, World!'</span>
+
+<span class="cc"># URL-safe Base64 (replaces + → -, / → _)</span>
+url_safe = base64.urlsafe_b64encode(<span class="cs">b'Hello, World!'</span>)
+<span class="cc"># → b'SGVsbG8sIFdvcmxkIQ=='</span>
+
+<span class="cc"># Strip padding for tokens</span>
+token = base64.urlsafe_b64encode(
+    secrets.token_bytes(<span class="cs">32</span>)
+).rstrip(<span class="cs">b'='</span>).decode()</code></pre>
+
+        <pre class="ct-panel" id="tab-go"><code><span class="ck">import</span> <span class="cs">"encoding/base64"</span>
+
+<span class="cc">// Standard Base64</span>
+encoded := base64.StdEncoding.EncodeToString([]byte(<span class="cs">"Hello, World!"</span>))
+<span class="cc">// → "SGVsbG8sIFdvcmxkIQ=="</span>
+
+decoded, err := base64.StdEncoding.DecodeString(encoded)
+<span class="cc">// → []byte("Hello, World!")</span>
+
+<span class="cc">// URL-safe Base64 (safe in URLs and filenames)</span>
+urlSafe := base64.URLEncoding.EncodeToString([]byte(<span class="cs">"Hello, World!"</span>))
+
+<span class="cc">// No padding variant (common for tokens)</span>
+raw := base64.RawURLEncoding.EncodeToString([]byte(<span class="cs">"Hello, World!"</span>))
+<span class="cc">// → "SGVsbG8sIFdvcmxkIQ"</span></code></pre>
+      </div>
+    </div>
+
+    <div class="security-notes">
+      <div class="sn-title">// Common mistakes</div>
+      <div class="sn-grid">
+        <div class="sn-item">
+          <div class="sn-dot" style="background:var(--red)"></div>
+          <div>
+            <strong>Base64 ≠ encryption</strong>
+            <p>Base64 is trivially reversible by anyone. Never use it to "hide" passwords, secrets, or sensitive data. Use proper encryption (AES-GCM) or hashing (bcrypt) for those.</p>
+          </div>
+        </div>
+        <div class="sn-item">
+          <div class="sn-dot" style="background:var(--orange)"></div>
+          <div>
+            <strong>Standard vs URL-safe variant</strong>
+            <p>Standard Base64 uses <code>+</code> and <code>/</code> which are special in URLs. Use <code>base64url</code> (replaces them with <code>-</code> and <code>_</code>) for JWTs, tokens, and anything in a URL or filename.</p>
+          </div>
+        </div>
+        <div class="sn-item">
+          <div class="sn-dot" style="background:var(--yellow)"></div>
+          <div>
+            <strong>Padding issues</strong>
+            <p>Some systems strip <code>=</code> padding; others require it. When comparing or parsing Base64 tokens, normalize padding first. <code>RawEncoding</code> variants omit it entirely.</p>
+          </div>
+        </div>
+        <div class="sn-item">
+          <div class="sn-dot" style="background:var(--cyan)"></div>
+          <div>
+            <strong>Size overhead in hot paths</strong>
+            <p>Base64 inflates data by ~33%. Avoid repeatedly encoding large binaries (e.g. images) in tight loops. Encode once, cache, or stream. Use binary protocols (protobuf, MessagePack) when size matters.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="theory-divider"></div>
+  <div class="demo-label">// Interactive Demo — watch each byte triplet transform into 4 Base64 characters</div>
+</div>
+
+<!-- ── DEMO ── -->
+<main>
+  <aside>
+    <div class="input-panel">
+      <div class="panel-title">// Encoder</div>
+
+      <div class="field">
+        <label>Input Text</label>
+        <input type="text" id="inputText" value="Man" placeholder="enter text to encode" autocomplete="off">
+        <div class="field-note">Try short words to see full triplets.</div>
+      </div>
+
+      <div class="field">
+        <label>Variant</label>
+        <select id="variantSelect">
+          <option value="standard">Standard (+ /)</option>
+          <option value="urlsafe">URL-safe (- _)</option>
+        </select>
+        <div class="field-note">URL-safe replaces + → - and / → _</div>
+      </div>
+
+      <div class="field">
+        <label>Mode</label>
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="modeAuto" onclick="setMode('auto')">Auto</button>
+          <button class="mode-btn" id="modeStep" onclick="setMode('step')">Step</button>
+        </div>
+        <div class="field-note-mode" id="modeNote">All triplets encode automatically.</div>
+      </div>
+
+      <button id="encodeBtn" onclick="runEncode()">Encode</button>
+
+      <div class="triplet-overview">
+        <div class="ov-title">// Triplets</div>
+        <div class="ov-triplets" id="ovTriplets"></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="demo-area" id="demoArea">
+    <div class="placeholder" id="placeholder">
+      <div style="font-size:2rem;opacity:0.3;margin-bottom:0.8rem">⬡</div>
+      Enter text and click <strong>Encode</strong> to watch each 3-byte triplet transform into 4 Base64 characters — bit by bit.
+    </div>
+  </div>
+</main>
+
+<script>
+const B64_STD = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+const B64_URL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+let currentMode  = 'auto';
+let allTriplets  = [];
+let currentIdx   = 0;
+let alphabet     = B64_STD;
+
+function setMode(m) {
+  currentMode = m;
+  document.getElementById('modeAuto').classList.toggle('active', m === 'auto');
+  document.getElementById('modeStep').classList.toggle('active', m === 'step');
+  document.getElementById('modeNote').textContent =
+    m === 'auto' ? 'All triplets encode automatically.' : 'You control each triplet.';
+}
+
+function showTab(name) {
+  document.querySelectorAll('.ct-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ct-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ── COMPUTE TRIPLETS ───────────────────────────────────
+function computeTriplets(text, urlsafe) {
+  alphabet = urlsafe ? B64_URL : B64_STD;
+  const bytes = new TextEncoder().encode(text);
+  const triplets = [];
+
+  for (let i = 0; i < bytes.length; i += 3) {
+    const b0 = bytes[i];
+    const b1 = i + 1 < bytes.length ? bytes[i + 1] : null;
+    const b2 = i + 2 < bytes.length ? bytes[i + 2] : null;
+
+    const packed = ((b0 & 0xFF) << 16) | (((b1 ?? 0) & 0xFF) << 8) | ((b2 ?? 0) & 0xFF);
+
+    const s0 = (packed >> 18) & 0x3F;
+    const s1 = (packed >> 12) & 0x3F;
+    const s2 = (packed >> 6)  & 0x3F;
+    const s3 =  packed        & 0x3F;
+
+    const padding = b1 === null ? 2 : b2 === null ? 1 : 0;
+
+    triplets.push({
+      index: triplets.length,
+      bytes: [b0, b1, b2],
+      sextets: [s0, s1, s2, s3],
+      chars: [
+        alphabet[s0],
+        alphabet[s1],
+        b1 !== null ? alphabet[s2] : '=',
+        b2 !== null ? alphabet[s3] : '=',
+      ],
+      padding,
+    });
+  }
+  return triplets;
+}
+
+// ── BIT HELPERS ────────────────────────────────────────
+function byteBits(b) {
+  if (b === null) return Array(8).fill(null);
+  return Array.from({length: 8}, (_, i) => (b >> (7 - i)) & 1);
+}
+
+function sextetBits(v) {
+  return Array.from({length: 6}, (_, i) => (v >> (5 - i)) & 1);
+}
+
+// Which original byte does each bit of a sextet come from?
+// Byte layout in 24-bit: b0=bits23-16, b1=bits15-8, b2=bits7-0
+// Sextet 0: bits 23-18 → byte 0
+// Sextet 1: bits 17-12 → bits 17-16 from byte0, bits 15-12 from byte1
+// Sextet 2: bits 11-6  → bits 11-8 from byte1, bits 7-6 from byte2
+// Sextet 3: bits  5-0  → byte 2
+function sextetBitSources(sextIdx) {
+  // returns array of 'b1'|'b2'|'b3'|'pad' for each of 6 bits
+  const map = {
+    0: ['b1','b1','b1','b1','b1','b1'],
+    1: ['b1','b1','b2','b2','b2','b2'],
+    2: ['b2','b2','b2','b2','b3','b3'],
+    3: ['b3','b3','b3','b3','b3','b3'],
+  };
+  return map[sextIdx];
+}
+
+// ── CHAR COLORS ────────────────────────────────────────
+const SEXTET_COLORS = ['var(--b1)', 'var(--cyan)', 'var(--b2)', 'var(--b3)'];
+// approximate: s0=b1 color, s1=mixed→cyan, s2=mixed→orange, s3=b3 color
+function sextetColor(idx, hasByte) {
+  if (!hasByte) return 'var(--dim)';
+  return SEXTET_COLORS[idx];
+}
+
+// ── BUILD VISUALIZER CARD ──────────────────────────────
+function buildTripletCard(t) {
+  const { index, bytes, sextets, chars, padding } = t;
+  const [b0, b1, b2] = bytes;
+  const urlsafe = document.getElementById('variantSelect').value === 'urlsafe';
+
+  // Header chars preview
+  const charBoxes = chars.map((c, ci) => {
+    const color = sextetColor(ci, ci === 0 ? true : ci === 1 ? b1 !== null : ci === 2 ? b1 !== null : b2 !== null);
+    const isPad = c === '=';
+    return `<div class="vis-char-box" style="color:${isPad ? 'var(--dim)' : color}; border-color:${isPad ? 'var(--dim)' : color}; background:${isPad ? 'transparent' : color.replace(')', ',0.08)').replace('var(','rgba(').replace(',0.08)','') + '1a)'}">${c}</div>`;
+  }).join('');
+
+  // Byte rows
+  function byteRow(b, cls, label, charLabel) {
+    if (b === null) {
+      return `<div class="bv-byte-group">
+        <div class="bv-byte-label">${label}</div>
+        <div class="bv-bits">${Array(8).fill(0).map(() => `<div class="bv-bit pad">0</div>`).join('')}</div>
+        <div class="bv-byte-label" style="color:var(--dim)">${charLabel || '(pad)'}</div>
+      </div>`;
+    }
+    const bits = byteBits(b);
+    const charDisp = (b >= 32 && b < 127) ? `'${String.fromCharCode(b)}'` : `0x${b.toString(16).padStart(2,'0')}`;
+    return `<div class="bv-byte-group">
+      <div class="bv-byte-label">${label}</div>
+      <div class="bv-bits">${bits.map(bit => `<div class="bv-bit ${cls}">${bit}</div>`).join('')}</div>
+      <div class="bv-byte-label" style="color:var(--${cls === 'b1' ? 'cyan' : cls === 'b2' ? 'orange' : 'purple'})">${charDisp} = ${b}</div>
+    </div>`;
+  }
+
+  // Sextets
+  const sextGroups = sextets.map((sv, si) => {
+    const sources = sextetBitSources(si);
+    const bits = sextetBits(sv);
+    const hasByte = si === 0 ? true : si === 1 ? b1 !== null : si === 2 ? b1 !== null : b2 !== null;
+    const isPad = chars[si] === '=';
+    const color = sextetColor(si, hasByte);
+    const bitsHtml = bits.map((bit, bi) => {
+      const src = sources[bi];
+      return `<div class="bv-bit ${src}" style="${isPad ? 'opacity:0.3' : ''}">${bit}</div>`;
+    }).join('');
+    return `<div class="bv-sextet-group">
+      <div class="bv-sextet-label">sextet ${si}</div>
+      <div class="bv-sextet-bits">${bitsHtml}</div>
+      <div class="bv-sextet-val">${isPad ? '–' : sv}</div>
+      <div class="bv-sextet-char ${isPad ? 'pad-char' : ''}" style="${isPad ? '' : `color:${color};border-color:${color};background:${color.replace('var(--','').replace(')','') === 'dim' ? 'transparent' : color + '1a'}`}">${chars[si]}</div>
+    </div>`;
+  }).join('');
+
+  // Why box content
+  let whyContent = `<p>Every 3 bytes of input are packed into a single <strong>24-bit integer</strong>, then sliced into four <strong>6-bit values</strong>. Each 6-bit value (0–63) maps directly to one of the 64 printable characters in the Base64 alphabet.</p>
+    <p>This is why Base64 has a fixed <strong>4/3 ratio</strong>: 3 bytes always produce exactly 4 characters. The 6-bit grouping was chosen because <code>2⁶ = 64</code> — the largest power of 2 that maps cleanly to printable ASCII without control characters or whitespace.</p>`;
+
+  let paddingNote = '';
+  if (padding > 0) {
+    paddingNote = `<div class="note-box"><strong>Padding:</strong> This triplet has only ${3 - padding} byte${3-padding>1?'s':''} (${(3-padding)*8} bits). The missing ${padding} byte${padding>1?'s are':' is'} treated as zero and ${padding} <code>=</code> character${padding>1?'s are':' is'} appended to maintain the 4-character block size. This lets decoders know exactly how many real bytes to expect at the end.</div>`;
+  }
+
+  return `<div class="visualizer-card" id="tcard-${index}">
+    <div class="vis-header">
+      <span class="vis-triplet-num">TRIPLET ${index + 1}</span>
+      <span class="vis-title">3 bytes → 4 characters</span>
+      <div class="vis-chars-preview">${charBoxes}</div>
+    </div>
+    <div class="vis-body">
+      <div class="bit-viz">
+        <div class="bv-row">
+          <span class="bv-label">input bytes</span>
+          <div class="bv-bytes">
+            ${byteRow(b0, 'b1', 'byte 1', null)}
+            ${byteRow(b1, 'b2', 'byte 2', null)}
+            ${byteRow(b2, 'b3', 'byte 3', padding > 0 ? `(zero pad)` : null)}
+          </div>
+        </div>
+        <div class="bv-divider">
+          <div class="bv-divider-line"></div>
+          <span class="bv-divider-label">regroup 24 bits into 4 × 6-bit sextets ↓</span>
+          <div class="bv-divider-line"></div>
+        </div>
+        <div class="bv-row">
+          <span class="bv-label">sextets</span>
+          <div class="bv-sextets">${sextGroups}</div>
+        </div>
+      </div>
+      <div class="why-box">
+        <div class="why-box-title">Why this transformation?</div>
+        ${whyContent}
+      </div>
+      ${paddingNote}
+    </div>
+  </div>`;
+}
+
+// ── BUILD ALPHABET CARD ────────────────────────────────
+function buildAlphabetCard(highlightedIndices) {
+  const cells = Array.from(alphabet).map((c, i) => {
+    const isHL = highlightedIndices.includes(i);
+    return `<div class="alpha-cell ${isHL ? 'highlighted' : ''}" id="alpha-${i}">
+      <span class="alpha-char">${c}</span>
+      <span class="alpha-idx">${i}</span>
+    </div>`;
+  }).join('');
+
+  return `<div class="alphabet-card" id="alphabetCard">
+    <div class="alphabet-header">
+      <div class="alphabet-title">Base64 Alphabet</div>
+      <div class="alphabet-sub">64 characters · indices 0–63 · highlighted = used in current triplet</div>
+    </div>
+    <div class="alphabet-grid">${cells}</div>
+  </div>`;
+}
+
+function updateAlphabetHighlight(triplet) {
+  // Reset all
+  document.querySelectorAll('.alpha-cell').forEach(el => {
+    el.classList.remove('highlighted', 'active-char');
+  });
+  triplet.sextets.forEach((sv, si) => {
+    if (triplet.chars[si] === '=') return;
+    const el = document.getElementById('alpha-' + sv);
+    if (el) el.classList.add('highlighted');
+  });
+}
+
+// ── BUILD OUTPUT CARD ──────────────────────────────────
+function buildOutputCard(triplets, activeTripletIdx) {
+  const allChars = triplets.flatMap((t, ti) =>
+    t.chars.map((c, ci) => {
+      const colorIdx = ti % 5;
+      const isPad = c === '=';
+      const isActive = ti === activeTripletIdx;
+      return `<span class="out-char ${isPad ? 'pad' : 'triplet-' + colorIdx} ${isActive ? 'active-triplet' : ''}">${c}</span>`;
+    })
+  ).join('');
+
+  const fullStr = triplets.flatMap(t => t.chars).join('');
+
+  return `<div class="output-card" id="outputCard">
+    <div class="output-header">
+      <span class="output-title">Encoded Output</span>
+      <span style="font-size:0.62rem;color:var(--muted)">${fullStr.length} chars for ${new TextEncoder().encode(document.getElementById('inputText').value).length} bytes</span>
+    </div>
+    <div class="output-body">
+      <div class="output-string">${allChars}</div>
+    </div>
+  </div>`;
+}
+
+function updateOutputActive(activeTripletIdx) {
+  document.querySelectorAll('.out-char').forEach(el => el.classList.remove('active-triplet'));
+  const total = allTriplets[activeTripletIdx]?.chars.length ?? 0;
+  const startChar = allTriplets.slice(0, activeTripletIdx).reduce((sum, t) => sum + t.chars.length, 0);
+  document.querySelectorAll('.out-char').forEach((el, i) => {
+    if (i >= startChar && i < startChar + 4) el.classList.add('active-triplet');
+  });
+}
+
+// ── OVERVIEW ──────────────────────────────────────────
+function buildOverview(triplets) {
+  const el = document.getElementById('ovTriplets');
+  el.innerHTML = triplets.map((t, i) =>
+    `<div class="ov-triplet" id="ov-${i}" onclick="jumpToTriplet(${i})">${t.chars.join('')}</div>`
+  ).join('');
+}
+
+function setOvActive(idx) {
+  document.querySelectorAll('.ov-triplet').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+    if (i < idx) el.classList.add('done');
+  });
+}
+
+function jumpToTriplet(idx) {
+  currentIdx = idx;
+  showTriplet(idx);
+  updateNavBar();
+}
+
+// ── RENDER TRIPLET ─────────────────────────────────────
+function showTriplet(idx) {
+  // Remove old visualizer(s), keep nav/alphabet/output
+  document.querySelectorAll('.visualizer-card').forEach(el => el.remove());
+
+  const area = document.getElementById('demoArea');
+  const navBar = document.getElementById('navBar');
+  const alphabetEl = document.getElementById('alphabetCard');
+  const outputEl = document.getElementById('outputCard');
+
+  // Insert triplet card before alphabet
+  const html = buildTripletCard(allTriplets[idx]);
+  if (alphabetEl) {
+    alphabetEl.insertAdjacentHTML('beforebegin', html);
+  } else {
+    area.insertAdjacentHTML('beforeend', html);
+  }
+
+  // Animate in
+  requestAnimationFrame(() => {
+    const card = document.getElementById('tcard-' + idx);
+    if (card) {
+      requestAnimationFrame(() => card.classList.add('visible'));
+    }
+  });
+
+  // Update alphabet
+  updateAlphabetHighlight(allTriplets[idx]);
+
+  // Update output highlight
+  updateOutputActive(idx);
+
+  // Update overview
+  setOvActive(idx);
+}
+
+// ── NAV BAR ───────────────────────────────────────────
+function updateNavBar() {
+  const bar = document.getElementById('navBar');
+  if (!bar) return;
+  const total = allTriplets.length;
+  document.getElementById('navCurrent').textContent = currentIdx + 1;
+  document.getElementById('navTotal').textContent = total;
+  document.getElementById('progressFill').style.width = `${((currentIdx + 1) / total) * 100}%`;
+  document.getElementById('prevBtn').disabled = currentIdx === 0;
+  document.getElementById('nextBtn').disabled = currentIdx === total - 1;
+  document.getElementById('nextBtn').textContent = currentIdx === total - 1 ? 'Done' : 'Next →';
+}
+
+function navStep(dir) {
+  const newIdx = currentIdx + dir;
+  if (newIdx < 0 || newIdx >= allTriplets.length) return;
+  currentIdx = newIdx;
+  showTriplet(currentIdx);
+  updateNavBar();
+}
+
+document.addEventListener('keydown', e => {
+  if (currentMode !== 'step' || !allTriplets.length) return;
+  if (e.key === 'ArrowRight') navStep(1);
+  if (e.key === 'ArrowLeft')  navStep(-1);
+});
+
+// ── MAIN RUN ──────────────────────────────────────────
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function runEncode() {
+  const text    = document.getElementById('inputText').value;
+  const urlsafe = document.getElementById('variantSelect').value === 'urlsafe';
+  if (!text) return;
+
+  const btn  = document.getElementById('encodeBtn');
+  const area = document.getElementById('demoArea');
+  btn.disabled = true;
+  btn.textContent = 'Encoding…';
+
+  allTriplets = computeTriplets(text, urlsafe);
+  currentIdx  = 0;
+  alphabet    = urlsafe ? B64_URL : B64_STD;
+
+  // Rebuild area
+  area.innerHTML = '';
+
+  // Build static parts: nav bar, output, alphabet
+  const navBarHtml = `<div class="nav-bar ${currentMode === 'step' ? 'show' : ''}" id="navBar">
+    <div class="progress-track">
+      <div class="progress-label">Triplet <strong id="navCurrent">1</strong><span> / <span id="navTotal">${allTriplets.length}</span></span></div>
+      <div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <span style="font-size:0.58rem;color:var(--dim)">← → keys</span>
+    <button class="nav-btn" id="prevBtn" onclick="navStep(-1)" disabled>← Prev</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="navStep(1)">Next →</button>
+  </div>`;
+
+  area.innerHTML = navBarHtml
+    + buildAlphabetCard([])
+    + buildOutputCard(allTriplets, 0);
+
+  buildOverview(allTriplets);
+
+  if (currentMode === 'step') {
+    showTriplet(0);
+    updateNavBar();
+  } else {
+    // Auto: step through all triplets
+    for (let i = 0; i < allTriplets.length; i++) {
+      currentIdx = i;
+      showTriplet(i);
+      await delay(i === 0 ? 200 : 600);
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Encode';
+}
+
+window.addEventListener('load', () => setTimeout(runEncode, 400));
+</script>
+</body>
+</html>
