@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gzip Compression — Visual Explainer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#060a12;--surface:#0b1220;--surface2:#101929;--border:#1c2e4a;--border2:#243550;--cyan:#00e5ff;--green:#00ff88;--orange:#ff7043;--purple:#bf5af2;--yellow:#ffd60a;--red:#ff4560;--text:#c0d4ec;--muted:#486080;--dim:#2a3d55}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;min-height:100vh;background-image:linear-gradient(rgba(0,229,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.015) 1px,transparent 1px);background-size:40px 40px}
+    ::-webkit-scrollbar{width:6px;height:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+    header{border-bottom:1px solid var(--border);padding:2.5rem 3rem 2rem;max-width:1280px;margin:0 auto}
+    .header-label{font-size:.65rem;letter-spacing:.25em;color:var(--cyan);text-transform:uppercase;margin-bottom:.6rem;opacity:.7}
+    h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1}
+    h1 span{color:var(--cyan)}
+    .header-sub{margin-top:.8rem;font-size:.78rem;color:var(--muted);letter-spacing:.05em}
+    main{max-width:1280px;margin:0 auto;padding:2rem 3rem 4rem;display:grid;grid-template-columns:340px 1fr;gap:2rem;align-items:start}
+    .input-panel{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.5rem;position:sticky;top:1.5rem}
+    .panel-title{font-size:.6rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:1px solid var(--border)}
+    .field{margin-bottom:1.2rem}
+    label{display:block;font-size:.62rem;letter-spacing:.15em;color:var(--cyan);text-transform:uppercase;margin-bottom:.4rem}
+    textarea{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.75rem;padding:.6rem .8rem;border-radius:3px;outline:none;transition:border-color .2s;resize:vertical;min-height:72px;line-height:1.6}
+    textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(0,229,255,.12)}
+    .field-note{margin-top:.3rem;font-size:.58rem;color:var(--muted)}
+    .mode-toggle{display:flex;border:1px solid var(--border2);border-radius:3px;overflow:hidden;margin-bottom:.8rem}
+    .mode-btn{flex:1;background:transparent;border:none;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;padding:.5rem;cursor:pointer;transition:all .2s}
+    .mode-btn.active{background:rgba(0,229,255,.1);color:var(--cyan)}
+    .mode-btn:hover:not(.active){background:rgba(255,255,255,.03)}
+    button#computeBtn{width:100%;background:var(--cyan);color:var(--bg);font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;border:none;padding:.75rem;border-radius:3px;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:.4rem}
+    button#computeBtn:hover{opacity:.88}button#computeBtn:active{transform:scale(.98)}
+    .overview{margin-top:1.6rem;padding-top:1.2rem;border-top:1px solid var(--border)}
+    .ov-title{font-size:.58rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:1rem}
+    .ov-node{display:flex;align-items:center;gap:.6rem;padding:.4rem .6rem;border-radius:3px;font-size:.65rem;cursor:pointer;transition:background .2s}
+    .ov-node:hover{background:rgba(255,255,255,.03)}
+    .ov-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid currentColor;transition:background .3s}
+    .ov-connector{width:1px;height:12px;background:var(--border2);margin-left:calc(.6rem + 4px)}
+    .ov-label{color:var(--muted);transition:color .3s;font-size:.64rem}
+    .ov-node.done .ov-dot{background:currentColor}.ov-node.done .ov-label{color:var(--text)}.ov-node.cur .ov-label{color:var(--cyan)!important}
+    .steps-panel{display:flex;flex-direction:column;gap:1rem}
+    .interactive-bar{display:none;align-items:center;gap:.8rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.8rem 1rem}
+    .interactive-bar.show{display:flex}
+    .step-counter{font-size:.7rem;color:var(--cyan);flex:1}.step-counter span{color:var(--muted)}
+    .nav-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.08em;padding:.4rem .8rem;border-radius:3px;cursor:pointer;transition:border-color .2s,color .2s}
+    .nav-btn:hover:not(:disabled){border-color:var(--cyan);color:var(--cyan)}.nav-btn:disabled{opacity:.3;cursor:not-allowed}
+    .nav-btn.primary{background:rgba(0,229,255,.1);border-color:var(--cyan);color:var(--cyan)}.nav-btn.primary:disabled{opacity:.3}
+    .progress-track{height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-bottom:.5rem}
+    .progress-fill{height:100%;background:var(--cyan);border-radius:1px;transition:width .4s ease;width:0%}
+    .step-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .4s ease,border-color .3s}
+    .step-card.visible{opacity:1;transform:translateY(0)}.step-card.active{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,229,255,.06)}.step-card.hidden-step{display:none}
+    .step-header{display:flex;align-items:center;gap:1rem;padding:.9rem 1.2rem;border-bottom:1px solid var(--border);background:var(--surface2)}
+    .step-num{font-size:.58rem;letter-spacing:.15em;color:var(--muted);min-width:48px}
+    .step-name{font-family:'Syne',sans-serif;font-weight:600;font-size:.88rem;color:#fff;flex:1}
+    .step-badge{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .5rem;border-radius:2px;border:1px solid}
+    .badge-xor{color:var(--orange);border-color:var(--orange);background:rgba(255,112,67,.07)}
+    .badge-hash{color:var(--purple);border-color:var(--purple);background:rgba(191,90,242,.07)}
+    .badge-pad{color:var(--yellow);border-color:var(--yellow);background:rgba(255,214,10,.07)}
+    .badge-concat{color:var(--green);border-color:var(--green);background:rgba(0,255,136,.07)}
+    .badge-out{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,.07)}
+    .step-body{padding:1.2rem}
+    .step-desc{font-size:.7rem;color:var(--muted);line-height:1.8;margin-bottom:1rem}
+    .step-desc code{color:var(--text);background:rgba(255,255,255,.04);padding:.1em .3em;border-radius:2px}
+    .data-row{display:grid;grid-template-columns:130px 1fr;gap:.4rem;align-items:start;margin-bottom:.55rem;font-size:.68rem}
+    .data-label{color:var(--muted);padding-top:.15rem;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase}
+    .data-val{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text);word-break:break-all;line-height:1.6}
+    .data-val.cyan{color:var(--cyan)}.data-val.green{color:var(--green)}.data-val.orange{color:var(--orange)}.data-val.purple{color:var(--purple)}.data-val.yellow{color:var(--yellow)}.data-val.red{color:var(--red)}
+    .why-box{background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.12);border-left:3px solid var(--cyan);border-radius:0 3px 3px 0;padding:.8rem 1rem;margin:.9rem 0}
+    .why-box-title{font-size:.58rem;letter-spacing:.2em;color:var(--cyan);text-transform:uppercase;margin-bottom:.5rem}
+    .why-box p{font-size:.68rem;color:var(--text);line-height:1.8}.why-box p+p{margin-top:.4rem}
+    .why-box strong{color:var(--cyan);font-weight:500}.why-box code{color:var(--green);background:rgba(0,255,136,.06);padding:.1em .3em;border-radius:2px;font-size:.85em}
+    .attack-box{background:rgba(255,69,96,.04);border:1px solid rgba(255,69,96,.15);border-left:3px solid var(--red);border-radius:0 3px 3px 0;padding:.8rem 1rem;margin:.9rem 0}
+    .attack-box-title{font-size:.58rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+    .attack-box p{font-size:.68rem;color:var(--text);line-height:1.8}.attack-box strong{color:var(--red);font-weight:500}.attack-box code{color:var(--orange);background:rgba(255,112,67,.06);padding:.1em .3em;border-radius:2px;font-size:.85em}
+    .token-stream{display:flex;flex-wrap:wrap;gap:3px;margin:.8rem 0;padding:.8rem;background:var(--bg);border:1px solid var(--border);border-radius:3px;max-height:130px;overflow-y:auto}
+    .tok-lit{display:inline-block;padding:2px 5px;border-radius:2px;font-size:.68rem;background:rgba(0,229,255,.08);color:var(--cyan);border:1px solid rgba(0,229,255,.2);font-family:'JetBrains Mono',monospace}
+    .tok-space{display:inline-block;padding:2px 5px;border-radius:2px;font-size:.68rem;background:rgba(72,96,128,.12);color:var(--muted);border:1px solid var(--border);font-family:'JetBrains Mono',monospace}
+    .tok-ref{display:inline-block;padding:2px 6px;border-radius:2px;font-size:.62rem;background:rgba(255,112,67,.1);color:var(--orange);border:1px solid rgba(255,112,67,.25);font-family:'JetBrains Mono',monospace;cursor:default;white-space:nowrap}
+    .freq-table{display:flex;flex-direction:column;gap:4px;margin:.8rem 0;max-height:200px;overflow-y:auto}
+    .freq-row{display:grid;grid-template-columns:26px 1fr 36px 90px;gap:6px;align-items:center;font-size:.65rem}
+    .freq-char{color:var(--cyan);font-family:'JetBrains Mono',monospace;text-align:center;background:rgba(0,229,255,.07);padding:1px 3px;border-radius:2px;white-space:pre}
+    .freq-bar-wrap{background:var(--border);border-radius:2px;height:7px;overflow:hidden}
+    .freq-bar{height:100%;border-radius:2px}
+    .freq-count{color:var(--muted);text-align:right}
+    .freq-code{color:var(--yellow);font-family:'JetBrains Mono',monospace;font-size:.6rem}
+    .huff-codes{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:4px;margin:.8rem 0}
+    .hc-item{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:.3rem .5rem;display:flex;align-items:center;justify-content:space-between;gap:.3rem}
+    .hc-char{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--cyan);white-space:pre}
+    .hc-code{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--yellow)}.hc-bits{font-size:.56rem;color:var(--muted)}
+    .gzip-file{display:flex;flex-direction:column;gap:3px;margin:.8rem 0;font-size:.65rem;font-family:'JetBrains Mono',monospace}
+    .gf-row{display:grid;grid-template-columns:120px 100px 1fr;gap:.5rem;align-items:center;padding:.3rem .6rem;border-radius:2px}
+    .gf-field{font-size:.58rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+    .gf-hex{color:var(--orange)}.gf-desc{font-size:.62rem;color:var(--text)}
+    .gf-row.magic{background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.12)}
+    .gf-row.hdr{background:rgba(72,96,128,.06);border:1px solid var(--border)}
+    .gf-row.data{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.1)}
+    .gf-row.trail{background:rgba(255,214,10,.04);border:1px solid rgba(255,214,10,.1)}
+    .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin:.8rem 0}
+    .stat-box{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:.7rem .8rem;text-align:center}
+    .stat-val{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;color:var(--cyan)}
+    .stat-label{font-size:.56rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.2rem}
+    .final-output{background:var(--bg);border:1px solid var(--green);border-radius:4px;padding:1rem 1.2rem;margin-top:.6rem;box-shadow:0 0 24px rgba(0,255,136,.06)}
+    .final-label{font-size:.58rem;letter-spacing:.2em;color:var(--green);text-transform:uppercase;margin-bottom:.5rem}
+    .final-val{font-size:.8rem;color:var(--green);word-break:break-all;line-height:1.7}
+    .theory-wrap{max-width:1280px;margin:0 auto;padding:0 3rem}
+    .theory-section{padding:2.5rem 0}
+    .theory-tag{font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--cyan);opacity:.6;margin-bottom:.7rem}
+    .theory-h2{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:1rem;letter-spacing:-.01em}
+    .theory-p{font-size:.75rem;color:var(--muted);line-height:1.9;max-width:640px;margin-bottom:.7rem}
+    .theory-p strong{color:var(--text);font-weight:500}.theory-p em{color:var(--cyan);font-style:normal}
+    .theory-divider{height:1px;background:linear-gradient(90deg,var(--border),transparent 60%)}
+    .demo-label{font-size:.62rem;letter-spacing:.15em;color:var(--muted);padding:1.2rem 0 .5rem}
+    .theory-grid.two-col{display:grid;grid-template-columns:1fr 400px;gap:2.5rem;align-items:start}
+    .theory-formula-block{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1rem 1.2rem;margin-top:1.2rem}
+    .tf-label{font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+    .tf-body{font-size:.85rem;color:var(--cyan);line-height:1.7;margin-bottom:.8rem}
+    .tf-dim{color:var(--muted)}.tf-vars{display:flex;flex-wrap:wrap;gap:.4rem 1rem;font-size:.6rem;color:var(--muted)}
+    .theory-compare{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.2rem}
+    .tc-title{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.8rem}
+    .compare-table{width:100%;border-collapse:collapse;font-size:.65rem}
+    .compare-table th{color:var(--muted);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .5rem;text-align:center;border-bottom:1px solid var(--border)}
+    .compare-table th:first-child{text-align:left}
+    .compare-table td{padding:.35rem .5rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.03);color:var(--muted);font-size:.63rem}
+    .compare-table td:first-child{text-align:left;color:var(--text)}
+    .compare-table td.yes{color:var(--green)}.compare-table td.no{color:var(--red);opacity:.7}.compare-table td.ok{color:var(--yellow)}
+    .use-cases-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:1.2rem}
+    .uc-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1rem 1.1rem;transition:border-color .2s}
+    .uc-card:hover{border-color:var(--border2)}
+    .uc-dot{width:8px;height:8px;border-radius:50%;margin-bottom:.5rem}
+    .uc-name{font-family:'Syne',sans-serif;font-weight:600;font-size:.82rem;color:#fff;margin-bottom:.4rem}
+    .uc-desc{font-size:.65rem;color:var(--muted);line-height:1.7;margin-bottom:.5rem}
+    .uc-detail{font-size:.58rem;color:var(--dim);font-family:'JetBrains Mono',monospace;line-height:1.5;word-break:break-all}
+    .code-tabs{margin-top:1.2rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+    .ct-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface2)}
+    .ct-tab{background:transparent;border:none;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.08em;padding:.6rem 1.2rem;cursor:pointer;border-right:1px solid var(--border);transition:color .2s,background .2s}
+    .ct-tab.active{color:var(--cyan);background:rgba(0,229,255,.05)}.ct-tab:hover:not(.active){color:var(--text)}
+    .ct-panel{display:none;padding:1.2rem 1.5rem;font-size:.7rem;line-height:1.9;color:var(--text);overflow-x:auto;white-space:pre;margin:0}
+    .ct-panel.active{display:block}.ck{color:var(--purple)}.cs{color:var(--green)}.cc{color:var(--muted);font-style:italic}
+    .security-notes{margin-top:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.2rem 1.4rem}
+    .sn-title{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+    .sn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .sn-item{display:flex;gap:.8rem;align-items:flex-start}
+    .sn-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:.35rem}
+    .sn-item strong{display:block;font-size:.68rem;color:var(--text);margin-bottom:.3rem;font-weight:500}
+    .sn-item p{font-size:.63rem;color:var(--muted);line-height:1.7}
+    .sn-item code{color:var(--orange);background:rgba(255,112,67,.06);padding:.1em .3em;border-radius:2px;font-size:.85em}
+    .sn-item em{color:var(--red);font-style:normal}
+    .http-flow{display:flex;align-items:stretch;margin:1rem 0;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;flex-wrap:wrap}
+    .hf-box{padding:.8rem 1rem;flex:1;min-width:90px;border-right:1px solid var(--border)}
+    .hf-box:last-child{border-right:none}
+    .hf-label{font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+    .hf-val{font-size:.65rem;color:var(--text);line-height:1.6}
+    .perf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.8rem;margin-top:1.2rem}
+    .perf-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1rem 1.1rem}
+    .perf-card-title{font-family:'Syne',sans-serif;font-weight:600;font-size:.85rem;color:#fff;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+    .perf-card-body{font-size:.68rem;color:var(--muted);line-height:1.75}
+    .perf-card-body strong{color:var(--text)}
+    .perf-card-body code{color:var(--cyan);background:rgba(0,229,255,.06);padding:.1em .3em;border-radius:2px;font-size:.85em}
+    .level-bar{display:flex;flex-direction:column;gap:4px;margin:.8rem 0}
+    .level-row{display:grid;grid-template-columns:55px 1fr 60px 70px;gap:6px;align-items:center;font-size:.64rem}
+    .level-label{color:var(--muted);font-family:'JetBrains Mono',monospace}
+    .level-track{background:var(--border);border-radius:2px;height:7px;overflow:hidden}
+    .level-fill{height:100%;border-radius:2px;background:var(--cyan)}
+    .level-ratio{color:var(--green);text-align:right;font-family:'JetBrains Mono',monospace}
+    .level-speed{color:var(--yellow);font-size:.6rem}
+    .bench-table{width:100%;border-collapse:collapse;font-size:.68rem;margin:.8rem 0}
+    .bench-table th{text-align:left;padding:.4rem .6rem;background:var(--surface2);color:var(--muted);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--border)}
+    .bench-table td{padding:.4rem .6rem;border:1px solid var(--border);color:var(--text)}
+    .bench-table tr:hover td{background:rgba(255,255,255,.02)}
+    .g{color:var(--green)}.o{color:var(--orange)}.y{color:var(--yellow)}.r{color:var(--red)}
+    @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+    .computing{animation:pulse 1s infinite;color:var(--cyan);font-size:.72rem;padding:2rem;text-align:center}
+    @media(max-width:900px){main{grid-template-columns:1fr;padding:1.5rem}header{padding:1.5rem}.input-panel{position:static}.theory-wrap{padding:0 1.5rem}.theory-grid.two-col{grid-template-columns:1fr}.use-cases-grid{grid-template-columns:1fr 1fr}.sn-grid{grid-template-columns:1fr}}
+    @media(max-width:600px){.use-cases-grid,.perf-grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">Compression / Data Encoding</div>
+  <h1>gzip <span>Compression</span></h1>
+  <div class="header-sub">DEFLATE = LZ77 back-references + Huffman coding &middot; HTTP &amp; APIs &middot; Browser behaviour &middot; Performance &amp; compression levels</div>
+</header>
+
+<div class="theory-wrap">
+
+<!-- ══════════════════════════════════ 01 WHAT IS GZIP ══ -->
+<section class="theory-section">
+  <div class="theory-tag">01 / What is gzip</div>
+  <div class="theory-grid two-col">
+    <div>
+      <h2 class="theory-h2">Two algorithms working in sequence to shrink data</h2>
+      <p class="theory-p">gzip is a lossless compression format created in 1992 by Jean-loup Gailly and Mark Adler. Under the hood it uses the <em>DEFLATE</em> algorithm, which chains two complementary techniques: <strong>LZ77</strong> eliminates repeated substrings by replacing them with (distance, length) back-references, then <strong>Huffman coding</strong> assigns shorter bit patterns to more-frequent symbols in the resulting stream.</p>
+      <p class="theory-p">These two stages attack different kinds of redundancy. LZ77 exploits <strong>repetition across the input</strong> &mdash; a word appearing 10&times; becomes 1 literal + 9 back-references. Huffman exploits <strong>frequency imbalance</strong> &mdash; if <code style="color:var(--cyan)">'e'</code> appears far more than <code style="color:var(--cyan)">'q'</code>, assign <code style="color:var(--cyan)">'e'</code> only 2 bits and <code style="color:var(--cyan)">'q'</code> 10 bits. Together they typically compress English text to 30&ndash;70&percnt; of its original size.</p>
+      <p class="theory-p">The gzip <strong>file wrapper</strong> adds a 10-byte header (magic bytes <code style="color:var(--orange)">1f 8b</code>, compression method, flags, mtime) and appends a 4-byte CRC32 checksum plus ISIZE (original size mod 2<sup>32</sup>), enabling integrity verification and streaming decompression without seeking.</p>
+      <div class="theory-formula-block">
+        <div class="tf-label">Core pipeline</div>
+        <div class="tf-body">
+          gzip(data) = <span class="tf-dim">[10-byte header]</span> + DEFLATE(data) + <span class="tf-dim">[CRC32 + ISIZE]</span><br>
+          DEFLATE(data) = Huffman(&thinsp;LZ77(data)&thinsp;)
+        </div>
+        <div class="tf-vars">
+          <span>LZ77 &mdash; replaces repeated substrings with (distance, length) pairs</span>
+          <span>Huffman &mdash; assigns shorter codes to more-frequent symbols</span>
+          <span>CRC32 &mdash; 32-bit integrity checksum over the original bytes</span>
+          <span>ISIZE &mdash; original file size mod 2&sup3;&sup2; (for stream verification)</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="theory-compare">
+        <div class="tc-title">gzip vs other compression formats</div>
+        <table class="compare-table">
+          <thead><tr><th>Format</th><th>Algorithm</th><th>Ratio</th><th>Speed</th><th>HTTP</th></tr></thead>
+          <tbody>
+            <tr><td><strong style="color:#fff">gzip</strong></td><td>DEFLATE</td><td class="ok">Good</td><td class="yes">Fast</td><td class="yes">Universal</td></tr>
+            <tr><td>brotli</td><td>LZ77+Huffman+ctx</td><td class="yes">Better</td><td class="ok">Slower</td><td class="yes">Modern</td></tr>
+            <tr><td>zstd</td><td>ANS+LZ4</td><td class="yes">Best</td><td class="yes">Fastest</td><td class="ok">Limited</td></tr>
+            <tr><td>lz4</td><td>LZ4</td><td class="no">OK</td><td class="yes">Fastest</td><td class="no">&ndash;</td></tr>
+            <tr><td>bzip2</td><td>BWT+Huffman</td><td class="yes">Better</td><td class="no">Slow</td><td class="no">&ndash;</td></tr>
+            <tr><td>xz/lzma</td><td>LZMA2</td><td class="yes">Best</td><td class="no">Slowest</td><td class="no">&ndash;</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:1.2rem">
+          <div class="tc-title">gzip file &mdash; byte layout</div>
+          <div style="font-size:.63rem;color:var(--muted);line-height:1.9;font-family:'JetBrains Mono',monospace">
+            <span style="color:var(--cyan)">1f 8b</span>&nbsp;&nbsp;&larr; magic number (always)<br>
+            <span style="color:var(--orange)">08</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&larr; CM: deflate method<br>
+            <span style="color:var(--muted)">00</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&larr; FLG: no extra flags<br>
+            <span style="color:var(--muted)">00 00 00 00</span>&nbsp;&larr; MTIME (unix timestamp)<br>
+            <span style="color:var(--muted)">00</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&larr; XFL: 0=default, 2=max, 4=fast<br>
+            <span style="color:var(--muted)">ff</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&larr; OS: 255=unknown, 3=Unix<br>
+            <span style="color:var(--green)">.. .. ..</span>&nbsp;&nbsp;&nbsp;&larr; DEFLATE compressed data<br>
+            <span style="color:var(--yellow)">xx xx xx xx</span>&nbsp;&larr; CRC32 (little-endian)<br>
+            <span style="color:var(--purple)">xx xx xx xx</span>&nbsp;&larr; ISIZE mod 2&sup3;&sup2;
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="theory-divider"></div>
+
+<!-- ══════════════════════════════════ 02 WHEN USED ════ -->
+<section class="theory-section">
+  <div class="theory-tag">02 / When it&rsquo;s used</div>
+  <h2 class="theory-h2">Everywhere bytes move across a wire or land on disk</h2>
+  <p class="theory-p">gzip is the most ubiquitous compression format in computing. Its balance of speed, ratio, and universal runtime support makes it the default for HTTP transport, log management, data archival, and container distribution.</p>
+
+  <div class="use-cases-grid">
+    <div class="uc-card">
+      <div class="uc-dot" style="background:var(--cyan)"></div>
+      <div class="uc-name">HTTP Response Compression</div>
+      <div class="uc-desc">Browser sends <code style="color:var(--cyan)">Accept-Encoding: gzip, br</code>. Server compresses the response body and replies with <code style="color:var(--cyan)">Content-Encoding: gzip</code>. Browser decompresses transparently &mdash; JS/DOM never sees the compressed bytes.</div>
+      <div class="uc-detail">Savings: HTML ~70%, JSON ~80%, CSS/JS ~75%. Default in nginx, Apache, Caddy, Express compression(), FastAPI GZipMiddleware.</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-dot" style="background:var(--green)"></div>
+      <div class="uc-name">Static File Pre-compression</div>
+      <div class="uc-desc">Build pipelines pre-generate <code style="color:var(--green)">.gz</code> versions of every static asset. nginx <code style="color:var(--green)">gzip_static on</code> serves <code>bundle.js.gz</code> instead of <code>bundle.js</code> when the browser supports it &mdash; zero CPU per request.</div>
+      <div class="uc-detail">Webpack CompressionPlugin / Vite vite-plugin-compression: generates .gz (and .br) at build time. Saves server CPU for high-traffic static sites.</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-dot" style="background:var(--orange)"></div>
+      <div class="uc-name">Log Rotation &amp; Archival</div>
+      <div class="uc-desc">logrotate compresses rotated logs with gzip by default. Application logs are extremely compressible &mdash; repetitive timestamps, host names, log levels achieve 90&ndash;95% compression in production.</div>
+      <div class="uc-detail">/etc/logrotate.conf: compress / delaycompress. Keeps app.log.1.gz, app.log.2.gz... 10 days at ~10&times; less disk space than uncompressed.</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-dot" style="background:var(--purple)"></div>
+      <div class="uc-name">Database Backups &amp; Exports</div>
+      <div class="uc-desc">Database dumps are piped directly through gzip before writing to disk or S3 &mdash; the uncompressed dump never touches disk. SQL is extremely repetitive: keywords, column names, quotes.</div>
+      <div class="uc-detail">pg_dump mydb | gzip &gt; backup.sql.gz &mdash; streaming, no temp file. Restore: gunzip -c backup.sql.gz | psql mydb. Typical ratio: 8:1 on SQL dumps.</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-dot" style="background:var(--yellow)"></div>
+      <div class="uc-name">REST APIs &amp; gRPC</div>
+      <div class="uc-desc">Large JSON list endpoints (/users?limit=10000) compress 80%+ because JSON field names repeat on every record. gRPC supports per-message or per-channel compression. Always check if the client sends <code style="color:var(--yellow)">Accept-Encoding</code> before compressing.</div>
+      <div class="uc-detail">Express: compression() middleware. gRPC Go: grpc.WithDefaultCallOptions(grpc.UseCompressor(gzip.Name)). Only worthwhile above ~1KB.</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-dot" style="background:var(--red)"></div>
+      <div class="uc-name">Docker &amp; OCI Image Layers</div>
+      <div class="uc-desc">Docker image layers are tarballs compressed with gzip (.tar.gz). Every push/pull transfers gzip streams. The OCI spec uses gzip by default; newer tooling (containerd 1.6+) supports zstd for faster decompression on pull.</div>
+      <div class="uc-detail">node_modules layer: ~120 MB uncompressed &rarr; ~32 MB gzipped. docker inspect shows both sizes. Use .dockerignore to reduce layer content first.</div>
+    </div>
+  </div>
+
+  <!-- HTTP flow -->
+  <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:#fff;font-size:1rem;margin:2rem 0 .8rem">HTTP gzip &mdash; full request/response cycle</h3>
+  <div class="http-flow">
+    <div class="hf-box">
+      <div class="hf-label">1 &mdash; Browser</div>
+      <div class="hf-val" style="color:var(--cyan)">Accept-Encoding:<br>gzip, br, deflate</div>
+    </div>
+    <div class="hf-box">
+      <div class="hf-label">2 &mdash; Server checks</div>
+      <div class="hf-val">Client supports gzip?<br>Content-Type compressible?<br>Size &gt; threshold?</div>
+    </div>
+    <div class="hf-box">
+      <div class="hf-label">3 &mdash; Compress</div>
+      <div class="hf-val" style="color:var(--green)">DEFLATE(body)<br>+ gzip wrapper<br>CPU cost here</div>
+    </div>
+    <div class="hf-box">
+      <div class="hf-label">4 &mdash; Response headers</div>
+      <div class="hf-val" style="color:var(--orange)">Content-Encoding: gzip<br>Vary: Accept-Encoding<br>Content-Length: &lt;compressed&gt;</div>
+    </div>
+    <div class="hf-box">
+      <div class="hf-label">5 &mdash; Browser decodes</div>
+      <div class="hf-val" style="color:var(--purple)">Transparent &mdash;<br>fetch()/XHR/img<br>sees original bytes</div>
+    </div>
+    <div class="hf-box">
+      <div class="hf-label">6 &mdash; CDN cache</div>
+      <div class="hf-val" style="color:var(--text)">Stores both gzip &amp;<br>plain versions keyed<br>on Vary header</div>
+    </div>
+  </div>
+  <p class="theory-p" style="margin-top:.8rem"><strong>Do not compress:</strong> already-compressed formats (JPEG, PNG, MP4, ZIP, WebP) &mdash; they will not shrink and CPU is wasted. Set a <strong>minimum size threshold</strong> (~1&thinsp;KB) to avoid compressing tiny responses where the 18-byte gzip wrapper is disproportionately large. Always set <code style="color:var(--cyan)">Vary: Accept-Encoding</code> so CDNs cache separate gzip and plain copies.</p>
+</section>
+
+<div class="theory-divider"></div>
+
+<!-- ══════════════════════════════════ 03 CODE ═════════ -->
+<section class="theory-section">
+  <div class="theory-tag">03 / How it&rsquo;s used in code</div>
+  <h2 class="theory-h2">Compress, decompress, and stream in three languages</h2>
+  <p class="theory-p">All major runtimes ship gzip in the standard library. The golden rule: <strong>always stream</strong> &mdash; pipe data through a gzip transform rather than buffering the whole payload. For HTTP middleware, a single line enables automatic compression. For upload/ingest APIs, check <code style="color:var(--cyan)">Content-Encoding: gzip</code> and decode before processing.</p>
+
+  <div class="code-tabs">
+    <div class="ct-tabs">
+      <button class="ct-tab active" onclick="showTab(this,'node')">Node.js</button>
+      <button class="ct-tab" onclick="showTab(this,'python')">Python</button>
+      <button class="ct-tab" onclick="showTab(this,'go')">Go</button>
+    </div>
+    <div class="ct-panels">
+      <pre class="ct-panel active" id="tab-node"><code><span class="cc">// ── Compress / decompress a buffer ────────────────────────────</span>
+<span class="ck">const</span> zlib = require(<span class="cs">'zlib'</span>), { promisify } = require(<span class="cs">'util'</span>);
+<span class="ck">const</span> gzip   = promisify(zlib.gzip);
+<span class="ck">const</span> gunzip = promisify(zlib.gunzip);
+
+<span class="ck">const</span> original   = Buffer.from(<span class="cs">'Hello Hello World Hello'</span>);
+<span class="ck">const</span> compressed = <span class="ck">await</span> gzip(original, { level: 6 });      <span class="cc">// level 1-9</span>
+<span class="ck">const</span> restored   = <span class="ck">await</span> gunzip(compressed);
+console.log(compressed.length, <span class="cs">'bytes compressed'</span>);
+
+<span class="cc">// ── Stream a file (never loads fully into memory) ─────────────</span>
+<span class="ck">const</span> fs = require(<span class="cs">'fs'</span>);
+fs.createReadStream(<span class="cs">'access.log'</span>)
+  .pipe(zlib.createGzip({ level: 6 }))
+  .pipe(fs.createWriteStream(<span class="cs">'access.log.gz'</span>));
+
+<span class="cc">// ── Express: auto-compress all responses above 1 KB ───────────</span>
+<span class="ck">const</span> compression = require(<span class="cs">'compression'</span>);
+app.use(compression({ threshold: 1024, level: 6 }));
+
+<span class="cc">// ── Hono / Fastify / Next.js ───────────────────────────────────</span>
+<span class="cc">// Fastify: fastify.register(require('@fastify/compress'), { global: true })</span>
+<span class="cc">// Next.js: compress: true in next.config.js (default enabled)</span>
+
+<span class="cc">// ── Accept a gzip-encoded POST body ───────────────────────────</span>
+app.post(<span class="cs">'/ingest'</span>, (req, res) => {
+  <span class="ck">if</span> (req.headers[<span class="cs">'content-encoding'</span>] === <span class="cs">'gzip'</span>) {
+    <span class="ck">const</span> chunks = [];
+    req.pipe(zlib.createGunzip())
+      .on(<span class="cs">'data'</span>, d => chunks.push(d))
+      .on(<span class="cs">'end'</span>, () => process(Buffer.concat(chunks)));
+  }
+});
+
+<span class="cc">// ── Decompress with size limit (gzip bomb protection) ─────────</span>
+<span class="ck">const</span> safe = <span class="ck">await</span> gunzip(untrustedBuf, { maxOutputLength: 10 * 1024 * 1024 });</code></pre>
+
+      <pre class="ct-panel" id="tab-python"><code><span class="cc"># ── Compress / decompress in memory ────────────────────────────</span>
+<span class="ck">import</span> gzip
+
+original   = <span class="cs">b'Hello Hello World Hello'</span>
+compressed = gzip.compress(original, compresslevel=<span class="cs">6</span>)   <span class="cc"># 1-9</span>
+restored   = gzip.decompress(compressed)
+print(len(compressed), <span class="cs">'bytes'</span>)
+
+<span class="cc"># ── Read / write .gz files ──────────────────────────────────────</span>
+<span class="ck">with</span> gzip.open(<span class="cs">'access.log.gz'</span>, <span class="cs">'wt'</span>, compresslevel=<span class="cs">6</span>) <span class="ck">as</span> f:
+    f.write(<span class="cs">'log line\n'</span> * 100_000)
+
+<span class="ck">with</span> gzip.open(<span class="cs">'access.log.gz'</span>, <span class="cs">'rt'</span>) <span class="ck">as</span> f:   <span class="cc"># 'rt' = text, auto-decode</span>
+    <span class="ck">for</span> line <span class="ck">in</span> f:
+        process(line)
+
+<span class="cc"># ── Stream compress (no full buffer in memory) ──────────────────</span>
+<span class="ck">import</span> shutil
+<span class="ck">with</span> open(<span class="cs">'dump.sql'</span>, <span class="cs">'rb'</span>) <span class="ck">as</span> src, gzip.open(<span class="cs">'dump.sql.gz'</span>, <span class="cs">'wb'</span>) <span class="ck">as</span> dst:
+    shutil.copyfileobj(src, dst, length=<span class="cs">65536</span>)  <span class="cc"># 64 KB chunks</span>
+
+<span class="cc"># ── FastAPI middleware: auto-compress responses &gt;= 1 KB ─────────</span>
+<span class="ck">from</span> fastapi <span class="ck">import</span> FastAPI
+<span class="ck">from</span> starlette.middleware.gzip <span class="ck">import</span> GZipMiddleware
+app = FastAPI()
+app.add_middleware(GZipMiddleware, minimum_size=<span class="cs">1000</span>)
+
+<span class="cc"># ── requests: transparently decodes gzip responses ─────────────</span>
+<span class="ck">import</span> requests
+r = requests.get(<span class="cs">'https://api.example.com/data'</span>)
+print(r.text)  <span class="cc"># already decompressed; r.headers['Content-Encoding'] was 'gzip'</span>
+
+<span class="cc"># ── Decode a gzip payload (e.g. from S3 / SQS event) ───────────</span>
+<span class="ck">import</span> base64
+raw  = base64.b64decode(event[<span class="cs">'body'</span>])
+data = gzip.decompress(raw).decode(<span class="cs">'utf-8'</span>)
+
+<span class="cc"># ── Protect against gzip bombs ──────────────────────────────────</span>
+<span class="ck">import</span> io
+MAX = <span class="cs">10</span> * <span class="cs">1024</span> * <span class="cs">1024</span>   <span class="cc"># 10 MB</span>
+<span class="ck">with</span> gzip.open(io.BytesIO(untrusted_bytes)) <span class="ck">as</span> f:
+    data = f.read(MAX + <span class="cs">1</span>)
+    <span class="ck">if</span> len(data) > MAX: <span class="ck">raise</span> ValueError(<span class="cs">'gzip bomb'</span>)</code></pre>
+
+      <pre class="ct-panel" id="tab-go"><code><span class="cc">// ── Compress / decompress in memory ────────────────────────────</span>
+<span class="ck">import</span> (<span class="cs">"bytes"</span>; <span class="cs">"compress/gzip"</span>; <span class="cs">"io"</span>)
+
+<span class="ck">func</span> Compress(data []<span class="ck">byte</span>, level <span class="ck">int</span>) ([]<span class="ck">byte</span>, error) {
+    <span class="ck">var</span> buf bytes.Buffer
+    w, _ := gzip.NewWriterLevel(&amp;buf, level) <span class="cc">// gzip.BestSpeed=1 .. gzip.BestCompression=9</span>
+    defer w.Close()
+    w.Write(data)
+    w.Close()
+    return buf.Bytes(), nil
+}
+
+<span class="ck">func</span> Decompress(data []<span class="ck">byte</span>) ([]<span class="ck">byte</span>, error) {
+    r, err := gzip.NewReader(bytes.NewReader(data))
+    <span class="ck">if</span> err != nil { return nil, err }
+    defer r.Close()
+    return io.ReadAll(io.LimitReader(r, 10&lt;&lt;20)) <span class="cc">// 10 MB limit</span>
+}
+
+<span class="cc">// ── Stream a file ──────────────────────────────────────────────</span>
+src, _ := os.Open(<span class="cs">"access.log"</span>)
+dst, _ := os.Create(<span class="cs">"access.log.gz"</span>)
+w, _   := gzip.NewWriterLevel(dst, gzip.DefaultCompression)
+io.Copy(w, src); w.Close(); src.Close(); dst.Close()
+
+<span class="cc">// ── HTTP handler: decode incoming gzip body ────────────────────</span>
+<span class="ck">func</span> handler(w http.ResponseWriter, r *http.Request) {
+    body := r.Body
+    <span class="ck">if</span> r.Header.Get(<span class="cs">"Content-Encoding"</span>) == <span class="cs">"gzip"</span> {
+        gr, err := gzip.NewReader(r.Body)
+        <span class="ck">if</span> err != nil { http.Error(w, <span class="cs">"bad gzip"</span>, 400); return }
+        defer gr.Close(); body = gr
+    }
+    data, _ := io.ReadAll(io.LimitReader(body, 10&lt;&lt;20))
+    <span class="cc">// process data...</span>
+}
+
+<span class="cc">// ── HTTP handler: send gzip response ──────────────────────────</span>
+<span class="ck">if</span> strings.Contains(r.Header.Get(<span class="cs">"Accept-Encoding"</span>), <span class="cs">"gzip"</span>) {
+    w.Header().Set(<span class="cs">"Content-Encoding"</span>, <span class="cs">"gzip"</span>)
+    w.Header().Set(<span class="cs">"Vary"</span>, <span class="cs">"Accept-Encoding"</span>)
+    gz, _ := gzip.NewWriterLevel(w, gzip.DefaultCompression)
+    defer gz.Close()
+    json.NewEncoder(gz).Encode(payload)
+} else {
+    json.NewEncoder(w).Encode(payload)
+}
+<span class="cc">// Or use nytimes/gziphandler / klauspost/compress for drop-in middleware</span></code></pre>
+    </div>
+  </div>
+
+  <div class="security-notes">
+    <div class="sn-title">// Security &amp; pitfall notes</div>
+    <div class="sn-grid">
+      <div class="sn-item">
+        <div class="sn-dot" style="background:var(--red)"></div>
+        <div>
+          <strong>CRIME / BREACH attacks</strong>
+          <p><em>Never</em> compress HTTPS responses that mix <strong>secret tokens</strong> (CSRF, session IDs) with <strong>attacker-controlled input</strong> (query params, POST bodies). Compression leaks secret length via ciphertext size changes. CRIME exploits TLS-layer compression; BREACH exploits HTTP-layer. Fix: disable gzip on pages with secrets, or use per-request CSRF token masking (randomise the secret before compressing).</p>
+        </div>
+      </div>
+      <div class="sn-item">
+        <div class="sn-dot" style="background:var(--orange)"></div>
+        <div>
+          <strong>gzip bombs (decompression DoS)</strong>
+          <p>A crafted 1&thinsp;KB gzip file can expand to 1&thinsp;GB+. <em>Always</em> set a maximum decompression limit before writing to memory. Node.js: <code>gunzip(buf, {maxOutputLength: 10*1024*1024})</code>. Go: <code>io.LimitReader(r, maxBytes)</code>. Python: read incrementally and count bytes. Never decompress untrusted data without a size cap &mdash; classic DoS vector in file upload and webhook ingest endpoints.</p>
+        </div>
+      </div>
+      <div class="sn-item">
+        <div class="sn-dot" style="background:var(--cyan)"></div>
+        <div>
+          <strong>zlib &ne; gzip &ne; deflate (HTTP confusion)</strong>
+          <p>Three distinct wrappers around the same DEFLATE core. <code>gzip</code> = 10-byte header + DEFLATE + CRC32 + ISIZE. <code>zlib</code> = 2-byte header + DEFLATE + Adler-32. <code>raw deflate</code> = no wrapper. <em>HTTP&rsquo;s</em> <code>Content-Encoding: deflate</code> historically sends zlib format, not raw DEFLATE &mdash; a known ambiguity. Always use <code>Content-Encoding: gzip</code> for HTTP; every browser and CDN handles it correctly.</p>
+        </div>
+      </div>
+      <div class="sn-item">
+        <div class="sn-dot" style="background:var(--yellow)"></div>
+        <div>
+          <strong>Double-compression &amp; binary formats</strong>
+          <p>Compressing already-compressed data (JPEG, PNG, MP4, ZIP, .wasm) adds the 18-byte gzip header with zero benefit and often makes the output <em>slightly larger</em>. Check <code>Content-Type</code> before enabling middleware compression. Also: set a <code>minimum_size</code> threshold (~1&thinsp;KB) everywhere &mdash; compressing a 200-byte JSON response wastes more CPU than it saves in transfer time on modern networks.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="theory-divider"></div>
+
+<!-- ══════════════════════════════════ 04 PERFORMANCE ══ -->
+<section class="theory-section">
+  <div class="theory-tag">04 / Performance</div>
+  <h2 class="theory-h2">Compression levels, benchmarks, and when not to bother</h2>
+  <p class="theory-p">gzip exposes a <strong>compression level</strong> from 1 (fastest, worst ratio) to 9 (slowest, best ratio). Level 6 is the default &mdash; a sweet spot that gets 90% of the compression benefit at ~30% of level-9&rsquo;s CPU cost. For HTTP responses generated on demand, level 5 or 6 is almost always the right choice. For offline archival, level 9 makes sense.</p>
+
+  <div class="theory-grid two-col" style="gap:2rem">
+    <div>
+      <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:#fff;font-size:.95rem;margin-bottom:.8rem">Compression levels &mdash; ratio vs speed tradeoff</h3>
+      <div class="level-bar">
+        <div class="freq-row" style="font-size:.6rem;color:var(--muted);padding-bottom:4px;border-bottom:1px solid var(--border)">
+          <span>Level</span><span>Compression ratio</span><span>Ratio</span><span>Speed</span>
+        </div>
+        <div class="level-row"><span class="level-label">-1 (fast)</span><div class="level-track"><div class="level-fill" style="width:40%;background:var(--orange)"></div></div><span class="level-ratio" style="color:var(--orange)">~45%</span><span class="level-speed g">fastest</span></div>
+        <div class="level-row"><span class="level-label">-3</span><div class="level-track"><div class="level-fill" style="width:54%"></div></div><span class="level-ratio">~54%</span><span class="level-speed" style="color:var(--yellow)">very fast</span></div>
+        <div class="level-row"><span class="level-label">-5</span><div class="level-track"><div class="level-fill" style="width:66%"></div></div><span class="level-ratio">~62%</span><span class="level-speed" style="color:var(--yellow)">fast</span></div>
+        <div class="level-row"><span class="level-label">-6 (default)</span><div class="level-track"><div class="level-fill" style="width:76%"></div></div><span class="level-ratio" style="color:var(--cyan)">~68%</span><span class="level-speed" style="color:var(--cyan)">medium &#9733;</span></div>
+        <div class="level-row"><span class="level-label">-7</span><div class="level-track"><div class="level-fill" style="width:82%"></div></div><span class="level-ratio">~70%</span><span class="level-speed" style="color:var(--orange)">slow</span></div>
+        <div class="level-row"><span class="level-label">-9 (best)</span><div class="level-track"><div class="level-fill" style="width:88%;background:var(--green)"></div></div><span class="level-ratio g">~72%</span><span class="level-speed r">slowest</span></div>
+      </div>
+      <p class="theory-p" style="margin-top:.8rem;font-size:.68rem">Ratios shown are approximate for a typical 100&thinsp;KB JSON payload. Notice that going from level&nbsp;6 to level&nbsp;9 gains only ~4% extra compression but can cost 3&ndash;4&times; more CPU. The diminishing returns are steep above level 6.</p>
+
+      <div class="why-box" style="margin-top:1rem">
+        <div class="why-box-title">The streaming principle</div>
+        <p>Never buffer a full payload to compress it if it can be streamed. Piping a 1&thinsp;GB log file through <code>createGzip()</code> uses ~256&thinsp;KB of working memory. Buffering it first requires 1&thinsp;GB of RAM. gzip is a <strong>stream cipher</strong> &mdash; it processes data in sliding windows. Always prefer <code>pipe()</code> / <code>io.Copy()</code> / <code>shutil.copyfileobj()</code> over <code>compress(wholeBuffer)</code> for anything larger than a few MB.</p>
+        <p>For HTTP responses in Node.js, the <code>compression()</code> middleware automatically switches to streaming: it wraps <code>res.write()</code> and <code>res.end()</code> so chunks are compressed as they are written, with no full-body buffer required.</p>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:#fff;font-size:.95rem;margin-bottom:.8rem">Real-world benchmark: 100 KB JSON payload</h3>
+      <table class="bench-table">
+        <thead><tr><th>Format / Level</th><th>Output size</th><th>Compress time</th><th>Decompress</th></tr></thead>
+        <tbody>
+          <tr><td>Uncompressed</td><td>100 KB</td><td>&mdash;</td><td>&mdash;</td></tr>
+          <tr><td>gzip -1</td><td class="o">~22 KB</td><td class="g">0.8 ms</td><td class="g">0.3 ms</td></tr>
+          <tr><td>gzip -6 (default)</td><td class="g">~18 KB</td><td class="y">2.4 ms</td><td class="g">0.4 ms</td></tr>
+          <tr><td>gzip -9</td><td class="g">~17 KB</td><td class="o">7.1 ms</td><td class="g">0.4 ms</td></tr>
+          <tr><td>brotli -4</td><td class="g">~16 KB</td><td class="y">3.2 ms</td><td class="y">0.8 ms</td></tr>
+          <tr><td>brotli -11</td><td class="g">~14 KB</td><td class="r">850 ms</td><td class="y">0.9 ms</td></tr>
+          <tr><td>zstd -3</td><td class="g">~17 KB</td><td class="g">0.6 ms</td><td class="g">0.2 ms</td></tr>
+        </tbody>
+      </table>
+      <p class="theory-p" style="font-size:.65rem">Benchmarks are indicative (single-core, M2 Pro). Key insight: <strong>decompression is always fast</strong> regardless of compression level &mdash; the browser/client pays no meaningful cost. All CPU cost is on the server/sender side at compression time.</p>
+
+      <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:#fff;font-size:.95rem;margin:1.2rem 0 .8rem">When NOT to use gzip</h3>
+      <table class="bench-table">
+        <thead><tr><th>Content type</th><th>Why skip gzip</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>JPEG / PNG / WebP</td><td>Already compressed</td><td class="r">Skip</td></tr>
+          <tr><td>MP4 / WebM / MP3</td><td>Already compressed</td><td class="r">Skip</td></tr>
+          <tr><td>.zip / .gz / .br</td><td>Already compressed</td><td class="r">Skip</td></tr>
+          <tr><td>&lt; 1 KB response</td><td>Header overhead dominates</td><td class="y">Skip / threshold</td></tr>
+          <tr><td>Server-Sent Events</td><td>Streaming: no Content-Length</td><td class="y">Use carefully</td></tr>
+          <tr><td>WebSockets</td><td>Use permessage-deflate extension</td><td class="y">Per-message</td></tr>
+          <tr><td>TLS + user secrets</td><td>BREACH attack surface</td><td class="r">Disable / mask</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="perf-grid" style="margin-top:1.5rem">
+    <div class="perf-card">
+      <div class="perf-card-title"><span style="color:var(--cyan)">&#9646;</span> nginx configuration</div>
+      <div class="perf-card-body">
+        <strong>gzip on;</strong> &mdash; enable gzip<br>
+        <strong>gzip_comp_level 6;</strong> &mdash; level 1&ndash;9<br>
+        <strong>gzip_min_length 1000;</strong> &mdash; skip tiny responses<br>
+        <strong>gzip_vary on;</strong> &mdash; adds Vary: Accept-Encoding<br>
+        <strong>gzip_proxied any;</strong> &mdash; compress proxied responses<br>
+        <strong>gzip_types</strong> text/plain text/css application/json application/javascript;<br>
+        <strong>gzip_static on;</strong> &mdash; serve pre-compressed .gz files
+      </div>
+    </div>
+    <div class="perf-card">
+      <div class="perf-card-title"><span style="color:var(--green)">&#9646;</span> CDN behaviour</div>
+      <div class="perf-card-body">
+        CDNs (Cloudflare, CloudFront, Fastly) <strong>automatically gzip</strong> compressible content at the edge, even if your origin doesn&rsquo;t. Cloudflare also applies brotli. Always set <code>Vary: Accept-Encoding</code> so the CDN stores separate cached copies for gzip and non-gzip clients. Without <code>Vary</code>, a non-gzip client might receive a gzip-encoded response they can&rsquo;t decode &mdash; a common misconfiguration.
+      </div>
+    </div>
+    <div class="perf-card">
+      <div class="perf-card-title"><span style="color:var(--yellow)">&#9646;</span> Brotli vs gzip choice</div>
+      <div class="perf-card-body">
+        Use <strong>brotli</strong> for static assets that can be pre-compressed at build time (brotli -11 takes seconds per file but is done once). Use <strong>gzip -6</strong> for dynamic responses compressed on the fly. Serve both if possible &mdash; check <code>Accept-Encoding</code> and pick <code>br</code> over <code>gzip</code> when available. Brotli yields ~15&ndash;20% better compression than gzip on typical web assets.
+      </div>
+    </div>
+    <div class="perf-card">
+      <div class="perf-card-title"><span style="color:var(--purple)">&#9646;</span> CPU &amp; memory budget</div>
+      <div class="perf-card-body">
+        gzip level 6 on a 100&thinsp;KB JSON response costs ~2&ndash;3&thinsp;ms CPU and ~256&thinsp;KB memory (sliding window). At 1&thinsp;000 req/s that&rsquo;s 2&ndash;3 CPU-seconds per second &mdash; significant. Options: <strong>pre-compress</strong> cacheable responses (compute once, serve many), use a <strong>reverse proxy</strong> (nginx/Caddy) to offload compression from the app, or increase compression threshold so only large responses are compressed.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="theory-divider"></div>
+<div class="demo-label">// Interactive Demo &mdash; LZ77 tokeniser &rarr; Huffman coder &rarr; gzip file layout, computed live in your browser</div>
+</div>
+
+<main class="demo-wrap" id="demo">
+  <aside class="demo-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Input text</div>
+      <textarea id="demo-input" class="demo-textarea" rows="4" spellcheck="false">abracadabra</textarea>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Mode</div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="btn-auto" onclick="setMode('auto')">Auto Play</button>
+        <button class="mode-btn" id="btn-step" onclick="setMode('step')">Step-by-Step</button>
+      </div>
+    </div>
+    <button class="compute-btn" onclick="startDemo()">&#9654; Compute</button>
+
+    <div class="sidebar-section" style="margin-top:1.5rem;">
+      <div class="sidebar-label">Pipeline</div>
+      <div class="overview-flow" id="overview-flow">
+        <div class="ov-dot" id="ov0" title="Input">IN</div>
+        <div class="ov-line"></div>
+        <div class="ov-dot" id="ov1" title="LZ77">LZ77</div>
+        <div class="ov-line"></div>
+        <div class="ov-dot" id="ov2" title="Huffman">HUF</div>
+        <div class="ov-line"></div>
+        <div class="ov-dot" id="ov3" title="CRC32">CRC</div>
+        <div class="ov-line"></div>
+        <div class="ov-dot" id="ov4" title="gzip header">HDR</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section" style="margin-top:1.5rem;">
+      <div class="sidebar-label">Stats</div>
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-row"><span class="stat-key">Input bytes</span><span class="stat-val" id="stat-in">—</span></div>
+        <div class="stat-row"><span class="stat-key">LZ77 tokens</span><span class="stat-val" id="stat-tokens">—</span></div>
+        <div class="stat-row"><span class="stat-key">Unique syms</span><span class="stat-val" id="stat-syms">—</span></div>
+        <div class="stat-row"><span class="stat-key">Huffman bits</span><span class="stat-val" id="stat-bits">—</span></div>
+        <div class="stat-row"><span class="stat-key">CRC32</span><span class="stat-val" id="stat-crc">—</span></div>
+        <div class="stat-row"><span class="stat-key">Est. ratio</span><span class="stat-val" id="stat-ratio">—</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <section class="demo-steps" id="demo-steps">
+    <div class="step-placeholder">
+      <div style="font-size:2rem;opacity:0.3;">&#9654;</div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:0.6rem;">Enter text and press Compute to begin.</div>
+    </div>
+  </section>
+</main>
+
+<style>
+/* ── Demo layout ── */
+.demo-wrap {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.5rem;
+  padding: 2rem 2rem 2rem;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.demo-sidebar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-self: start;
+  position: sticky;
+  top: 1.5rem;
+}
+.sidebar-section { margin-bottom: 1rem; }
+.sidebar-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+}
+.demo-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 3px;
+  resize: vertical;
+}
+.demo-textarea:focus { outline: none; border-color: var(--cyan); }
+.mode-toggle { display: flex; gap: 0.4rem; }
+.mode-btn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.5rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mode-btn.active { background: rgba(0,229,255,0.08); border-color: var(--cyan); color: var(--cyan); }
+.compute-btn {
+  width: 100%;
+  background: rgba(0,229,255,0.08);
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.55rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.compute-btn:hover { background: rgba(0,229,255,0.14); }
+
+/* Overview flow */
+.overview-flow { display: flex; align-items: center; gap: 0; }
+.ov-dot {
+  width: 36px; height: 24px;
+  border-radius: 2px;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-size: 0.5rem;
+  letter-spacing: 0.04em;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.25s;
+  cursor: default;
+}
+.ov-dot.done  { border-color: var(--green);  color: var(--green);  background: rgba(0,255,136,0.07); }
+.ov-dot.active{ border-color: var(--cyan);   color: var(--cyan);   background: rgba(0,229,255,0.12); }
+.ov-line { flex: 1; height: 1px; background: var(--border2); }
+
+/* Stats */
+.stats-grid { display: flex; flex-direction: column; gap: 0.3rem; }
+.stat-row { display: flex; justify-content: space-between; font-size: 0.6rem; }
+.stat-key { color: var(--muted); }
+.stat-val { color: var(--cyan); font-weight: 500; }
+
+/* Step cards */
+.demo-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 300px;
+}
+.step-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 300px; color: var(--dim);
+}
+.step-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.step-card.active { border-color: var(--cyan); }
+.step-card.hidden-step { opacity: 0; pointer-events: none; height: 0; overflow: hidden; margin: 0; padding: 0; }
+.step-card.visible { opacity: 1; pointer-events: auto; height: auto; }
+.step-header {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.015);
+}
+.step-num { font-size: 0.55rem; color: var(--dim); letter-spacing: 0.1em; min-width: 32px; }
+.step-title { font-family: 'Syne', sans-serif; font-size: 0.85rem; color: #fff; font-weight: 600; }
+.step-tag {
+  margin-left: auto;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  background: rgba(0,229,255,0.06);
+}
+.step-body { padding: 1rem; }
+.step-desc { font-size: 0.68rem; color: var(--muted); line-height: 1.7; margin-bottom: 0.8rem; }
+.step-visual {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.8rem;
+  font-size: 0.65rem;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+/* Step nav (step mode) */
+.step-nav {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  border-top: 1px solid var(--border);
+  background: rgba(255,255,255,0.01);
+}
+.step-nav.show { display: flex; }
+.step-nav-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.step-nav-btn:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
+.step-nav-btn:disabled { opacity: 0.3; cursor: default; }
+.step-nav-counter { font-size: 0.58rem; color: var(--dim); }
+
+/* Tokens table */
+.token-table { width: 100%; border-collapse: collapse; font-size: 0.63rem; }
+.token-table th { color: var(--muted); padding: 0.25rem 0.5rem; text-align: left; border-bottom: 1px solid var(--border); }
+.token-table td { padding: 0.25rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.tok-lit  { color: var(--cyan); }
+.tok-back { color: var(--green); }
+.tok-end  { color: var(--orange); }
+
+/* Huffman tree visual */
+.huf-codes { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.huf-code-item {
+  display: flex; align-items: center; gap: 0.4rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.62rem;
+}
+.huf-sym  { color: var(--cyan); min-width: 20px; }
+.huf-freq { color: var(--muted); font-size: 0.55rem; }
+.huf-bits { color: var(--green); letter-spacing: 0.05em; }
+
+/* Byte stream */
+.byte-row { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.3rem; }
+.byte-box {
+  display: flex; flex-direction: column; align-items: center;
+  width: 40px;
+}
+.byte-hex  { font-size: 0.65rem; color: var(--cyan); font-weight: 500; }
+.byte-dec  { font-size: 0.5rem; color: var(--dim); }
+.byte-label{ font-size: 0.48rem; color: var(--muted); margin-top: 0.1rem; text-align: center; line-height: 1.1; }
+
+/* CRC visual */
+.crc-visual { font-family: 'JetBrains Mono', monospace; }
+.crc-hex { font-size: 1.2rem; color: var(--purple); letter-spacing: 0.1em; }
+
+/* Responsive */
+@media (max-width: 700px) {
+  .demo-wrap { grid-template-columns: 1fr; }
+  .demo-sidebar { position: static; }
+}
+</style>
+
+
+<script>
+/* ── Utilities ── */
+const $ = id => document.getElementById(id);
+const enc = new TextEncoder();
+
+function toHex2(n){ return n.toString(16).padStart(2,'0').toUpperCase(); }
+function toHex8(n){ return n.toString(16).padStart(8,'0').toUpperCase(); }
+
+/* ── LZ77 tokeniser ── */
+// Returns array of { type:'lit', ch } or { type:'back', dist, len }
+function lz77Tokenize(input, winSize=255, minMatch=3, maxMatch=15){
+  const out = [];
+  let i = 0;
+  while(i < input.length){
+    const start = Math.max(0, i - winSize);
+    const window = input.slice(start, i);
+    const lookahead = input.slice(i, i + maxMatch);
+    let bestLen = 0, bestDist = 0;
+    for(let j = 0; j < window.length; j++){
+      let l = 0;
+      while(l < lookahead.length && window[j+l] === lookahead[l]) l++;
+      if(l > bestLen){ bestLen = l; bestDist = window.length - j; }
+    }
+    if(bestLen >= minMatch){
+      out.push({ type:'back', dist:bestDist, len:bestLen, raw:input.slice(i, i+bestLen) });
+      i += bestLen;
+    } else {
+      out.push({ type:'lit', ch:input[i] });
+      i++;
+    }
+  }
+  return out;
+}
+
+/* ── Huffman coding ── */
+function buildHuffman(tokens){
+  // collect symbol frequencies from LZ77 token stream
+  const freq = {};
+  for(const t of tokens){
+    if(t.type==='lit'){ freq[t.ch] = (freq[t.ch]||0)+1; }
+    else { /* back-refs use length+distance codes in real DEFLATE; simplified: count as pair */
+      const sym = `(${t.dist},${t.len})`;
+      freq[sym] = (freq[sym]||0)+1;
+    }
+  }
+  freq['END'] = 1; // end-of-block
+
+  // Build min-heap / priority queue via sorted array
+  let nodes = Object.entries(freq).map(([sym,f])=>({ sym, freq:f, left:null, right:null }));
+  if(nodes.length === 1){
+    // single symbol — assign code '0'
+    return { [nodes[0].sym]: { freq: nodes[0].freq, code:'0' } };
+  }
+  // Sort and merge
+  while(nodes.length > 1){
+    nodes.sort((a,b)=>a.freq-b.freq);
+    const left = nodes.shift(), right = nodes.shift();
+    nodes.push({ sym:`[${left.sym}+${right.sym}]`, freq:left.freq+right.freq, left, right });
+  }
+  const root = nodes[0];
+  const codes = {};
+  function traverse(node, prefix){
+    if(!node.left && !node.right){ codes[node.sym] = { freq:node.freq, code:prefix||'0' }; return; }
+    traverse(node.left, prefix+'0');
+    traverse(node.right, prefix+'1');
+  }
+  traverse(root, '');
+  return codes;
+}
+
+/* ── CRC32 ── */
+const CRC_TABLE = (()=>{
+  const t = new Uint32Array(256);
+  for(let n=0;n<256;n++){
+    let c=n;
+    for(let k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1;
+    t[n]=c;
+  }
+  return t;
+})();
+function crc32(bytes){
+  let crc = 0xFFFFFFFF;
+  for(const b of bytes) crc = CRC_TABLE[(crc^b)&0xFF]^(crc>>>8);
+  return (crc^0xFFFFFFFF)>>>0;
+}
+
+/* ── State ── */
+let demoMode = 'auto';
+let demoStepIndex = 0;
+let demoStepCards = [];
+let autoTimer = null;
+
+function setMode(m){
+  demoMode = m;
+  $('btn-auto').classList.toggle('active', m==='auto');
+  $('btn-step').classList.toggle('active', m==='step');
+}
+
+/* ── Overview highlight ── */
+function setOverview(activeIdx){
+  for(let i=0;i<5;i++){
+    const d = $('ov'+i);
+    if(i < activeIdx){ d.className='ov-dot done'; }
+    else if(i===activeIdx){ d.className='ov-dot active'; }
+    else { d.className='ov-dot'; }
+  }
+}
+
+/* ── Build step HTML ── */
+function buildSteps(input, tokens, hufCodes, crcVal, inputBytes){
+  const steps = [];
+
+  /* Step 1 — Input */
+  const inputHex = Array.from(inputBytes).map(b=>`
+    <div class="byte-box">
+      <div class="byte-hex">${toHex2(b)}</div>
+      <div class="byte-dec">${b}</div>
+      <div class="byte-label">'${b>=32&&b<127?String.fromCharCode(b):'.'}'</div>
+    </div>`).join('');
+  steps.push({
+    num:'01', title:'Raw Input', tag:'Input', ovIdx:0,
+    desc:`Your text is interpreted as UTF-8 bytes. Each character maps to one or more bytes. The raw byte sequence is what gets fed into DEFLATE.`,
+    visual:`<div class="sidebar-label" style="margin-bottom:0.5rem;">${inputBytes.length} bytes</div>
+<div class="byte-row">${inputHex}</div>`
+  });
+
+  /* Step 2 — LZ77 */
+  const litCount  = tokens.filter(t=>t.type==='lit').length;
+  const backCount = tokens.filter(t=>t.type==='back').length;
+  const rows = tokens.map((t,i)=>{
+    if(t.type==='lit')
+      return `<tr><td class="tok-lit">${i+1}</td><td class="tok-lit">Literal</td><td class="tok-lit">'${t.ch}'</td><td>—</td><td>—</td></tr>`;
+    else
+      return `<tr><td class="tok-back">${i+1}</td><td class="tok-back">Back-ref</td><td class="tok-back">—</td><td class="tok-back">${t.dist}</td><td class="tok-back">${t.len} chars: "${t.raw}"</td></tr>`;
+  }).join('');
+  steps.push({
+    num:'02', title:'LZ77 Tokenisation', tag:'LZ77', ovIdx:1,
+    desc:`LZ77 scans left-to-right, maintaining a sliding window (up to 32 KB in real DEFLATE). When it finds a match ≥3 chars in the window it emits a (distance, length) back-reference instead of repeating bytes. Literals that have no match are emitted as-is.`,
+    visual:`<div style="font-size:0.62rem;color:var(--muted);margin-bottom:0.6rem;">${tokens.length} tokens — ${litCount} literal${litCount!==1?'s':''}, ${backCount} back-ref${backCount!==1?'s':''}</div>
+<table class="token-table">
+<thead><tr><th>#</th><th>Type</th><th>Char</th><th>Dist</th><th>Len / Match</th></tr></thead>
+<tbody>${rows}</tbody>
+</table>`
+  });
+
+  /* Step 3 — Huffman */
+  const codeEntries = Object.entries(hufCodes)
+    .sort((a,b)=>a[1].code.length - b[1].code.length || a[0].localeCompare(b[0]));
+  const codeItems = codeEntries.map(([sym,{freq,code}])=>`
+    <div class="huf-code-item">
+      <span class="huf-sym">${sym==='END'?'END':sym.startsWith('(')?sym:`'${sym}'`}</span>
+      <span class="huf-freq">×${freq}</span>
+      <span class="huf-bits">${code}</span>
+    </div>`).join('');
+  const totalBits = Object.values(hufCodes).reduce((s,{freq,code})=>s+freq*code.length,0);
+  steps.push({
+    num:'03', title:'Huffman Coding', tag:'Huffman', ovIdx:2,
+    desc:`A Huffman tree is built from symbol frequencies. Frequent symbols get short codes, rare ones get long codes. The tree is stored in the DEFLATE block header so the decoder can reconstruct it. This is the second compression stage after LZ77.`,
+    visual:`<div style="font-size:0.62rem;color:var(--muted);margin-bottom:0.6rem;">${codeEntries.length} symbols · ${totalBits} total bits</div>
+<div class="huf-codes">${codeItems}</div>`
+  });
+
+  /* Step 4 — CRC32 */
+  const crcHex = toHex8(crcVal);
+  const crcLE = [(crcVal)&0xFF,(crcVal>>8)&0xFF,(crcVal>>16)&0xFF,(crcVal>>24)&0xFF];
+  const crcBytes = crcLE.map(b=>`<div class="byte-box"><div class="byte-hex">${toHex2(b)}</div><div class="byte-dec">${b}</div></div>`).join('');
+  steps.push({
+    num:'04', title:'CRC-32 Integrity Check', tag:'CRC32', ovIdx:3,
+    desc:`CRC-32 (Cyclic Redundancy Check) is computed over the original uncompressed bytes. It uses the polynomial 0xEDB88320 (reflected form of IEEE 802.3). The value is stored in the gzip trailer (last 4 bytes before ISIZE) in little-endian order so the decompressor can verify data integrity.`,
+    visual:`<div class="crc-visual">
+  <div style="font-size:0.62rem;color:var(--muted);margin-bottom:0.5rem;">CRC-32 over ${inputBytes.length} bytes:</div>
+  <div class="crc-hex">0x${crcHex}</div>
+  <div style="font-size:0.6rem;color:var(--muted);margin-top:0.5rem;">Stored little-endian in gzip trailer:</div>
+  <div class="byte-row" style="margin-top:0.3rem;">${crcBytes}</div>
+</div>`
+  });
+
+  /* Step 5 — gzip header */
+  const hdrBytes = [
+    {v:'1F',label:'Magic 1'},{v:'8B',label:'Magic 2'},
+    {v:'08',label:'CM=DEFLATE'},{v:'00',label:'FLG=none'},
+    {v:'00',label:'MTIME'},{v:'00',label:'MTIME'},{v:'00',label:'MTIME'},{v:'00',label:'MTIME'},
+    {v:'00',label:'XFL=0'},{v:'FF',label:'OS=unknown'},
+  ];
+  const hdrHtml = hdrBytes.map(b=>`<div class="byte-box"><div class="byte-hex">${b.v}</div><div class="byte-label">${b.label}</div></div>`).join('');
+  const isizeLE = [(inputBytes.length)&0xFF,(inputBytes.length>>8)&0xFF,(inputBytes.length>>16)&0xFF,(inputBytes.length>>24)&0xFF];
+  const isizeHtml = isizeLE.map(b=>`<div class="byte-box"><div class="byte-hex">${toHex2(b)}</div><div class="byte-label">ISIZE</div></div>`).join('');
+  steps.push({
+    num:'05', title:'gzip File Layout', tag:'Header', ovIdx:4,
+    desc:`The gzip format wraps the DEFLATE-compressed payload with a 10-byte header and an 8-byte trailer. The header identifies the format (magic bytes 0x1F 0x8B) and compression method. The trailer holds the CRC-32 and original size (ISIZE) in little-endian, both mod 2³² for files >4 GB.`,
+    visual:`<div style="font-size:0.62rem;color:var(--muted);margin-bottom:0.4rem;">10-byte header:</div>
+<div class="byte-row">${hdrHtml}</div>
+<div style="font-size:0.62rem;color:var(--muted);margin:0.8rem 0 0.4rem;">... DEFLATE compressed payload ...</div>
+<div style="font-size:0.62rem;color:var(--muted);margin-bottom:0.4rem;">8-byte trailer:</div>
+<div class="byte-row">${crcBytes}${isizeHtml}</div>`
+  });
+
+  return steps;
+}
+
+/* ── Render cards ── */
+function renderSteps(steps, mode, visibleCount){
+  let html = '';
+  const navClass = mode==='step' ? 'step-nav show' : 'step-nav';
+  steps.forEach((s,i)=>{
+    const hidden = mode==='step' && i >= visibleCount;
+    const active = mode==='step' && i === visibleCount-1;
+    html += `<div class="step-card${hidden?' hidden-step':''}${active?' active':''}">
+  <div class="step-header">
+    <span class="step-num">STEP ${s.num}</span>
+    <span class="step-title">${s.title}</span>
+    <span class="step-tag">${s.tag}</span>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">${s.desc}</div>
+    <div class="step-visual">${s.visual}</div>
+  </div>
+  <div class="${navClass}">
+    <button class="step-nav-btn" onclick="stepPrev()" ${i===0?'disabled':''}>&#8592; Prev</button>
+    <span class="step-nav-counter">${i+1} / ${steps.length}</span>
+    <button class="step-nav-btn" onclick="stepNext()" ${i===steps.length-1?'disabled':''}>Next &#8594;</button>
+  </div>
+</div>`;
+  });
+  return html;
+}
+
+/* ── Start demo ── */
+function startDemo(){
+  if(autoTimer){ clearTimeout(autoTimer); autoTimer=null; }
+  const input = $('demo-input').value || 'abracadabra';
+  const bytes  = enc.encode(input);
+  const tokens = lz77Tokenize(input);
+  const huf    = buildHuffman(tokens);
+  const crcVal = crc32(bytes);
+
+  // stats
+  $('stat-in').textContent     = bytes.length + ' B';
+  $('stat-tokens').textContent = tokens.length;
+  $('stat-syms').textContent   = Object.keys(huf).length;
+  const totalBits = Object.values(huf).reduce((s,{freq,code})=>s+freq*code.length,0);
+  $('stat-bits').textContent   = totalBits;
+  $('stat-crc').textContent    = '0x'+toHex8(crcVal);
+  const ratio = (totalBits/8 / bytes.length * 100).toFixed(0);
+  $('stat-ratio').textContent  = ratio + '%';
+
+  demoStepCards = buildSteps(input, tokens, huf, crcVal, bytes);
+  demoStepIndex = 0;
+  setOverview(-1);
+
+  if(demoMode === 'auto'){
+    // show placeholder, then reveal one card at a time
+    $('demo-steps').innerHTML = renderSteps(demoStepCards, 'auto', demoStepCards.length);
+    // hide all first then reveal with delay
+    const cards = $('demo-steps').querySelectorAll('.step-card');
+    cards.forEach(c=>{ c.classList.add('hidden-step'); c.classList.remove('active'); });
+    function revealNext(idx){
+      if(idx >= cards.length) return;
+      cards[idx].classList.remove('hidden-step');
+      cards[idx].classList.add('active');
+      if(idx>0) cards[idx-1].classList.remove('active');
+      setOverview(demoStepCards[idx].ovIdx);
+      autoTimer = setTimeout(()=>revealNext(idx+1), 1400);
+    }
+    revealNext(0);
+  } else {
+    demoStepIndex = 1;
+    $('demo-steps').innerHTML = renderSteps(demoStepCards, 'step', demoStepIndex);
+    setOverview(demoStepCards[0].ovIdx);
+  }
+}
+
+function stepNext(){
+  if(demoStepIndex >= demoStepCards.length) return;
+  demoStepIndex++;
+  $('demo-steps').innerHTML = renderSteps(demoStepCards, 'step', demoStepIndex);
+  setOverview(demoStepCards[demoStepIndex-1].ovIdx);
+  // scroll last visible card into view
+  const cards = $('demo-steps').querySelectorAll('.step-card:not(.hidden-step)');
+  if(cards.length) cards[cards.length-1].scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function stepPrev(){
+  if(demoStepIndex <= 1) return;
+  demoStepIndex--;
+  $('demo-steps').innerHTML = renderSteps(demoStepCards, 'step', demoStepIndex);
+  setOverview(demoStepCards[demoStepIndex-1].ovIdx);
+}
+
+// keyboard nav in step mode
+document.addEventListener('keydown', e=>{
+  if(demoMode!=='step') return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') stepNext();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') stepPrev();
+});
+</script>
+</body>
+</html>
