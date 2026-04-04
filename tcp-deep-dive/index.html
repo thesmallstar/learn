@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TCP Deep Dive — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── STATE DIAGRAM ── */
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+  margin: 0.8rem 0;
+  text-align: left;
+}
+.state-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.6rem;
+  border-radius: 3px;
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+.state-box .state-name { font-weight: 700; }
+.state-box .state-desc { color: var(--text2); font-weight: 400; font-size: 0.62rem; }
+
+/* ── HANDSHAKE DIAGRAM ── */
+.handshake-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  margin: 0.3rem 0;
+  font-size: 0.72rem;
+}
+.hs-node {
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 60px;
+  text-align: center;
+}
+.hs-arrow {
+  flex: 1;
+  max-width: 280px;
+  text-align: center;
+  color: var(--text2);
+  font-size: 0.68rem;
+  border-bottom: 1px dashed var(--border2);
+  padding-bottom: 0.2rem;
+  position: relative;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  .state-grid{grid-template-columns:1fr 1fr}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="/networking/">Networking</a>
+    <span>/</span>
+    <span style="color:var(--text);">TCP Deep Dive</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Networking</div>
+  <h1>TCP <span class="thin">Deep Dive</span></h1>
+  <p class="header-sub">How the Transmission Control Protocol provides reliable, ordered, byte-stream delivery over an unreliable network -- from the 3-way handshake to congestion control algorithms and the reasons HTTP/3 moved to QUIC.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Fundamentals</div>
+    <h2>What TCP Guarantees</h2>
+    <p>TCP (RFC 793, updated by RFC 9293) sits at the transport layer and provides four core guarantees that raw IP does not: <strong>connection-oriented</strong> communication, <strong>reliable</strong> delivery, <strong>ordered</strong> byte arrival, and a <strong>byte-stream</strong> abstraction that hides packet boundaries from the application.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Connection-Oriented</div>
+        <p>Both endpoints must establish a connection before any data flows. State is maintained at each end.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Reliable Delivery</div>
+        <p>Every byte is acknowledged. Lost segments are retransmitted. Checksums detect corruption.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Ordered</div>
+        <p>Sequence numbers ensure the receiver reassembles data in the exact order it was sent, even if packets arrive out of order.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Byte-Stream</div>
+        <p>Applications read and write a continuous stream of bytes. TCP decides how to segment it into packets (segments) internally.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">TCP vs UDP at a glance</div>
+      TCP trades latency for reliability. UDP trades reliability for speed. Neither is "better" -- the choice depends on whether your application can tolerate lost or reordered data.
+    </div>
+
+    <table class="cmp-table">
+      <thead><tr><th>Property</th><th>TCP</th><th>UDP</th></tr></thead>
+      <tbody>
+        <tr><td>Connection</td><td>Connection-oriented (handshake)</td><td>Connectionless</td></tr>
+        <tr><td>Reliability</td><td>ACKs + retransmission</td><td>Best-effort, no ACKs</td></tr>
+        <tr><td>Ordering</td><td>Guaranteed via sequence numbers</td><td>No ordering guarantee</td></tr>
+        <tr><td>Overhead</td><td>20-60 byte header</td><td>8 byte header</td></tr>
+        <tr><td>Use cases</td><td>HTTP, SSH, databases</td><td>DNS, video streaming, gaming</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Connection Lifecycle</div>
+    <h2>Handshake, Data Transfer, and Teardown</h2>
+
+    <h3>The 3-Way Handshake</h3>
+    <p>Before any data flows, client and server synchronize sequence numbers via three segments: SYN, SYN-ACK, ACK. This prevents stale connections from being accepted and lets both sides agree on initial sequence numbers (ISNs).</p>
+
+    <div class="diagram">
+      <div class="diagram-label">TCP 3-Way Handshake</div>
+      <div style="display:flex;justify-content:center;gap:2rem;margin-bottom:0.5rem;">
+        <span style="font-weight:700;color:var(--accent);font-size:0.75rem;">Client</span>
+        <span style="flex:1;max-width:280px;"></span>
+        <span style="font-weight:700;color:var(--accent);font-size:0.75rem;">Server</span>
+      </div>
+      <div class="handshake-row">
+        <span class="hs-node">CLOSED</span>
+        <span class="hs-arrow">SYN (seq=x) &rarr;</span>
+        <span class="hs-node">LISTEN</span>
+      </div>
+      <div class="handshake-row">
+        <span class="hs-node">SYN_SENT</span>
+        <span class="hs-arrow">&larr; SYN-ACK (seq=y, ack=x+1)</span>
+        <span class="hs-node">SYN_RCVD</span>
+      </div>
+      <div class="handshake-row">
+        <span class="hs-node">ESTAB</span>
+        <span class="hs-arrow">ACK (ack=y+1) &rarr;</span>
+        <span class="hs-node">ESTAB</span>
+      </div>
+    </div>
+
+    <h3>The 4-Way Teardown</h3>
+    <p>Either side can initiate a close. Because TCP is full-duplex, each direction must be shut down independently. The initiator sends FIN, gets ACK, then the other side sends its FIN and receives ACK. This produces the well-known <code>FIN_WAIT_1 &rarr; FIN_WAIT_2 &rarr; TIME_WAIT</code> progression on the initiating side.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">TCP 4-Way Teardown</div>
+      <div class="handshake-row">
+        <span class="hs-node">ESTAB</span>
+        <span class="hs-arrow">FIN (seq=m) &rarr;</span>
+        <span class="hs-node">ESTAB</span>
+      </div>
+      <div class="handshake-row">
+        <span class="hs-node">FIN_WAIT_1</span>
+        <span class="hs-arrow">&larr; ACK (ack=m+1)</span>
+        <span class="hs-node">CLOSE_WAIT</span>
+      </div>
+      <div class="handshake-row">
+        <span class="hs-node">FIN_WAIT_2</span>
+        <span class="hs-arrow">&larr; FIN (seq=n)</span>
+        <span class="hs-node">LAST_ACK</span>
+      </div>
+      <div class="handshake-row">
+        <span class="hs-node">TIME_WAIT</span>
+        <span class="hs-arrow">ACK (ack=n+1) &rarr;</span>
+        <span class="hs-node">CLOSED</span>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">TIME_WAIT = 2 x MSL</div>
+      The initiating side stays in TIME_WAIT for twice the Maximum Segment Lifetime (typically 60s total on Linux). This ensures delayed duplicates from the old connection expire before the same port pair is reused. On busy servers, many sockets in TIME_WAIT can exhaust ephemeral ports -- mitigations include <code>SO_REUSEADDR</code>, <code>tcp_tw_reuse</code>, and reducing MSL.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Flow Control</div>
+    <h2>Sequence Numbers, ACKs, and the Sliding Window</h2>
+
+    <p>Every byte in a TCP stream has a 32-bit sequence number. The receiver advertises a <strong>receive window</strong> (rwnd) -- the number of bytes it can buffer. The sender must not have more than rwnd bytes outstanding (sent but not yet acknowledged).</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Sliding Window Concept</div>
+      <div class="flow-row">
+        <div class="flow-box" style="background:var(--green-bg);border-color:var(--green);color:var(--green);">ACKed bytes</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Sent, awaiting ACK</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange);">Sendable (within window)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box" style="background:var(--surface2);border-color:var(--border);color:var(--muted);">Not yet sendable</div>
+      </div>
+    </div>
+
+    <h3>Window Scaling (RFC 7323)</h3>
+    <p>The original 16-bit window field caps rwnd at 64 KB -- far too small for high-bandwidth, high-latency links (bandwidth-delay product). The window scale option, negotiated during the handshake, applies a left-shift of up to 14 bits, supporting windows up to ~1 GB.</p>
+
+    <h3>Cumulative vs Selective ACK</h3>
+    <p>Standard TCP ACKs are <strong>cumulative</strong>: an ACK number of N means "I have received all bytes up to N-1." This is simple but forces retransmission of everything after a gap. <strong>Selective ACK (SACK)</strong>, defined in RFC 2018, lets the receiver report non-contiguous blocks it has received, so the sender retransmits only the missing segments.</p>
+
+    <div class="callout good">
+      <div class="callout-title">Practical Impact</div>
+      On a 100 Mbps link with 50 ms RTT, the bandwidth-delay product is 625 KB. Without window scaling, TCP can only fill 64 KB / 625 KB = ~10% of the pipe. Window scaling is essential for modern networks.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Congestion Control</div>
+    <h2>Slow Start, CUBIC, and BBR</h2>
+
+    <p>Flow control prevents overwhelming the <em>receiver</em>. Congestion control prevents overwhelming the <em>network</em>. The sender maintains a <strong>congestion window (cwnd)</strong>. The effective sending window is <code>min(cwnd, rwnd)</code>.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Congestion Window Growth (Classic TCP)</div>
+      <div class="flow-row">
+        <div class="flow-box">Slow Start<br><span style="font-size:0.6rem;color:var(--text2);">cwnd doubles each RTT</span></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange);">ssthresh reached</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Congestion Avoidance<br><span style="font-size:0.6rem;color:var(--text2);">cwnd += 1 MSS per RTT</span></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box" style="background:var(--red-bg);border-color:var(--red);color:var(--red);">Loss detected</div>
+      </div>
+    </div>
+
+    <h3>Phases of Congestion Control</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Phase</th><th>Trigger</th><th>Behavior</th></tr></thead>
+      <tbody>
+        <tr><td>Slow Start</td><td>Connection open or timeout</td><td>cwnd starts at 1-10 MSS; doubles each RTT (exponential growth)</td></tr>
+        <tr><td>Congestion Avoidance</td><td>cwnd &ge; ssthresh</td><td>cwnd grows by ~1 MSS per RTT (linear / additive increase)</td></tr>
+        <tr><td>Fast Retransmit</td><td>3 duplicate ACKs</td><td>Retransmit missing segment immediately without waiting for timeout</td></tr>
+        <tr><td>Fast Recovery</td><td>After fast retransmit</td><td>ssthresh = cwnd/2, cwnd = ssthresh + 3 MSS, then linear growth</td></tr>
+      </tbody>
+    </table>
+
+    <h3>CUBIC (Linux default)</h3>
+    <p>CUBIC uses a cubic function of time since the last loss event to set cwnd, making it less aggressive near the previous maximum but more aggressive when far below it. This produces faster recovery on high-BDP links than the classic Reno/NewReno linear increase.</p>
+
+    <h3>BBR (Bottleneck Bandwidth and RTT)</h3>
+    <p>Developed by Google, BBR does not use packet loss as the primary congestion signal. Instead it estimates the bottleneck bandwidth and the minimum RTT, then paces packets to match. This works much better on links where buffer bloat causes loss-based algorithms to underperform.</p>
+
+    <div class="callout">
+      <div class="callout-title">CUBIC vs BBR</div>
+      CUBIC reacts to loss (fills buffers until packets drop). BBR proactively models the link (tries to avoid filling buffers). BBR typically achieves lower latency and higher throughput on lossy or bufferbloated paths, but can be unfair to CUBIC flows sharing the same bottleneck.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / TCP State Machine and Tuning Knobs</div>
+    <h2>States, Options, and Practical Tuning</h2>
+
+    <h3>The 11 TCP States</h3>
+    <div class="diagram">
+      <div class="diagram-label">TCP State Machine (all states)</div>
+      <div class="state-grid">
+        <div class="state-box"><span class="state-name">CLOSED</span><br><span class="state-desc">No connection</span></div>
+        <div class="state-box"><span class="state-name">LISTEN</span><br><span class="state-desc">Server waiting for SYN</span></div>
+        <div class="state-box"><span class="state-name">SYN_SENT</span><br><span class="state-desc">Client sent SYN</span></div>
+        <div class="state-box"><span class="state-name">SYN_RCVD</span><br><span class="state-desc">Server got SYN, sent SYN-ACK</span></div>
+        <div class="state-box"><span class="state-name">ESTABLISHED</span><br><span class="state-desc">Data transfer</span></div>
+        <div class="state-box"><span class="state-name">FIN_WAIT_1</span><br><span class="state-desc">Sent FIN, awaiting ACK</span></div>
+        <div class="state-box"><span class="state-name">FIN_WAIT_2</span><br><span class="state-desc">Got ACK for FIN</span></div>
+        <div class="state-box"><span class="state-name">CLOSE_WAIT</span><br><span class="state-desc">Got FIN, app not closed yet</span></div>
+        <div class="state-box"><span class="state-name">CLOSING</span><br><span class="state-desc">Both sides sent FIN simultaneously</span></div>
+        <div class="state-box"><span class="state-name">LAST_ACK</span><br><span class="state-desc">Sent FIN, awaiting final ACK</span></div>
+        <div class="state-box"><span class="state-name">TIME_WAIT</span><br><span class="state-desc">Wait 2xMSL before reuse</span></div>
+      </div>
+    </div>
+
+    <h3>Important Options and Tuning</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Nagle's Algorithm</div>
+        <p>Coalesces small writes into fewer, larger segments. Reduces overhead but adds latency. Disable with <code>TCP_NODELAY</code> for latency-sensitive apps (games, trading).</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Delayed ACK</div>
+        <p>Receiver waits up to ~40 ms hoping to piggyback the ACK on a data response. Interacts badly with Nagle's -- disable one or the other if you see 40 ms stalls.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">TCP Keepalive</div>
+        <p>Sends probes after idle period (default 2 hours on Linux) to detect dead peers. Configure via <code>tcp_keepalive_time</code>, <code>tcp_keepalive_intvl</code>, <code>tcp_keepalive_probes</code>.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">MSS (Max Segment Size)</div>
+        <p>Announced during handshake. Typically 1460 bytes (1500 MTU minus 40 bytes of IP+TCP headers). Path MTU discovery adjusts this.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">TCP Fast Open (TFO)</div>
+        <p>Allows data in the SYN packet on repeat connections using a cached cookie. Saves one RTT on connection setup. Requires both client and server support.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">SO_REUSEADDR / SO_REUSEPORT</div>
+        <p><code>REUSEADDR</code> lets you bind to a port in TIME_WAIT. <code>REUSEPORT</code> lets multiple sockets bind to the same port for load balancing across threads.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">Nagle + Delayed ACK = Latency Trap</div>
+      When Nagle is on, the sender waits to coalesce small writes until it gets an ACK. When delayed ACK is on, the receiver waits to piggyback. Both sides end up waiting on each other, introducing up to 40 ms of artificial delay per write. Set <code>TCP_NODELAY</code> on interactive connections.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Head-of-Line Blocking and Socket Programming</div>
+    <h2>TCP's Limits and the Path to QUIC</h2>
+
+    <h3>Head-of-Line Blocking</h3>
+    <p>TCP guarantees ordered delivery within a single byte stream. If segment #5 is lost, segments #6, #7, #8 must wait in the receive buffer even though they arrived fine. For HTTP/2, which multiplexes many logical streams over one TCP connection, a single lost packet blocks <em>all</em> streams. This is TCP-level head-of-line blocking.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Head-of-Line Blocking in HTTP/2 over TCP</div>
+      <div class="flow-row">
+        <div class="flow-box" style="background:var(--green-bg);border-color:var(--green);color:var(--green);">Stream A pkt</div>
+        <div class="flow-box" style="background:var(--red-bg);border-color:var(--red);color:var(--red);">Stream B pkt LOST</div>
+        <div class="flow-box" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange);">Stream C pkt (blocked)</div>
+        <div class="flow-box" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange);">Stream A pkt (blocked)</div>
+      </div>
+    </div>
+
+    <p>HTTP/3 solves this by replacing TCP with <strong>QUIC</strong>, which runs over UDP and implements its own per-stream reliability. A lost packet on stream B only blocks stream B -- streams A and C continue unaffected.</p>
+
+    <h3>Socket Programming: Server Lifecycle</h3>
+    <p>Understanding TCP's connection model is essential for server programming. The kernel manages two queues for each listening socket:</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Server Socket Lifecycle</div>
+      <div class="flow-row">
+        <div class="flow-box">socket()</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">bind()</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">listen(backlog)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">accept()</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">read/write</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">close()</div>
+      </div>
+    </div>
+
+    <table class="cmp-table">
+      <thead><tr><th>Queue</th><th>Contains</th><th>Controlled By</th></tr></thead>
+      <tbody>
+        <tr><td>SYN Queue (incomplete)</td><td>Connections in SYN_RCVD state</td><td><code>tcp_max_syn_backlog</code></td></tr>
+        <tr><td>Accept Queue (complete)</td><td>Connections in ESTABLISHED waiting for accept()</td><td><code>listen(backlog)</code> argument</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <div class="callout-title">SYN Flood Attacks</div>
+      An attacker sends many SYN packets with spoofed source IPs. The server allocates state for each in the SYN queue and sends SYN-ACKs that will never be answered. The SYN queue fills up, blocking legitimate connections. Defenses: <strong>SYN cookies</strong> (encode state in the ISN, avoid allocating queue entries), rate limiting, and firewall rules. Enable via <code>net.ipv4.tcp_syncookies = 1</code>.
+    </div>
+
+    <pre><code>// Minimal TCP server in C
+int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+struct sockaddr_in addr = {
+    .sin_family = AF_INET,
+    .sin_port = htons(8080),
+    .sin_addr.s_addr = INADDR_ANY
+};
+bind(server_fd, (struct sockaddr*)&addr, sizeof(addr));
+listen(server_fd, 128);  // backlog = 128
+
+while (1) {
+    int client_fd = accept(server_fd, NULL, NULL);
+    // read/write on client_fd ...
+    close(client_fd);
+}</code></pre>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">How many packets are exchanged during a normal TCP connection establishment?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 2 (SYN, ACK)</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 4 (SYN, SYN-ACK, ACK, DATA)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 3 (SYN, SYN-ACK, ACK)</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> 1 (SYN with cookie)</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">TCP uses a 3-way handshake: the client sends SYN, the server responds with SYN-ACK, and the client completes with ACK. This synchronizes sequence numbers on both sides.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">Why does the TIME_WAIT state last for 2x MSL?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> To allow the server to retransmit its FIN</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> To ensure delayed duplicate segments from the old connection expire before the port pair is reused</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> To give the application time to flush its buffers</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> To allow TCP Fast Open cookies to be generated</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">TIME_WAIT lasts 2x MSL so that any delayed segments from the just-closed connection have time to expire in the network. This prevents them from being misinterpreted as belonging to a new connection on the same port pair.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="d" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">What is the maximum receive window size with the window scaling option?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 64 KB</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 1 MB</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 16 MB</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> ~1 GB (65535 &times; 2^14)</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">The window field is 16 bits (max 65535). Window scaling applies a left-shift of up to 14 bits, giving a maximum of 65535 &times; 16384 &approx; 1 GB.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="a" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">During TCP slow start, how does the congestion window (cwnd) grow?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Exponentially -- doubles each RTT</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Linearly -- increases by 1 MSS each RTT</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Logarithmically</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It stays fixed at the initial value</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">Despite being called "slow" start, cwnd actually doubles each RTT (exponential growth). It's "slow" only compared to sending at full rate immediately. Growth switches to linear (congestion avoidance) once cwnd reaches ssthresh.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What triggers TCP fast retransmit?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> A retransmission timeout (RTO) expiring</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The receiver sending a window update</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Receiving 3 duplicate ACKs for the same sequence number</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The application calling send() with the MSG_DONTWAIT flag</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">When the sender receives 3 duplicate ACKs (4 total ACKs for the same sequence number), it infers a packet was lost and retransmits immediately without waiting for the retransmission timeout.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">What problem does setting TCP_NODELAY solve?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It increases the receive buffer size</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It disables Nagle's algorithm, preventing small-write coalescing delays</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It enables TCP Fast Open</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It disables the congestion window</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">TCP_NODELAY disables Nagle's algorithm, which coalesces small writes into larger segments. This is critical for latency-sensitive applications like real-time games, financial trading, and interactive protocols where every small message should be sent immediately.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="d" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">Why did HTTP/3 switch from TCP to QUIC (over UDP)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> UDP is more reliable than TCP</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> TCP cannot support encryption</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> UDP has smaller packet headers, doubling throughput</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> TCP's single byte-stream causes head-of-line blocking across multiplexed streams</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">TCP delivers a single ordered byte stream. When HTTP/2 multiplexes many streams over one TCP connection, a single lost packet blocks all streams. QUIC implements per-stream reliability over UDP, so loss on one stream does not block others.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What does the listen() backlog parameter control?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The maximum number of fully established connections waiting in the accept queue</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The maximum number of simultaneous active connections</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The size of the TCP receive buffer</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The number of retransmission attempts</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">The backlog limits the size of the accept queue -- completed connections (ESTABLISHED) that have not yet been picked up by accept(). When this queue is full, new incoming connections may be dropped or receive a RST.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">How do SYN cookies defend against SYN flood attacks?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> By dropping all SYN packets when the queue is full</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> By encrypting the SYN-ACK with a shared secret</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> By encoding connection state in the initial sequence number, avoiding queue allocation until the handshake completes</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> By requiring clients to solve a proof-of-work puzzle</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">SYN cookies encode the essential connection parameters (MSS, timestamp, etc.) into the server's initial sequence number. The server does not allocate any state for the SYN_RCVD entry. When the client's ACK arrives, the server reconstructs the state from the sequence number.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">How does BBR differ from CUBIC in its approach to congestion control?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> BBR uses a larger initial congestion window</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> BBR models bottleneck bandwidth and minimum RTT instead of reacting to packet loss</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> BBR disables slow start entirely</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> BBR only works over UDP, not TCP</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">CUBIC (and Reno) treat packet loss as the congestion signal -- they fill buffers until packets drop. BBR instead estimates the bottleneck bandwidth (BtlBw) and minimum RTT (RTprop), then paces packets to match, aiming to keep queues empty rather than full.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="/">← all topics</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

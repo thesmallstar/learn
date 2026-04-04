@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Performance Engineering — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="/performance-engineering/">Performance</a>
+    <span>/</span>
+    <span style="color:var(--text);">Performance Engineering</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Performance</div>
+  <h1>Performance <span class="thin">Engineering</span></h1>
+  <p class="header-sub">Measuring, modeling, and eliminating bottlenecks. From latency percentiles and queueing theory to flame graphs, load testing, and the anti-patterns that silently kill throughput.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Key Metrics</div>
+    <h2>What to Measure and Why</h2>
+    <p>You cannot improve what you do not measure, but measuring the wrong thing is worse than measuring nothing. Performance engineering begins with choosing the right metrics and understanding what they actually tell you.</p>
+
+    <h3>Latency and Percentiles</h3>
+    <p>Latency is the time between a request being sent and its response arriving. The trap: reporting average latency hides the experience of your worst-off users. If P50 is 20ms but P99 is 1.2s, one in a hundred users waits 60x longer than the median user.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Latency Distribution (not symmetric)</div>
+      <div class="flow-row">
+        <div class="flow-box">P50: 20ms</div>
+        <div class="flow-arrow">...</div>
+        <div class="flow-box">P95: 180ms</div>
+        <div class="flow-arrow">...</div>
+        <div class="flow-box">P99: 1.2s</div>
+        <div class="flow-arrow">...</div>
+        <div class="flow-box">P99.9: 4.8s</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">Why Averages Lie</div>
+      Averages are heavily influenced by outliers in skewed distributions. A single 30-second timeout can shift the average dramatically while the median barely moves. Worse, averages are not additive across services: if service A averages 50ms and service B averages 50ms, the average of A+B is NOT necessarily 100ms. Always report P50, P95, and P99.
+    </div>
+
+    <h3>Throughput</h3>
+    <p><strong>QPS</strong> (queries per second) and <strong>TPS</strong> (transactions per second) measure how much work a system completes per unit time. High throughput with high latency often means requests are queuing. High throughput with low latency is the goal.</p>
+
+    <h3>Other Critical Metrics</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Metric</th><th>What It Measures</th><th>Watch For</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Bandwidth</strong></td><td>Data volume per second (Gbps)</td><td>Network saturation, large payloads</td></tr>
+        <tr><td><strong>IOPS</strong></td><td>I/O operations per second</td><td>Disk bottlenecks, random vs sequential</td></tr>
+        <tr><td><strong>Saturation</strong></td><td>How full a resource is (0-100%)</td><td>Queuing begins well before 100%</td></tr>
+        <tr><td><strong>Error Rate</strong></td><td>Failed requests / total requests</td><td>Load shedding masking as "fast" responses</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">The USE Method (Brendan Gregg)</div>
+      For every resource, check: <strong>Utilization</strong> (% busy), <strong>Saturation</strong> (queue depth), and <strong>Errors</strong>. This systematically catches bottlenecks that ad-hoc monitoring misses.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Fundamental Laws</div>
+    <h2>The Math Behind Scaling</h2>
+    <p>Three laws form the theoretical backbone of performance engineering. They tell you what is possible before you write a single line of code.</p>
+
+    <h3>Amdahl's Law</h3>
+    <p>If a fraction <code>s</code> of your workload is serial (cannot be parallelized), then the maximum speedup with <code>N</code> processors is:</p>
+    <pre><code>Speedup(N) = 1 / (s + (1 - s) / N)
+
+Example: s = 5% serial
+  N = 10  cores  →  Speedup = 6.9x
+  N = 100 cores  →  Speedup = 16.8x
+  N = ∞   cores  →  Speedup = 20x  (hard ceiling!)</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">The Serial Fraction Trap</div>
+      Even 5% serial work limits you to 20x speedup no matter how many cores you throw at it. This is why "just add more servers" eventually stops working. Identify and shrink the serial fraction first.
+    </div>
+
+    <h3>Little's Law</h3>
+    <p>A deceptively simple but universally applicable relationship for any stable system:</p>
+    <pre><code>L = λ × W
+
+L = average number of items in system
+λ = average arrival rate
+W = average time each item spends in system
+
+Example: If requests arrive at 500/sec (λ) and each takes 200ms (W):
+  L = 500 × 0.2 = 100 concurrent requests in the system</code></pre>
+    <p>This tells you how many connections, threads, or workers you need. It works for queues, databases, thread pools, and even checkout lines at the grocery store.</p>
+
+    <h3>Universal Scalability Law (USL)</h3>
+    <p>Extends Amdahl's Law by adding a <strong>coherence penalty</strong> term: as you add nodes, they must coordinate (cache invalidation, locks, consensus). Beyond a certain point, adding capacity actually <em>decreases</em> throughput.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Throughput vs. Concurrency (USL)</div>
+      <div class="flow-row">
+        <div class="flow-box">Linear (ideal)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Amdahl (plateaus)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">USL (drops!)</div>
+      </div>
+    </div>
+    <p>The USL model: <code>C(N) = N / (1 + α(N-1) + β·N·(N-1))</code> where α is contention and β is coherence delay. When β > 0, there is a point of negative returns.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Profiling</div>
+    <h2>Finding the Bottleneck</h2>
+    <p>Profiling answers "where is the time going?" before you optimize. Guessing where bottlenecks are is wrong more often than you think.</p>
+
+    <h3>CPU Flame Graphs</h3>
+    <p>Flame graphs (invented by Brendan Gregg) visualize stack traces sampled over time. The x-axis is the sampled stack population (wider = more time spent), and the y-axis is stack depth. They instantly reveal which functions dominate CPU time.</p>
+    <pre><code># Generate a flame graph on Linux
+perf record -g -p &lt;PID&gt; -- sleep 30
+perf script | stackcollapse-perf.pl | flamegraph.pl > flame.svg
+
+# For Java (using async-profiler)
+./asprof -d 30 -f flame.html &lt;PID&gt;</code></pre>
+
+    <div class="callout">
+      <div class="callout-title">Reading a Flame Graph</div>
+      Look for wide plateaus (functions that consume a lot of CPU). The color is random and meaningless. If a function is wide at the top, it is a leaf function doing real work. If wide at the bottom, everything above it is its children.
+    </div>
+
+    <h3>Memory Profiling</h3>
+    <p>Track heap allocations, object retention, and GC behavior. In garbage-collected languages, excessive allocation rates create GC pressure even if peak memory is fine. Tools: <code>jmap</code>/<code>MAT</code> (Java), <code>memray</code> (Python), <code>pprof</code> (Go), Chrome DevTools (JS).</p>
+
+    <h3>I/O Profiling</h3>
+    <p>Disk and network I/O are often the real bottleneck but are harder to profile. Use <code>iostat</code>, <code>iotop</code>, <code>strace</code> (syscall tracing), and <code>bpftrace</code> for production-safe tracing on Linux.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Benchmarking Pitfalls</div>
+      <strong>Coordinated omission:</strong> if your load generator waits for each response before sending the next request, high-latency responses reduce the measured load, making the system look faster than it is. Use open-loop benchmarks. Also beware: JIT warmup, OS page cache, and CPU frequency scaling can all invalidate results.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Load Testing</div>
+    <h2>Breaking Things on Purpose</h2>
+    <p>Load testing validates whether your system meets performance targets under realistic conditions. Different test types answer different questions.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Test Type</th><th>Purpose</th><th>Duration</th><th>Load Pattern</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Load</strong></td><td>Can we handle expected traffic?</td><td>5-30 min</td><td>Ramp to target QPS</td></tr>
+        <tr><td><strong>Stress</strong></td><td>Where does the system break?</td><td>Until failure</td><td>Ramp beyond capacity</td></tr>
+        <tr><td><strong>Soak</strong></td><td>Memory leaks, resource exhaustion</td><td>4-24 hours</td><td>Sustained target QPS</td></tr>
+        <tr><td><strong>Spike</strong></td><td>Can we handle traffic bursts?</td><td>Short bursts</td><td>Sudden 10x jumps</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Tools</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">k6</div>
+        <p>JavaScript-based, scriptable. Excellent for CI/CD integration. Outputs detailed percentile data. Good for protocol-level testing (HTTP, gRPC, WebSocket).</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Locust</div>
+        <p>Python-based, user-behavior modeling. Distributed mode for high load. Great when tests need complex logic or database seeding.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">wrk / wrk2</div>
+        <p>Ultra-lightweight C-based HTTP benchmarking. wrk2 fixes coordinated omission. Best for raw throughput testing of a single endpoint.</p>
+      </div>
+    </div>
+
+    <pre><code># k6 example: ramp to 200 VUs over 2 minutes
+import http from 'k6/http';
+import { check } from 'k6';
+
+export const options = {
+  stages: [
+    { duration: '1m', target: 200 },
+    { duration: '3m', target: 200 },
+    { duration: '1m', target: 0 },
+  ],
+};
+
+export default function () {
+  const res = http.get('https://api.example.com/items');
+  check(res, { 'status 200': (r) => r.status === 200 });
+}</code></pre>
+
+    <div class="callout good">
+      <div class="callout-title">Load Testing Best Practice</div>
+      Always test from a separate machine (not the same host as the server). Use realistic data, not the same cached request repeated. Monitor the load generator itself — it can become the bottleneck.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Anti-Patterns</div>
+    <h2>Performance Killers</h2>
+    <p>These patterns silently degrade performance. They often pass code review because they look correct, but under load they are devastating.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">N+1 Queries</div>
+        <p>Fetching a list of N items, then issuing a separate query for each item's related data. Turns 1 query into N+1. Fix: use JOINs, eager loading, or DataLoader batching.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Chatty APIs</div>
+        <p>Client makes many small requests instead of one composite request. Each round trip adds latency. Fix: aggregate endpoints, GraphQL, or BFF (Backend for Frontend).</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Blocking I/O in Async</div>
+        <p>A single blocking call in an async event loop starves all other coroutines. In Node.js or Python asyncio, this freezes the entire server. Fix: use async-compatible libraries or offload to a thread pool.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">GC Pressure</div>
+        <p>Allocating millions of short-lived objects forces frequent garbage collection pauses. Fix: reuse objects, use object pools, avoid unnecessary boxing, prefer primitives.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Lock Contention</div>
+        <p>Multiple threads competing for the same lock serialize execution, negating parallelism. Fix: lock-free data structures, finer-grained locks, or share-nothing architecture.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Unbounded Queues</div>
+        <p>Queues without size limits let producers outpace consumers, eventually exhausting memory. Under load, latency grows unboundedly. Fix: bounded queues with backpressure.</p>
+      </div>
+    </div>
+
+    <pre><code># N+1 query example (Python/SQLAlchemy)
+
+# BAD: N+1 — 1 query for users, then N queries for orders
+users = session.query(User).all()
+for user in users:
+    print(user.orders)  # Each access triggers a lazy-load query
+
+# GOOD: Eager loading — 1 query with JOIN
+users = session.query(User).options(joinedload(User.orders)).all()
+for user in users:
+    print(user.orders)  # Already loaded, no extra query</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">The Unbounded Queue Trap</div>
+      An unbounded queue under sustained overload does not shed load — it accumulates it. Memory grows linearly with time. When the process finally OOMs, all queued work is lost. Always set a max size and decide what to do when the queue is full: drop, reject, or block.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Connection Pooling</div>
+    <h2>Amortizing Connection Cost</h2>
+    <p>Establishing a new connection is expensive. A TCP handshake is 1 RTT, TLS adds 1-2 more, and database authentication adds yet another round trip. For a cross-region connection at 80ms RTT, that is 240-400ms before the first byte of useful work.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Cost of a New Connection</div>
+      <div class="flow-row">
+        <div class="flow-box">TCP Handshake (1 RTT)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">TLS Handshake (1-2 RTT)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Auth / Login (1 RTT)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Ready!</div>
+      </div>
+    </div>
+
+    <p>A connection pool maintains a set of pre-established connections. When your code needs a connection, it borrows one from the pool and returns it when done. This amortizes the setup cost across thousands of requests.</p>
+
+    <h3>Database Connection Pools</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Pool</th><th>Language/DB</th><th>Key Feature</th></tr></thead>
+      <tbody>
+        <tr><td><strong>HikariCP</strong></td><td>Java / JDBC</td><td>Fastest JVM pool. Minimal overhead, no-frills design. Default in Spring Boot.</td></tr>
+        <tr><td><strong>PgBouncer</strong></td><td>Any / PostgreSQL</td><td>External proxy. Transaction-level pooling lets 1000s of clients share a few PG connections.</td></tr>
+        <tr><td><strong>pgpool-II</strong></td><td>Any / PostgreSQL</td><td>Also handles replication, load balancing. Heavier than PgBouncer.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>HTTP Connection Pools</h3>
+    <p>HTTP/1.1 <code>keep-alive</code> reuses TCP connections across requests. HTTP/2 multiplexes many requests over a single connection. Most HTTP client libraries manage pools internally, but you must configure max connections per host and idle timeouts.</p>
+
+    <h3>Pool Sizing</h3>
+    <div class="callout">
+      <div class="callout-title">HikariCP's Formula</div>
+      For database pools, a good starting point: <code>pool_size = (core_count * 2) + disk_spindles</code>. For SSDs, that simplifies to roughly <code>core_count * 2</code>. Counter-intuitively, smaller pools often outperform larger ones because they reduce context switching and lock contention on the database side.
+    </div>
+
+    <pre><code># PgBouncer config example (pgbouncer.ini)
+[databases]
+mydb = host=localhost port=5432 dbname=mydb
+
+[pgbouncer]
+pool_mode = transaction          # Return conn to pool after each transaction
+default_pool_size = 20           # Connections per user/database pair
+max_client_conn = 1000           # Max client connections to PgBouncer
+reserve_pool_size = 5            # Extra conns for burst traffic
+reserve_pool_timeout = 3         # Seconds before using reserve pool</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">Connection Pool Exhaustion</div>
+      If your pool is too small or connections are not returned (leaked), threads block waiting for a free connection. This manifests as sudden latency spikes and timeouts under moderate load. Always set a connection checkout timeout and monitor pool utilization.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">A service has P50 latency of 15ms and P99 latency of 2.5s. The average latency is 120ms. Which metric best represents the experience of the worst-affected users?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Average (120ms)</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> P50 (15ms)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> P99 (2.5s)</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> All three are equally informative</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">P99 captures the tail latency experienced by the worst 1% of users. The average is skewed by these outliers and misrepresents both the typical and worst-case experience. Always look at high percentiles to understand tail behavior.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">According to Amdahl's Law, if 10% of a workload is serial, what is the maximum possible speedup with infinite processors?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 100x</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 10x</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 90x</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Unlimited</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">Speedup = 1/s where s is the serial fraction. With s = 0.10, the maximum speedup is 1/0.10 = 10x, regardless of how many processors you add. The serial portion becomes the bottleneck.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="d" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">Using Little's Law: if a web server handles 1000 requests/sec and each request takes an average of 50ms, how many concurrent requests are in the system?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 20,000</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 500</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 1,000</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> 50</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">L = λ x W = 1000 req/sec x 0.050 sec = 50 concurrent requests. This tells you that you need at least 50 worker threads (or equivalent concurrency) to handle this load without queuing.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="a" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What is "coordinated omission" in the context of load testing?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The load generator slows down when the server is slow, underreporting true latency</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Multiple load generators failing to coordinate their request timing</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The server dropping requests that arrive simultaneously</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Omitting warm-up time from benchmark results</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">In a closed-loop benchmark, the client waits for each response before sending the next request. When the server is slow, the client sends fewer requests, reducing measured load. This makes the system appear faster than it really is under sustained traffic. Open-loop generators (like wrk2) fix this by sending requests at a fixed rate regardless of response time.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What type of load test is best for detecting memory leaks and slow resource exhaustion?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Spike test</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Stress test</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Soak test</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Load test</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">Soak tests run at a sustained load for hours (4-24h). They are specifically designed to catch problems that only manifest over time: memory leaks, connection leaks, log file growth, file descriptor exhaustion, and gradual performance degradation.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">A page loads a list of 50 blog posts, then fetches each post's author with a separate query. What anti-pattern is this?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Chatty API</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> N+1 query</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Unbounded queue</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Lock contention</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">This is a classic N+1 query: 1 query to get 50 posts, then 50 individual queries to get each post's author. The fix is to use a JOIN or eager loading to fetch posts and authors in a single query (or at most 2 queries with an IN clause).</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="d" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">Why do smaller database connection pools often outperform larger ones?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Larger pools use more memory for the pool object itself</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Databases have a hard limit of 20 connections</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Smaller pools force developers to write faster queries</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Fewer connections reduce context switching and lock contention on the database server</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">Each database connection consumes server resources (memory, a backend process/thread). More connections mean more context switching on the DB server and more contention for shared resources like buffer pools and WAL locks. A smaller pool lets each connection get more CPU time and reduces coordination overhead.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">In a flame graph, what does a wide plateau at the top of the stack indicate?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> A leaf function consuming significant CPU time directly</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> A function that calls many children</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> A memory leak in that function</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> An I/O-bound operation</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">The top of the stack in a flame graph represents leaf functions — code that is actually "on CPU" rather than waiting for a child function to return. A wide plateau at the top means that function is directly consuming a large share of CPU time and is a prime optimization target.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">What happens when you make a blocking I/O call inside a Python asyncio event loop?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Only that coroutine is blocked; others continue</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The runtime spawns a background thread automatically</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The entire event loop is blocked, freezing all coroutines</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> An exception is raised immediately</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">Asyncio uses a single-threaded event loop. A blocking call (like time.sleep() or a synchronous HTTP request) blocks the entire thread, preventing the event loop from scheduling any other coroutines. All concurrent work stalls until the blocking call returns. Use async libraries or run_in_executor() to offload blocking work.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">What does the Universal Scalability Law add beyond Amdahl's Law?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The cost of adding more memory</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> A coherence penalty where throughput can decrease as nodes are added</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Network latency between data centers</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The cost of software licenses per node</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">Amdahl's Law models contention (serial fraction) but assumes no coordination cost between processors. The USL adds a coherence/crosstalk penalty (β term) that accounts for the cost of keeping caches, state, or data consistent across nodes. When β > 0, adding too many nodes causes throughput to actually decrease — a retrograde region.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="/">← all topics</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

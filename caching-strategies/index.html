@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Caching Strategies — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="/infrastructure/">Infrastructure</a>
+    <span>/</span>
+    <span style="color:var(--text);">Caching Strategies</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Infrastructure</div>
+  <h1>Caching <span class="thin">Strategies</span></h1>
+  <p class="header-sub">From CPU registers to CDN edges — understanding where, how, and when to cache data. Patterns for reading and writing, eviction policies, failure modes, and production-grade tools like Redis.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1: CACHING LAYERS ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Caching Layers</div>
+    <h2>The Caching Hierarchy</h2>
+    <p>Every system has multiple caching layers stacked on top of each other. A request traverses these layers from the fastest and smallest to the slowest and largest. Understanding where each layer sits helps you decide which one to optimize.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Request path through caching layers</div>
+      <div class="flow-row">
+        <div class="flow-box">CPU Cache (L1/L2/L3)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">OS Page Cache</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">App-level Cache</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Distributed Cache (Redis)</div>
+      </div>
+      <div class="flow-row" style="margin-top:0.8rem;">
+        <div class="flow-box">CDN Edge</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Browser Cache</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">DB Buffer Pool</div>
+      </div>
+    </div>
+
+    <h3>CPU Cache</h3>
+    <p>L1 (~1ns), L2 (~4ns), L3 (~10ns). Hardware-managed. You influence it through data locality — keep hot data contiguous in memory so cache lines stay useful. False sharing across cores is a common pitfall in multi-threaded code.</p>
+
+    <h3>OS Page Cache</h3>
+    <p>The kernel caches recently read disk pages in free RAM. This is why the second <code>cat</code> of a large file is instant. Tools like <code>vmtouch</code> let you inspect what's cached. Database engines like PostgreSQL rely heavily on this layer.</p>
+
+    <h3>Application-level Cache</h3>
+    <p>In-process caches like Guava, Caffeine (JVM), or a Python dictionary. Zero network overhead, but limited to a single process and lost on restart. Best for reference data that changes rarely.</p>
+
+    <h3>Distributed Cache</h3>
+    <p>Redis or Memcached — shared across all app instances. Adds a network hop (~0.5ms) but provides a unified view. This is the workhorse cache in most web architectures.</p>
+
+    <h3>CDN Edge Cache</h3>
+    <p>Cloudflare, CloudFront, Fastly — caches HTTP responses at PoPs close to users. Eliminates origin round-trips for static and semi-static content. Latency drops from 200ms to 20ms.</p>
+
+    <h3>Browser Cache</h3>
+    <p>Controlled via HTTP headers (<code>Cache-Control</code>, <code>ETag</code>). The fastest cache — no network at all. But hard to invalidate once set.</p>
+
+    <h3>DB Buffer Pool</h3>
+    <p>InnoDB's buffer pool, PostgreSQL's shared buffers. The database caches frequently accessed pages in its own managed memory, reducing disk I/O. Tuning buffer pool size is one of the highest-impact database optimizations.</p>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      The fastest cache hit is the one closest to the requester. Design so that most requests never reach the origin — the CDN handles static assets, Redis handles dynamic lookups, and the DB buffer pool handles the rest.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2: CACHING PATTERNS ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Caching Patterns</div>
+    <h2>Read and Write Patterns</h2>
+    <p>How your application interacts with the cache determines consistency, latency, and complexity tradeoffs. Five core patterns cover the majority of use cases.</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Pattern</th><th>Read Path</th><th>Write Path</th><th>Consistency</th><th>Best For</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Cache-Aside</strong></td><td>App checks cache, on miss reads DB, fills cache</td><td>App writes DB, invalidates cache</td><td>Eventual</td><td>General purpose, most common</td></tr>
+        <tr><td><strong>Read-Through</strong></td><td>Cache itself loads from DB on miss</td><td>Same as cache-aside</td><td>Eventual</td><td>Simpler app code, cache-as-library</td></tr>
+        <tr><td><strong>Write-Through</strong></td><td>From cache</td><td>App writes cache, cache synchronously writes DB</td><td>Strong</td><td>When consistency matters more than write latency</td></tr>
+        <tr><td><strong>Write-Behind</strong></td><td>From cache</td><td>App writes cache, cache async writes DB</td><td>Eventual (risk of loss)</td><td>High write throughput, acceptable loss risk</td></tr>
+        <tr><td><strong>Refresh-Ahead</strong></td><td>Cache proactively refreshes before TTL expires</td><td>N/A</td><td>Eventual</td><td>Predictable access patterns, low-latency reads</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Cache-Aside (Lazy Loading)</h3>
+    <p>The most widely used pattern. The application is responsible for all cache interactions. On a cache miss, the app fetches from the database and populates the cache. On writes, the app updates the database first, then invalidates (not updates) the cache entry.</p>
+    <pre><code>def get_user(user_id):
+    user = cache.get(f"user:{user_id}")
+    if user is None:
+        user = db.query("SELECT * FROM users WHERE id = %s", user_id)
+        cache.set(f"user:{user_id}", user, ttl=300)
+    return user
+
+def update_user(user_id, data):
+    db.execute("UPDATE users SET ... WHERE id = %s", user_id)
+    cache.delete(f"user:{user_id}")  # invalidate, don't update</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">Why invalidate, not update?</div>
+      Updating the cache on write creates a race condition: two concurrent writes can leave the cache holding stale data from the slower writer. Deleting the key forces the next read to fetch fresh data from the source of truth.
+    </div>
+
+    <h3>Write-Behind (Write-Back)</h3>
+    <p>The cache buffers writes and flushes them to the database asynchronously in batches. This dramatically improves write throughput but introduces a durability risk — if the cache node crashes before flushing, those writes are lost. Used in systems like CPU caches, OS page cache dirty writeback, and some message queue patterns.</p>
+
+    <h3>Refresh-Ahead</h3>
+    <p>The cache predicts which keys will be needed soon and refreshes them before they expire. This avoids the latency spike of a cache miss. Works well when access patterns are predictable (e.g., a product page refreshed every 30s). Poorly predicted refreshes waste resources.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 3: EVICTION POLICIES ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Eviction Policies</div>
+    <h2>When the Cache is Full</h2>
+    <p>Every cache has a size limit. When it fills up, the eviction policy decides which entries to drop. The right policy depends on your access pattern.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">LRU</div>
+        <p>Least Recently Used. Evicts the entry that hasn't been accessed for the longest time. Good general-purpose policy. Used by Redis (<code>allkeys-lru</code>).</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">LFU</div>
+        <p>Least Frequently Used. Evicts the entry with the fewest accesses. Better for workloads with stable hot keys, but slow to adapt to access pattern changes.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">FIFO</div>
+        <p>First In, First Out. Evicts the oldest entry regardless of access pattern. Simple but naive — ignores popularity entirely. Rarely used in production caches.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">TTL-based</div>
+        <p>Entries expire after a fixed time-to-live. Not strictly eviction but controls cache freshness. Often combined with LRU/LFU for memory pressure eviction.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">W-TinyLFU</div>
+        <p>Used by Caffeine (Java). Combines a small admission window (LRU) with a main space (segmented LRU), using a frequency sketch to decide admission. Near-optimal hit rates with low overhead.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Random</div>
+        <p>Evicts a random entry. Surprisingly effective for uniform access patterns. Redis supports <code>allkeys-random</code>. Zero overhead for tracking access metadata.</p>
+      </div>
+    </div>
+
+    <div class="callout good">
+      <div class="callout-title">Practical Guidance</div>
+      Start with LRU — it works well for most web workloads. If you notice scan-resistance issues (a batch read evicts your hot data), consider W-TinyLFU or segmented LRU. Use LFU only when your hot set is truly stable.
+    </div>
+
+    <h3>Redis Eviction Modes</h3>
+    <p>Redis offers 8 eviction policies configured via <code>maxmemory-policy</code>: <code>noeviction</code> (return errors), <code>allkeys-lru</code>, <code>volatile-lru</code> (only keys with TTL), <code>allkeys-lfu</code>, <code>volatile-lfu</code>, <code>allkeys-random</code>, <code>volatile-random</code>, and <code>volatile-ttl</code> (evict keys with shortest remaining TTL). The <code>volatile-*</code> variants only consider keys that have an expiration set.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 4: INVALIDATION ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Cache Invalidation</div>
+    <h2>The Hard Problem</h2>
+    <p>"There are only two hard things in computer science: cache invalidation and naming things." Invalidation is hard because you must ensure the cache reflects the source of truth without sacrificing the performance gains that caching provides.</p>
+
+    <h3>TTL-based Invalidation</h3>
+    <p>The simplest approach. Every cache entry gets a time-to-live. After expiry, the next read triggers a fresh fetch. Staleness is bounded by the TTL value. Short TTLs reduce staleness but increase origin load. A 60s TTL means data can be up to 60 seconds stale.</p>
+
+    <h3>Event-driven Invalidation</h3>
+    <p>When data changes, the writer publishes an event (via Kafka, Redis Pub/Sub, or a DB trigger) and cache subscribers invalidate or update the relevant keys. Provides near-real-time consistency but adds infrastructure complexity.</p>
+    <pre><code># Publisher (on write)
+def update_product(product_id, data):
+    db.update(product_id, data)
+    event_bus.publish("product.updated", {"id": product_id})
+
+# Subscriber (cache invalidator)
+@event_bus.on("product.updated")
+def handle_product_update(event):
+    cache.delete(f"product:{event['id']}")</code></pre>
+
+    <h3>Version-based Invalidation</h3>
+    <p>Cache keys include a version number or hash. When data changes, the version increments, and old keys are naturally never read again. The stale entries eventually get evicted by memory pressure. Common in CDN cache-busting: <code>app.v3.js</code> or <code>app.abc123.js</code>.</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Strategy</th><th>Staleness</th><th>Complexity</th><th>Origin Load</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>TTL-based</td><td>Bounded by TTL</td><td>Low</td><td>Moderate (on expiry)</td></tr>
+        <tr><td>Event-driven</td><td>Near-zero</td><td>High</td><td>Low (only on miss)</td></tr>
+        <tr><td>Version-based</td><td>Zero (new key)</td><td>Medium</td><td>Low (orphaned keys waste space)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      Most production systems combine strategies: TTL as a safety net (even event-driven caches use TTL as a fallback), event-driven for critical data, and version-based for static assets.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5: FAILURE PATTERNS ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Failure Patterns</div>
+    <h2>When Caching Goes Wrong</h2>
+    <p>Caching introduces its own class of failure modes. Understanding these patterns — and their mitigations — is essential for building resilient systems.</p>
+
+    <h3>Cache Stampede (Thundering Herd)</h3>
+    <p>A popular key expires, and hundreds of concurrent requests all miss the cache simultaneously, hammering the database with identical queries. The mitigation toolkit:</p>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Locking</div>
+        <p>Only one request fetches from DB; others wait for the cache to be repopulated. Use a distributed lock (e.g., Redis <code>SET NX EX</code>).</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Request Coalescing</div>
+        <p>Deduplicate in-flight requests for the same key. The first request does the work; others receive the same result. Libraries like <code>singleflight</code> (Go) implement this.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Jitter on TTL</div>
+        <p>Add random variance to TTL values so keys don't all expire at the same instant. E.g., TTL = 300 + random(0, 60).</p>
+      </div>
+    </div>
+
+    <h3>Cache Penetration</h3>
+    <p>Requests for data that doesn't exist bypass the cache every time (cache miss, DB miss, nothing to cache). Attackers can exploit this to overload your database. Mitigations:</p>
+    <p><strong>Cache negative results:</strong> Store a null/empty sentinel value with a short TTL for keys that don't exist in the DB.</p>
+    <p><strong>Bloom filter:</strong> Check a Bloom filter before querying. If the filter says "not present," skip the DB entirely. False positives are acceptable (they just cause a normal DB miss).</p>
+
+    <h3>Cache Avalanche</h3>
+    <p>A large number of keys expire at the same time (e.g., all populated during the same cache warmup), causing a sudden spike in DB load. Mitigation: stagger TTLs with random jitter, and implement circuit breakers to degrade gracefully.</p>
+
+    <h3>Hot Key Problem</h3>
+    <p>A single extremely popular key receives disproportionate traffic, overloading the cache node that owns it. Solutions: replicate the hot key across multiple nodes with slight key name variations, use local in-process caching as a first layer, or split the value across sub-keys.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Production Checklist</div>
+      Before launching any caching layer: (1) add TTL jitter, (2) cache negative lookups, (3) set up monitoring for hit rate, miss rate, and eviction rate, (4) have a circuit breaker for cache failures so you can fall back to the DB without cascading.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6: CDN & REDIS ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / CDN and Redis in Production</div>
+    <h2>Edge Caching and Distributed Caching</h2>
+
+    <h3>CDN Edge Caching</h3>
+    <p>CDNs cache content at Points of Presence (PoPs) worldwide. The key mechanisms:</p>
+    <p><strong>Cache-Control headers</strong> govern CDN behavior. <code>Cache-Control: public, max-age=86400</code> tells the CDN to cache for 24 hours. <code>s-maxage</code> overrides <code>max-age</code> for shared caches (CDNs) specifically. <code>stale-while-revalidate</code> serves stale content while fetching fresh data in the background.</p>
+
+    <pre><code># Common Cache-Control patterns
+Cache-Control: public, max-age=31536000, immutable     # versioned assets (app.3f2a.js)
+Cache-Control: public, s-maxage=60, stale-while-revalidate=300  # API responses
+Cache-Control: private, no-cache                        # user-specific data
+Cache-Control: no-store                                 # sensitive data, never cache</code></pre>
+
+    <p><strong>Cache busting:</strong> Append a hash or version to filenames (<code>style.a1b2c3.css</code>) so updated assets get a new URL and bypass stale CDN caches. Build tools like Webpack/Vite do this automatically.</p>
+    <p><strong>Origin shield:</strong> An intermediate CDN layer between edge PoPs and your origin. Multiple edge nodes fetch from the shield instead of hitting the origin directly, reducing origin load during cache misses.</p>
+
+    <h3>Redis in Production</h3>
+    <p>Redis is the dominant distributed cache. Key considerations:</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Feature</th><th>Details</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Data Structures</strong></td><td>Strings, Hashes, Lists, Sets, Sorted Sets, Streams, HyperLogLog. Use the right structure — Hashes for objects, Sorted Sets for leaderboards, Streams for event logs.</td></tr>
+        <tr><td><strong>Persistence</strong></td><td>RDB (periodic snapshots) and AOF (append-only log). RDB is faster for restarts; AOF is more durable. Use both in production for safety.</td></tr>
+        <tr><td><strong>Sentinel</strong></td><td>Automatic failover for master-replica setups. Monitors master health, promotes a replica on failure, and reconfigures clients. Minimum 3 Sentinel instances for quorum.</td></tr>
+        <tr><td><strong>Cluster</strong></td><td>Shards data across multiple nodes using 16,384 hash slots. Provides horizontal scaling beyond a single node's memory. Adds complexity — some multi-key operations require all keys on the same shard (use hash tags).</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Common Redis Patterns</h3>
+    <pre><code># Distributed lock (for cache stampede prevention)
+SET lock:product:42 owner_id NX EX 10  # acquire lock, 10s timeout
+# ... fetch from DB, populate cache ...
+DEL lock:product:42                     # release lock
+
+# Rate limiting with sliding window
+ZADD rate:user:123 NOW NOW             # add timestamp as score and member
+ZREMRANGEBYSCORE rate:user:123 0 (NOW-60)  # remove entries older than 60s
+ZCARD rate:user:123                     # count requests in window
+
+# Leaderboard
+ZADD leaderboard 1500 "player:alice"
+ZADD leaderboard 2100 "player:bob"
+ZREVRANGE leaderboard 0 9 WITHSCORES   # top 10</code></pre>
+
+    <div class="callout good">
+      <div class="callout-title">Redis vs Memcached</div>
+      Use Redis when you need data structures beyond key-value, persistence, pub/sub, or Lua scripting. Use Memcached for pure key-value caching where simplicity and multi-threaded performance matter. Redis is the default choice for most teams today.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="b" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">In a cache-aside pattern, what should the application do after updating the database?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Update the cache with the new value</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Delete the cache entry (invalidate)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Do nothing — TTL will handle it</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Write to cache first, then database</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">Invalidating (deleting) the cache key avoids a race condition where two concurrent writes could leave the cache with stale data from the slower writer. The next read will populate the cache with fresh data from the database.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="c" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">Which eviction policy does Caffeine (Java) use to achieve near-optimal hit rates?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Pure LRU</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Pure LFU</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> W-TinyLFU</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> FIFO with TTL</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">W-TinyLFU combines a small admission window (LRU) with a main space (segmented LRU) and uses a compact frequency sketch (Count-Min Sketch) to decide whether new entries should be admitted. This achieves near-optimal hit rates with low memory overhead.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="d" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">What is the primary risk of the write-behind (write-back) caching pattern?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Higher read latency</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Cache penetration</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Higher write latency</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Data loss if the cache node crashes before flushing to DB</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">Write-behind buffers writes in the cache and flushes them to the database asynchronously. If the cache node crashes before the flush completes, those buffered writes are lost permanently. This is the fundamental tradeoff for the higher write throughput it provides.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="a" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">How does a Bloom filter help prevent cache penetration?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It quickly identifies keys that definitely do not exist, skipping unnecessary DB queries</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It compresses cache entries to fit more data</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It distributes hot keys across multiple nodes</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It locks the database during cache misses</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">A Bloom filter is a space-efficient probabilistic data structure that can tell you with certainty if an element is NOT in a set. When a request comes for a non-existent key, the Bloom filter catches it before it hits the database. False positives are possible (causing a normal DB miss) but false negatives are not.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="b" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What does <code>stale-while-revalidate</code> in a Cache-Control header do?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Prevents the CDN from caching the response entirely</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Serves stale cached content while fetching a fresh copy in the background</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Forces the browser to revalidate with the origin on every request</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Sets the maximum TTL for shared caches</button>
+      </div>
+      <div class="q-explanation" id="q5-exp"><code>stale-while-revalidate</code> allows the cache to immediately serve a stale response while asynchronously fetching a fresh one from the origin. The user gets instant response times, and the cache stays fresh for the next request. It's a way to get both low latency and freshness.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="c" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">What is the primary mitigation for cache avalanche?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Using write-through caching</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Caching negative results</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Adding random jitter to TTL values so keys don't expire simultaneously</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Using FIFO eviction</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">Cache avalanche occurs when many keys expire at the same time, causing a sudden load spike on the database. By adding random jitter to TTL values (e.g., base TTL + random offset), expirations are spread out over time, preventing the thundering herd effect.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="d" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">In Redis Cluster, how is data distributed across nodes?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Consistent hashing with virtual nodes</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Round-robin assignment</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Range-based partitioning</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> 16,384 hash slots assigned to nodes</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">Redis Cluster uses a fixed set of 16,384 hash slots. Each key is mapped to a slot via CRC16(key) mod 16384, and each node is responsible for a subset of slots. This is different from consistent hashing — it uses a fixed slot space that is explicitly assigned to nodes.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What is an origin shield in a CDN architecture?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> An intermediate cache layer between edge PoPs and the origin server</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> A firewall that protects the origin from DDoS attacks</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> A DNS-based load balancer for origin servers</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> A TLS termination point at the edge</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">An origin shield is a designated CDN PoP that acts as a middle layer. Instead of every edge node independently fetching from the origin on a cache miss, they fetch from the shield. This collapses many edge misses into a single origin request, significantly reducing origin load.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="b" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">Which Redis persistence mode provides better durability?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> RDB (periodic snapshots)</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> AOF (append-only file)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Both provide identical durability</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Neither — Redis is purely in-memory</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">AOF logs every write operation and can be configured to fsync on every command (<code>appendfsync always</code>), providing near-zero data loss. RDB takes periodic snapshots, so you can lose all writes since the last snapshot. In practice, production setups use both: AOF for durability and RDB for fast restarts.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="c" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">What distinguishes read-through caching from cache-aside?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Read-through provides stronger consistency guarantees</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Read-through writes to the database synchronously</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> In read-through, the cache library itself loads data from the DB on a miss, not the application</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Read-through does not support TTL-based expiration</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">In cache-aside, the application is responsible for checking the cache, fetching from the DB on a miss, and populating the cache. In read-through, this logic is encapsulated within the cache itself — the app simply asks the cache for data, and the cache transparently loads from the DB on a miss. This simplifies application code.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="/">← all topics</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

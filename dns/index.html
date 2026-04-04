@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DNS (Domain Name System) — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="/networking/">Networking</a>
+    <span>/</span>
+    <span style="color:var(--text);">DNS</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Networking</div>
+  <h1>DNS <span class="thin">Domain Name System</span></h1>
+  <p class="header-sub">The internet's phone book. How human-readable domain names get translated into IP addresses, the hierarchy of servers that make it work, and the security mechanisms that protect it.</p>
+</header>
+
+<div class="content">
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-num">01 / Resolution</div>
+    <h2>How DNS Resolution Works</h2>
+    <p>When you type <code>example.com</code> into a browser, a chain of lookups begins. Your machine doesn't know the IP address, so it asks a recursive resolver (usually run by your ISP or a public provider like 8.8.8.8). The resolver then walks the DNS hierarchy on your behalf.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">DNS Resolution Flow</div>
+      <div class="flow-row">
+        <div class="flow-box">Client</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Recursive Resolver</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Root Server (.)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">TLD Server (.com)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Authoritative NS</div>
+      </div>
+      <div class="flow-row" style="margin-top:0.8rem;">
+        <div class="flow-box" style="background:var(--green-bg);border-color:rgba(27,125,70,0.2);color:var(--green);">IP address returned</div>
+        <div class="flow-arrow">&larr;</div>
+        <div class="flow-box">Answer cached at each layer</div>
+      </div>
+    </div>
+
+    <h3>Step by Step</h3>
+    <p><strong>1. Local cache check</strong> &mdash; The OS checks its own DNS cache and the <code>/etc/hosts</code> file before making any network request.</p>
+    <p><strong>2. Recursive resolver</strong> &mdash; If not cached, the stub resolver sends a query to the configured recursive resolver. This server does the heavy lifting.</p>
+    <p><strong>3. Root servers</strong> &mdash; The resolver asks a root server "where is .com?" The root responds with the address of the TLD nameservers for <code>.com</code>.</p>
+    <p><strong>4. TLD nameservers</strong> &mdash; The resolver asks the .com TLD server "where is example.com?" and gets back the authoritative nameservers for that domain.</p>
+    <p><strong>5. Authoritative nameserver</strong> &mdash; The resolver queries the authoritative NS, which returns the actual A/AAAA record with the IP address.</p>
+
+    <h3>Caching and TTL</h3>
+    <p>Every DNS record has a <strong>TTL (Time to Live)</strong> value in seconds. The resolver caches the answer for that duration. Typical TTLs range from 300s (5 min) to 86400s (24 hours). Lower TTLs mean faster propagation of changes but higher query load on authoritative servers.</p>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      DNS resolution is <strong>iterative</strong> from the resolver's perspective: it walks the hierarchy step by step. From the client's perspective, it's <strong>recursive</strong>: the client sends one query and gets back the final answer.
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-num">02 / Record Types</div>
+    <h2>DNS Record Types</h2>
+    <p>DNS stores far more than just IP addresses. Each record type serves a specific purpose in the ecosystem.</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Type</th><th>Purpose</th><th>Example Value</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>A</code></td><td>Maps domain to IPv4 address</td><td><code>93.184.216.34</code></td></tr>
+        <tr><td><code>AAAA</code></td><td>Maps domain to IPv6 address</td><td><code>2606:2800:220:1::</code></td></tr>
+        <tr><td><code>CNAME</code></td><td>Alias pointing to another domain</td><td><code>www.example.com &rarr; example.com</code></td></tr>
+        <tr><td><code>MX</code></td><td>Mail server for the domain (with priority)</td><td><code>10 mail.example.com</code></td></tr>
+        <tr><td><code>TXT</code></td><td>Arbitrary text (SPF, DKIM, DMARC, verification)</td><td><code>v=spf1 include:_spf.google.com ~all</code></td></tr>
+        <tr><td><code>NS</code></td><td>Authoritative nameservers for a zone</td><td><code>ns1.example.com</code></td></tr>
+        <tr><td><code>SOA</code></td><td>Start of Authority &mdash; zone metadata, serial number</td><td><code>ns1.example.com admin.example.com 2024010101</code></td></tr>
+        <tr><td><code>SRV</code></td><td>Service location (port, priority, weight)</td><td><code>_sip._tcp 10 60 5060 sip.example.com</code></td></tr>
+        <tr><td><code>PTR</code></td><td>Reverse DNS &mdash; IP to domain name</td><td><code>34.216.184.93.in-addr.arpa &rarr; example.com</code></td></tr>
+        <tr><td><code>CAA</code></td><td>Certificate Authority Authorization &mdash; which CAs can issue certs</td><td><code>0 issue "letsencrypt.org"</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>TXT Records for Email Security</h3>
+    <p><strong>SPF</strong> (Sender Policy Framework) declares which mail servers are allowed to send email for your domain. <strong>DKIM</strong> (DomainKeys Identified Mail) publishes a public key that recipients use to verify email signatures. <strong>DMARC</strong> ties SPF and DKIM together with a policy for handling failures.</p>
+
+    <pre><code># SPF record
+v=spf1 include:_spf.google.com ~all
+
+# DKIM record (selector: google)
+google._domainkey  IN  TXT  "v=DKIM1; k=rsa; p=MIIBIjAN..."
+
+# DMARC record
+_dmarc  IN  TXT  "v=DMARC1; p=reject; rua=mailto:reports@example.com"</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">CNAME Restrictions</div>
+      A CNAME record cannot coexist with other record types at the same name. You cannot put a CNAME at the zone apex (e.g., <code>example.com</code>) if you also need MX or TXT records there. Many DNS providers offer "ALIAS" or "ANAME" as a workaround.
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-num">03 / Infrastructure</div>
+    <h2>DNS Infrastructure</h2>
+    <p>The DNS ecosystem is built on distinct server roles and clever networking techniques that keep it fast and resilient.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Authoritative NS</div>
+        <p>Holds the actual DNS records for a zone. It's the source of truth. Returns answers with the "aa" (authoritative answer) flag set.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Recursive Resolver</div>
+        <p>Does the work of walking the hierarchy on behalf of clients. Caches results. Examples: 8.8.8.8 (Google), 1.1.1.1 (Cloudflare), your ISP's resolver.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Root Servers</div>
+        <p>13 logical root server clusters (A through M), operated by different organizations. They use anycast so each "server" is actually hundreds of instances worldwide.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Anycast</div>
+        <p>Multiple servers share the same IP address. BGP routing sends each query to the nearest instance. This is how root servers and CDN DNS handle global traffic with low latency.</p>
+      </div>
+    </div>
+
+    <div class="callout good">
+      <div class="callout-title">Why 13 Root Servers?</div>
+      The original DNS packet size limit of 512 bytes (for UDP) could fit exactly 13 nameserver records with their IPv4 addresses. Today these 13 logical servers span 1,700+ physical instances via anycast.
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-num">04 / Features</div>
+    <h2>Advanced DNS Features</h2>
+
+    <h3>DNS Load Balancing</h3>
+    <p>DNS can distribute traffic by returning multiple A records (round-robin) or by using weighted responses. The client typically uses the first IP returned. More sophisticated setups use health checks and geographic routing at the DNS level (GeoDNS).</p>
+
+    <pre><code># Multiple A records for round-robin
+example.com.  300  IN  A  192.0.2.1
+example.com.  300  IN  A  192.0.2.2
+example.com.  300  IN  A  192.0.2.3</code></pre>
+
+    <h3>Split-Horizon DNS</h3>
+    <p>Returns different answers depending on who is asking. Internal users on the corporate network get private IPs pointing to internal servers, while external users get public IPs. This is common in enterprise environments and is implemented by configuring DNS views based on the source IP of the query.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Split-Horizon DNS</div>
+      <div class="flow-row">
+        <div class="flow-box">Internal Client (10.0.x.x)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">DNS Server</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box" style="background:var(--green-bg);border-color:rgba(27,125,70,0.2);color:var(--green);">10.0.1.5 (private)</div>
+      </div>
+      <div class="flow-row" style="margin-top:0.4rem;">
+        <div class="flow-box">External Client (public IP)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">DNS Server</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box" style="background:var(--orange-bg);border-color:rgba(212,115,14,0.2);color:var(--orange);">203.0.113.10 (public)</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Service Discovery with DNS</div>
+      Tools like <strong>Consul</strong> and <strong>Kubernetes CoreDNS</strong> use DNS as a service discovery mechanism. Services register themselves, and clients find them via SRV records (e.g., <code>_web._tcp.service.consul</code>). This avoids hardcoding IPs and makes infrastructure dynamic.
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-num">05 / Security</div>
+    <h2>DNS Security</h2>
+    <p>DNS was designed in the 1980s without authentication or encryption. Several extensions have been added to address this.</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Mechanism</th><th>What It Does</th><th>Layer</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>DNSSEC</strong></td><td>Adds cryptographic signatures to DNS responses. Resolvers can verify that records haven't been tampered with. Uses a chain of trust from root to zone.</td><td>Data integrity</td></tr>
+        <tr><td><strong>DoH</strong> (DNS over HTTPS)</td><td>Encrypts DNS queries inside HTTPS. Prevents ISPs and middleboxes from seeing or modifying queries. Runs on port 443.</td><td>Transport encryption</td></tr>
+        <tr><td><strong>DoT</strong> (DNS over TLS)</td><td>Encrypts DNS queries with TLS on a dedicated port (853). Easier for network admins to manage than DoH since it uses a distinct port.</td><td>Transport encryption</td></tr>
+      </tbody>
+    </table>
+
+    <h3>DNS Amplification Attacks</h3>
+    <p>An attacker sends DNS queries with a <strong>spoofed source IP</strong> (the victim's IP) to open resolvers. The resolver sends the (much larger) response to the victim. Because DNS responses can be 50-70x larger than queries (especially with DNSSEC or ANY queries), this amplifies the attack traffic massively.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Mitigation</div>
+      Open resolvers should implement <strong>response rate limiting (RRL)</strong>. Networks should deploy <strong>BCP38/ingress filtering</strong> to prevent IP spoofing. Many resolvers now refuse <code>ANY</code> queries to reduce amplification factor.
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-num">06 / Practice</div>
+    <h2>Operational Practices</h2>
+
+    <h3>DNS Propagation</h3>
+    <p>When you change a DNS record, the old value may remain in caches worldwide until its TTL expires. "Propagation" is just caches expiring at different times. There's no push mechanism &mdash; each resolver refreshes independently.</p>
+
+    <h3>Low TTL for Migrations</h3>
+    <p>Before a migration (changing hosting provider, IP address, etc.), lower the TTL to 60-300 seconds a few days in advance. This ensures that when you flip the record, caches expire quickly and traffic moves to the new destination. After the migration stabilizes, raise the TTL back up to reduce query load.</p>
+
+    <pre><code># Days before migration: lower TTL
+example.com.  300  IN  A  old-ip
+
+# Migration day: flip the record
+example.com.  300  IN  A  new-ip
+
+# After stabilization: raise TTL
+example.com.  86400  IN  A  new-ip</code></pre>
+
+    <h3>Useful Diagnostic Commands</h3>
+    <pre><code># Query specific record type
+dig example.com A
+dig example.com MX +short
+
+# Trace the full resolution path
+dig +trace example.com
+
+# Query a specific nameserver
+dig @8.8.8.8 example.com
+
+# Reverse DNS lookup
+dig -x 93.184.216.34
+
+# Check DNSSEC
+dig +dnssec example.com</code></pre>
+
+    <div class="callout good">
+      <div class="callout-title">Pro Tip</div>
+      Use <code>dig +trace</code> to see every step of the resolution process from root to authoritative. It bypasses your local cache and shows you exactly what the hierarchy returns at each level.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">9</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">In a typical DNS resolution, what is the correct order of servers queried by the recursive resolver?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> TLD &rarr; Root &rarr; Authoritative</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Authoritative &rarr; Root &rarr; TLD</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Root &rarr; TLD &rarr; Authoritative</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Root &rarr; Authoritative &rarr; TLD</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">The resolver walks top-down: root servers point to TLD servers, which point to the authoritative nameservers for the domain.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">Which DNS record type is used for reverse lookups (IP to domain name)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> CNAME</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> PTR</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> SRV</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> NS</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">PTR (Pointer) records map IP addresses back to domain names. They live under the <code>in-addr.arpa</code> (IPv4) or <code>ip6.arpa</code> (IPv6) zones.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="d" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">Why can't you place a CNAME record at the zone apex (e.g., example.com)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> CNAME records only work for subdomains</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The root zone doesn't support CNAME</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> CNAME records cannot point to A records</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> CNAME cannot coexist with other record types, and the apex requires SOA and NS records</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">Per RFC 1034, a CNAME record means "this name is an alias; use the canonical name instead." It cannot coexist with any other record type at the same name. Since the zone apex must have SOA and NS records, a CNAME is forbidden there.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="a" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What does DNSSEC provide?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Data integrity and authentication of DNS responses</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Encryption of DNS queries and responses</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Protection against DDoS attacks</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Faster DNS resolution through caching</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">DNSSEC adds cryptographic signatures to DNS records so resolvers can verify authenticity and integrity. It does <em>not</em> encrypt queries &mdash; that's what DoH and DoT are for.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What networking technique allows all 13 root server addresses to serve from hundreds of physical locations worldwide?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Multicast</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Round-robin DNS</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Anycast</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Load balancer</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">Anycast allows multiple servers to share the same IP address. BGP routing directs each query to the nearest instance, providing low latency and resilience.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">Before migrating to a new server, you should:</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Set TTL to 86400 to ensure stability</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Lower the TTL days in advance so caches expire quickly when you flip</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Delete all DNS records and re-create them</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Use CNAME records for everything during the migration</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">Lowering the TTL before a migration ensures that when you change the IP, resolvers worldwide will pick up the new value quickly. You need to lower it <em>before</em> the change, because existing caches will hold the old TTL value until it expires.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="d" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">What makes DNS amplification attacks effective?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> DNS queries are encrypted, hiding the attack</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> DNS servers forward all traffic to the victim</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> DNSSEC makes responses impossible to filter</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Small queries produce much larger responses, and UDP allows source IP spoofing</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">DNS uses UDP, which has no handshake, so the source IP can be spoofed. A 40-byte query can produce a 3000+ byte response (especially with DNSSEC or ANY queries), amplifying the traffic aimed at the victim.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What is split-horizon DNS used for?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Returning different DNS answers based on the client's network location</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Splitting DNS zones across multiple authoritative servers</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Encrypting DNS traffic between internal and external networks</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Distributing DNS queries evenly across resolvers</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">Split-horizon DNS returns different records depending on where the query comes from. Internal users get private IPs while external users get public IPs, commonly used in enterprise networks.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">Which TXT record mechanism declares which mail servers are authorized to send email on behalf of a domain?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> DMARC</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> DKIM</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> SPF</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> CAA</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">SPF (Sender Policy Framework) specifies which IP addresses and servers are authorized to send email for a domain. DKIM handles message signing, DMARC ties them together with policy, and CAA is for certificate authority authorization (unrelated to email).</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="/">← all topics</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

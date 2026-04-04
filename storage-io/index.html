@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Storage & I/O — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="/cs-fundamentals/">CS Fundamentals</a>
+    <span>/</span>
+    <span style="color:var(--text);">Storage &amp; I/O</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Hardware &amp; Compute</div>
+  <h1>Storage <span class="thin">&amp;</span> I/O</h1>
+  <p class="header-sub">From spinning platters to flash cells, from RAID arrays to copy-on-write file systems -- how data is persisted, organized, and made durable at every layer of the stack.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1: HDD ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Hard Disk Drives</div>
+    <h2>HDD Internals</h2>
+    <p>A hard disk drive stores data on spinning magnetic <strong>platters</strong>. A read/write <strong>head</strong> floats nanometers above each platter surface on an actuator arm. Data is organized into concentric <strong>tracks</strong>, each divided into fixed-size <strong>sectors</strong> (typically 512 bytes or 4 KiB with Advanced Format).</p>
+
+    <div class="diagram">
+      <div class="diagram-label">HDD read path</div>
+      <div class="flow-row">
+        <div class="flow-box">Seek to track</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Rotational delay</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Data transfer</div>
+      </div>
+    </div>
+
+    <h3>Latency breakdown</h3>
+    <p><strong>Seek time</strong> is the time for the head to move to the correct track (3-15 ms average). <strong>Rotational latency</strong> is the time for the target sector to spin under the head -- on average half a rotation. A 7200 RPM drive completes one rotation in ~8.3 ms, so average rotational latency is ~4.15 ms. <strong>Transfer time</strong> is typically negligible for small reads.</p>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      Sequential reads are dramatically faster than random reads on HDDs. Sequential access avoids repeated seeks and rotational delays, achieving 100-200 MB/s, while random 4 KiB reads may yield only 0.5-1 MB/s effective throughput.
+    </div>
+
+    <h3>IOPS and scheduling</h3>
+    <p><strong>IOPS</strong> (I/O Operations Per Second) for a typical 7200 RPM HDD is roughly 75-150 for random reads. The OS I/O scheduler reorders pending requests to minimize head movement. Classic algorithms include <strong>SCAN</strong> (elevator), <strong>C-SCAN</strong>, and the Linux <strong>CFQ</strong> (Completely Fair Queuing) or <strong>mq-deadline</strong> schedulers.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 2: SSD ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Solid-State Drives</div>
+    <h2>SSD &amp; NAND Flash</h2>
+    <p>SSDs use NAND flash memory -- no moving parts. Data is stored in floating-gate transistors organized into <strong>pages</strong> (~4-16 KiB) grouped into <strong>blocks</strong> (~256-4096 pages). Reads and writes happen at page granularity, but erases happen at block granularity -- this asymmetry drives much of SSD complexity.</p>
+
+    <h3>NAND types</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Type</th><th>Bits/Cell</th><th>Endurance (P/E cycles)</th><th>Speed</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td>SLC</td><td>1</td><td>~100,000</td><td>Fastest</td><td>Highest</td></tr>
+        <tr><td>MLC</td><td>2</td><td>~10,000</td><td>Fast</td><td>Moderate</td></tr>
+        <tr><td>TLC</td><td>3</td><td>~3,000</td><td>Moderate</td><td>Lower</td></tr>
+        <tr><td>QLC</td><td>4</td><td>~1,000</td><td>Slowest</td><td>Lowest</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Flash Translation Layer (FTL)</h3>
+    <p>The FTL maps logical block addresses (LBAs) to physical NAND pages, hiding flash complexities from the OS. It handles:</p>
+    <p><strong>Write amplification</strong> -- because you cannot overwrite a page in-place (must erase whole block first), the FTL writes data to a new clean page and marks the old one invalid. Garbage collection later reclaims blocks, but may move valid pages, amplifying total writes. A write amplification factor (WAF) of 2-3x is common.</p>
+    <p><strong>Wear leveling</strong> -- distributes writes evenly across all blocks so no single block wears out prematurely. Static wear leveling also relocates cold data to give heavily-written blocks a rest.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">TRIM matters</div>
+      When the OS deletes a file, the SSD doesn't know those pages are free unless the OS sends a <code>TRIM</code> command. Without TRIM, the FTL cannot reclaim invalidated pages efficiently, leading to higher write amplification and degraded performance over time.
+    </div>
+
+    <h3>NVMe vs SATA</h3>
+    <p><strong>SATA</strong> SSDs use the AHCI protocol designed for spinning disks -- limited to a single command queue of 32 entries. <strong>NVMe</strong> (Non-Volatile Memory Express) was designed for flash: up to 65,535 queues with 65,536 entries each, communicating over PCIe. NVMe drives achieve 3-7 GB/s sequential reads vs SATA's ~550 MB/s ceiling.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 3: I/O INTERFACES ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / I/O Interfaces</div>
+    <h2>PCIe, DMA &amp; IOMMU</h2>
+
+    <h3>PCIe generations</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Generation</th><th>Per-Lane Bandwidth</th><th>x4 Link (NVMe)</th><th>Encoding</th></tr></thead>
+      <tbody>
+        <tr><td>PCIe 3.0</td><td>~1 GB/s</td><td>~3.9 GB/s</td><td>128b/130b</td></tr>
+        <tr><td>PCIe 4.0</td><td>~2 GB/s</td><td>~7.9 GB/s</td><td>128b/130b</td></tr>
+        <tr><td>PCIe 5.0</td><td>~4 GB/s</td><td>~15.8 GB/s</td><td>128b/130b</td></tr>
+        <tr><td>PCIe 6.0</td><td>~8 GB/s</td><td>~31.5 GB/s</td><td>PAM4 + FEC</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Direct Memory Access (DMA)</h3>
+    <p>DMA allows peripherals (disks, NICs) to transfer data directly to/from main memory without involving the CPU for every byte. The CPU sets up a DMA descriptor (source, destination, length), the DMA controller handles the transfer, and raises an interrupt upon completion. This frees CPU cycles for computation while I/O proceeds in parallel.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">DMA transfer flow</div>
+      <div class="flow-row">
+        <div class="flow-box">CPU programs DMA</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Device &harr; RAM</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Interrupt on done</div>
+      </div>
+    </div>
+
+    <h3>IOMMU</h3>
+    <p>The <strong>IOMMU</strong> (I/O Memory Management Unit) sits between DMA-capable devices and physical memory. It translates device-visible I/O virtual addresses to physical addresses, providing <strong>memory isolation</strong> (a device can only access memory regions mapped to it) and enabling <strong>device passthrough</strong> in virtualized environments (e.g., VFIO in Linux). Intel calls theirs VT-d; AMD calls theirs AMD-Vi.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 4: RAID ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / RAID</div>
+    <h2>RAID Levels</h2>
+    <p>RAID (Redundant Array of Independent Disks) combines multiple drives to improve performance, capacity, or fault tolerance. Understanding the tradeoffs is critical for system design.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">RAID 0 -- Striping</div>
+        <p>Data striped across N drives. Read/write throughput scales with N. Zero redundancy -- any single drive failure loses all data. Usable capacity: 100%.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">RAID 1 -- Mirroring</div>
+        <p>Every write goes to two (or more) drives. Survives one drive failure. Read throughput can double. Usable capacity: 50%. Simple but expensive.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">RAID 5 -- Distributed Parity</div>
+        <p>Data and parity striped across N drives. Survives one drive failure. Usable capacity: (N-1)/N. Write penalty: each write requires read-modify-write of parity.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">RAID 6 -- Double Parity</div>
+        <p>Like RAID 5 but with two parity blocks per stripe. Survives two simultaneous drive failures. Higher write penalty. Usable capacity: (N-2)/N.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">RAID 10 -- Striped Mirrors</div>
+        <p>RAID 0 over RAID 1 pairs. Excellent read/write performance with one-drive-per-pair fault tolerance. Usable capacity: 50%. Preferred for databases.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">RAID is not a backup</div>
+      RAID protects against hardware failure, not accidental deletion, corruption, ransomware, or disasters. Always maintain separate backups.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5: FILE SYSTEMS ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / File Systems</div>
+    <h2>File Systems &amp; Journaling</h2>
+
+    <h3>Inodes</h3>
+    <p>An <strong>inode</strong> is a metadata structure stored on disk that describes a file: permissions, ownership, timestamps, size, and pointers to data blocks. Directories are simply files whose data maps filenames to inode numbers. The inode count is typically fixed at format time (ext4) -- running out of inodes means you can't create files even with free space.</p>
+
+    <h3>Journaling</h3>
+    <p>A <strong>journal</strong> (or log) records intended metadata (and optionally data) changes before applying them to the main file system. On crash recovery, the journal is replayed to bring the file system to a consistent state. This avoids lengthy <code>fsck</code> scans. Journaling modes in ext4:</p>
+    <table class="cmp-table">
+      <thead><tr><th>Mode</th><th>What's journaled</th><th>Safety</th><th>Performance</th></tr></thead>
+      <tbody>
+        <tr><td><code>journal</code></td><td>Metadata + data</td><td>Highest</td><td>Slowest</td></tr>
+        <tr><td><code>ordered</code> (default)</td><td>Metadata only, data written first</td><td>High</td><td>Good</td></tr>
+        <tr><td><code>writeback</code></td><td>Metadata only, data order not guaranteed</td><td>Lower</td><td>Fastest</td></tr>
+      </tbody>
+    </table>
+
+    <h3>File system comparison</h3>
+    <table class="cmp-table">
+      <thead><tr><th>FS</th><th>Key Features</th><th>Max Volume</th><th>Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ext4</strong></td><td>Journaling, extents, delayed allocation</td><td>1 EiB</td><td>Linux default, general purpose</td></tr>
+        <tr><td><strong>XFS</strong></td><td>Excellent large-file performance, parallel I/O</td><td>8 EiB</td><td>Large files, media, HPC</td></tr>
+        <tr><td><strong>ZFS</strong></td><td>Copy-on-write, checksums, snapshots, built-in RAID</td><td>256 ZiB</td><td>Data integrity, NAS, enterprise</td></tr>
+        <tr><td><strong>Btrfs</strong></td><td>CoW, snapshots, subvolumes, inline compression</td><td>16 EiB</td><td>Linux CoW alternative to ZFS</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">ZFS checksums</div>
+      ZFS checksums every block of data and metadata using a Merkle tree. On read, if a checksum mismatch is detected and a redundant copy exists (mirror or raidz), ZFS automatically repairs the corruption -- silent data corruption (bit rot) is caught and healed transparently.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6: DURABILITY ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Durability &amp; Storage Models</div>
+    <h2>Durability Guarantees &amp; Storage Types</h2>
+
+    <h3>fsync and fdatasync</h3>
+    <p>Calling <code>write()</code> only places data in the kernel page cache -- a power loss before the OS flushes it means data loss. <code>fsync(fd)</code> forces all dirty pages <em>and metadata</em> for the file to stable storage. <code>fdatasync(fd)</code> is similar but skips metadata that isn't needed to read the data (e.g., <code>st_atime</code>), making it slightly faster.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Write durability path</div>
+      <div class="flow-row">
+        <div class="flow-box">write()</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Page cache</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">fsync()</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Disk platter / NAND</div>
+      </div>
+    </div>
+
+    <h3>Write-Ahead Log (WAL)</h3>
+    <p>Databases use a WAL to guarantee durability without flushing every data page on each commit. The sequence: (1) append the change to the WAL, (2) <code>fsync</code> the WAL, (3) acknowledge the commit to the client. Data pages are flushed lazily in the background. On crash, the WAL is replayed to recover committed transactions. PostgreSQL, SQLite, and most ACID databases rely on this pattern.</p>
+
+    <h3>O_DIRECT</h3>
+    <p>Opening a file with <code>O_DIRECT</code> bypasses the kernel page cache, issuing I/O directly between user-space buffers and the disk. Databases like MySQL (InnoDB) use this because they manage their own buffer pool and don't want the OS double-caching pages. Buffers must be aligned to the filesystem block size.</p>
+
+    <div class="callout">
+      <div class="callout-title">Important</div>
+      <code>O_DIRECT</code> does not guarantee durability by itself -- you still need <code>fsync()</code> or <code>O_DSYNC</code> to ensure data reaches stable storage. <code>O_DIRECT</code> only bypasses the page cache.
+    </div>
+
+    <h3>Block vs Object vs File Storage</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Type</th><th>Abstraction</th><th>Access</th><th>Examples</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Block</strong></td><td>Fixed-size blocks (LBAs)</td><td>Low-level, requires FS on top</td><td>EBS, iSCSI, local disk</td></tr>
+        <tr><td><strong>File</strong></td><td>Hierarchical files &amp; directories</td><td>POSIX API, NFS/SMB</td><td>NFS, EFS, CIFS</td></tr>
+        <tr><td><strong>Object</strong></td><td>Flat namespace, key &rarr; blob + metadata</td><td>HTTP API (PUT/GET/DELETE)</td><td>S3, GCS, MinIO</td></tr>
+      </tbody>
+    </table>
+    <p>Block storage offers the lowest latency and is used for databases and boot volumes. File storage provides shared access with familiar semantics. Object storage scales massively for unstructured data (images, logs, backups) with built-in replication, but offers only eventual consistency and higher latency.</p>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="b" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">Why are sequential reads dramatically faster than random reads on an HDD?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The magnetic material is denser at the outer tracks</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Sequential reads avoid repeated seek and rotational delays</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The OS caches sequential data in L1 cache</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> HDDs use a different encoding for sequential data</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">Each random read incurs seek time (3-15 ms) plus rotational latency (~4 ms). Sequential reads keep the head on the same or adjacent tracks, eliminating most of this mechanical overhead.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="c" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">What does a higher bit-per-cell count in NAND flash (SLC &rarr; QLC) primarily sacrifice?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Read latency only</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Physical cell size</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Endurance (P/E cycles) and speed</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Compatibility with NVMe</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">Storing more bits per cell requires finer voltage level distinctions, which reduces both endurance (fewer program/erase cycles before wear-out) and read/write speed. SLC lasts ~100K cycles; QLC ~1K cycles.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">Why is the TRIM command important for SSD performance?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It tells the SSD which pages are no longer in use, enabling efficient garbage collection</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It compresses data before writing to NAND</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It increases the PCIe lane count available to the drive</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It defragments the flash blocks for sequential layout</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">Without TRIM, the FTL cannot tell which pages hold deleted data. It must treat them as valid during garbage collection, causing unnecessary page copies and higher write amplification.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What is the main advantage of NVMe over SATA for SSDs?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> NVMe uses cheaper NAND flash</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> NVMe supports larger sector sizes</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> NVMe drives don't need wear leveling</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> NVMe supports massively parallel command queues over PCIe</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">SATA uses AHCI with a single queue of 32 commands. NVMe supports up to 65,535 queues each with 65,536 entries, communicating directly over PCIe lanes for much higher throughput and lower latency.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="b" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">In RAID 5 with 4 drives, what is the usable capacity?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 50% (2 drives)</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 75% (3 drives)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 100% (4 drives)</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> 25% (1 drive)</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">RAID 5 uses one drive's worth of capacity for distributed parity. With 4 drives, usable capacity is (N-1)/N = 3/4 = 75%.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="c" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">What does DMA (Direct Memory Access) allow?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The CPU to access disk sectors directly without a file system</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Devices to bypass the IOMMU entirely</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Peripherals to transfer data to/from RAM without CPU involvement per byte</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Applications to write directly to NAND flash pages</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">DMA offloads bulk data movement from the CPU. The CPU sets up a transfer descriptor, then the DMA controller moves data between device and RAM independently, raising an interrupt when complete.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="a" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">What distinguishes ZFS from ext4 regarding data integrity?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> ZFS checksums every block and can self-heal from redundant copies</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> ZFS uses a write-ahead log while ext4 does not</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> ZFS supports larger file sizes</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> ZFS uses in-place writes for better performance</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">ZFS stores checksums in a Merkle tree for every data and metadata block. If corruption is detected on read and a mirror or raidz copy exists, ZFS automatically repairs it. ext4 has metadata checksums (optional) but no data checksum or self-healing.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="b" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">Why do databases like PostgreSQL use a Write-Ahead Log (WAL)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> To compress data pages before flushing them</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> To guarantee durability without fsyncing every data page on each commit</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> To bypass the kernel page cache</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> To avoid using inodes for table storage</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">The WAL records changes sequentially. Only the WAL must be fsynced at commit time -- an efficient sequential write. Dirty data pages are flushed lazily in the background. On crash, the WAL is replayed to recover committed transactions.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="d" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">What does <code>O_DIRECT</code> do when opening a file?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Guarantees data is on stable storage after write()</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Enables TRIM commands for the file's blocks</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Opens the raw block device instead of the file</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Bypasses the kernel page cache for I/O on that file</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">O_DIRECT causes reads and writes to go directly between user-space buffers and the storage device, skipping the page cache. It does NOT guarantee durability -- you still need fsync() for that.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="c" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">Which storage model is best suited for storing billions of images with HTTP API access and built-in replication?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Block storage</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> File storage</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Object storage</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> RAID 10</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">Object storage (e.g., S3, GCS) uses a flat namespace accessed via HTTP APIs, scales to billions of objects, and provides built-in replication and durability. It's ideal for unstructured data like images, logs, and backups.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="/">← all topics</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

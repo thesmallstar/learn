@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Docker & Containers — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="/docker-containers/">Infrastructure</a>
+    <span>/</span>
+    <span style="color:var(--text);">Docker & Containers</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Infrastructure</div>
+  <h1>Docker <span class="thin">&</span> Containers</h1>
+  <p class="header-sub">From Linux namespaces to production-ready images. How containers isolate processes, how Docker builds and ships them, and the practices that keep everything secure and reproducible.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Containers from First Principles</div>
+    <h2>What Is a Container?</h2>
+    <p>A container is not a VM. It is a regular Linux process whose view of the system has been restricted by three kernel features working together: <strong>namespaces</strong> isolate what the process can see, <strong>cgroups</strong> limit what it can use, and a <strong>layered filesystem</strong> (like OverlayFS) gives it its own root directory without duplicating the entire OS.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Container building blocks</div>
+      <div class="flow-row">
+        <div class="flow-box">Namespaces</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box">Cgroups</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box">Layered FS</div>
+        <div class="flow-arrow">=</div>
+        <div class="flow-box">Container</div>
+      </div>
+    </div>
+
+    <h3>Namespaces</h3>
+    <p>Each namespace type isolates a different resource: <code>pid</code> (process tree), <code>net</code> (network stack), <code>mnt</code> (filesystem mounts), <code>uts</code> (hostname), <code>ipc</code> (inter-process communication), <code>user</code> (UID/GID mappings), and <code>cgroup</code> (cgroup root view). A container typically gets its own instance of all seven.</p>
+
+    <h3>Cgroups (Control Groups)</h3>
+    <p>Cgroups cap and account for CPU, memory, I/O, and network bandwidth. Without them a container could starve the host. cgroups v2 (unified hierarchy) is the modern default and what Docker uses on recent kernels.</p>
+
+    <h3>Containers vs VMs</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Property</th><th>Container</th><th>Virtual Machine</th></tr></thead>
+      <tbody>
+        <tr><td>Isolation</td><td>Process-level (shared kernel)</td><td>Hardware-level (separate kernel)</td></tr>
+        <tr><td>Startup time</td><td>Milliseconds</td><td>Seconds to minutes</td></tr>
+        <tr><td>Image size</td><td>MBs (often &lt; 100 MB)</td><td>GBs</td></tr>
+        <tr><td>Resource overhead</td><td>Near zero</td><td>Hypervisor + guest OS</td></tr>
+        <tr><td>Security boundary</td><td>Weaker (kernel shared)</td><td>Stronger (separate kernel)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>OCI and Runtimes</h3>
+    <p>The <strong>Open Container Initiative (OCI)</strong> defines two specs: the <em>image spec</em> (how layers and metadata are packaged) and the <em>runtime spec</em> (how a container is created from a root filesystem and config). <code>runc</code> is the reference low-level runtime. Higher-level runtimes like <code>containerd</code> and <code>CRI-O</code> manage image pulls, storage, and lifecycle on top of runc.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Runtime stack</div>
+      <div class="flow-row">
+        <div class="flow-box">docker CLI</div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-box">dockerd</div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-box">containerd</div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-box">runc</div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-box">Linux kernel</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Writing Dockerfiles</div>
+    <h2>Dockerfile Instructions</h2>
+    <p>A Dockerfile is a declarative recipe that turns a base image into your application image. Each instruction creates a new layer (or metadata entry) in the final image.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">FROM</div>
+        <p>Sets the base image. Every Dockerfile starts here. Use specific tags: <code>FROM node:20-slim</code>.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">RUN</div>
+        <p>Executes a command during build. Chain commands with <code>&&</code> to reduce layers.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">COPY / ADD</div>
+        <p><code>COPY</code> copies files from build context. <code>ADD</code> also handles URLs and tar extraction -- prefer COPY for clarity.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">WORKDIR</div>
+        <p>Sets the working directory for subsequent instructions. Creates the directory if it does not exist.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">ENV / ARG</div>
+        <p><code>ENV</code> sets runtime environment variables (persists in image). <code>ARG</code> is build-time only and disappears after build.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">EXPOSE</div>
+        <p>Documents which ports the container listens on. Does not actually publish the port -- that requires <code>-p</code> at runtime.</p>
+      </div>
+    </div>
+
+    <h3>CMD vs ENTRYPOINT</h3>
+    <p><code>CMD</code> provides default arguments that can be overridden at <code>docker run</code>. <code>ENTRYPOINT</code> sets the executable that always runs. When both are present, CMD supplies default arguments to ENTRYPOINT.</p>
+
+    <pre><code># ENTRYPOINT + CMD pattern
+ENTRYPOINT ["python", "app.py"]
+CMD ["--port", "8000"]
+
+# docker run myimage              => python app.py --port 8000
+# docker run myimage --port 9000  => python app.py --port 9000</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">Shell form vs Exec form</div>
+      Always prefer exec form (<code>["executable", "arg"]</code>) over shell form (<code>executable arg</code>). Shell form wraps your command in <code>/bin/sh -c</code>, which means your process runs as PID 1's child and won't receive SIGTERM properly.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Image Layers & Caching</div>
+    <h2>Build Smart, Build Fast</h2>
+    <p>Every <code>RUN</code>, <code>COPY</code>, and <code>ADD</code> instruction creates a new layer. Docker caches each layer and only rebuilds from the first instruction whose input changed. This means <strong>instruction order matters enormously</strong>.</p>
+
+    <h3>Optimal instruction order</h3>
+    <p>Put things that change rarely at the top (OS packages, language runtime) and things that change often at the bottom (your application code).</p>
+
+    <pre><code># Good: dependencies cached separately from code
+FROM node:20-slim
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --production
+COPY . .
+CMD ["node", "server.js"]</code></pre>
+
+    <div class="callout good">
+      <div class="callout-title">Why this works</div>
+      Changing a source file only invalidates the final <code>COPY . .</code> layer. The <code>npm ci</code> layer stays cached because package.json did not change. This saves minutes on every build.
+    </div>
+
+    <h3>Multi-stage builds</h3>
+    <p>Multi-stage builds let you compile in one stage and copy only the artifact to a minimal final image. Build tools, dev dependencies, and source code never ship to production.</p>
+
+    <pre><code># Stage 1: build
+FROM golang:1.22 AS builder
+WORKDIR /src
+COPY . .
+RUN CGO_ENABLED=0 go build -o /app
+
+# Stage 2: runtime
+FROM gcr.io/distroless/static
+COPY --from=builder /app /app
+ENTRYPOINT ["/app"]</code></pre>
+
+    <p>The final image contains only the static binary -- no Go toolchain, no source. Image size drops from ~800 MB to ~5 MB.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Networking</div>
+    <h2>Container Networking</h2>
+    <p>Docker provides pluggable network drivers. The driver you choose determines how containers communicate with each other and the outside world.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Driver</th><th>Scope</th><th>Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><code>bridge</code></td><td>Single host</td><td>Default. Containers on same bridge can talk via container name (with user-defined bridge).</td></tr>
+        <tr><td><code>host</code></td><td>Single host</td><td>Container shares the host's network stack. No isolation, but no NAT overhead.</td></tr>
+        <tr><td><code>none</code></td><td>Single host</td><td>No networking at all. For batch jobs or security-sensitive workloads.</td></tr>
+        <tr><td><code>overlay</code></td><td>Multi-host</td><td>Spans multiple Docker daemons (Swarm). Uses VXLAN tunneling.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Port mapping</h3>
+    <p>Containers in a bridge network are isolated from the host by default. To expose a service, map a host port to a container port:</p>
+
+    <pre><code># -p hostPort:containerPort
+docker run -p 8080:3000 myapp
+
+# Bind to specific interface
+docker run -p 127.0.0.1:8080:3000 myapp
+
+# Random host port
+docker run -p 3000 myapp     # check with docker port</code></pre>
+
+    <div class="callout">
+      <div class="callout-title">DNS resolution</div>
+      The default bridge network does not provide DNS resolution between containers (only <code>--link</code>, which is deprecated). Always create a user-defined bridge network -- containers on it can resolve each other by name automatically.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Storage & Registries</div>
+    <h2>Volumes, Mounts & Image Distribution</h2>
+
+    <h3>Storage options</h3>
+    <p>Container filesystems are ephemeral -- data is lost when the container is removed. Docker provides three ways to persist data:</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Type</th><th>Managed by Docker?</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Named volume</strong></td><td>Yes (<code>/var/lib/docker/volumes/</code>)</td><td>Databases, persistent app data. Portable across hosts.</td></tr>
+        <tr><td><strong>Bind mount</strong></td><td>No (any host path)</td><td>Development (live code reload). Host path must exist.</td></tr>
+        <tr><td><strong>tmpfs</strong></td><td>No (RAM only)</td><td>Secrets, scratch data. Never written to disk. Linux only.</td></tr>
+      </tbody>
+    </table>
+
+    <pre><code># Named volume
+docker volume create pgdata
+docker run -v pgdata:/var/lib/postgresql/data postgres:16
+
+# Bind mount (development)
+docker run -v $(pwd)/src:/app/src myapp
+
+# tmpfs (secrets)
+docker run --tmpfs /run/secrets:rw,noexec,size=64m myapp</code></pre>
+
+    <h3>Container Registries</h3>
+    <p>Registries store and distribute container images. The main options are <strong>Docker Hub</strong> (public default), <strong>Amazon ECR</strong>, <strong>Google GCR / Artifact Registry</strong>, and <strong>GitHub Container Registry (ghcr.io)</strong>.</p>
+
+    <h3>Tagging strategy</h3>
+    <div class="callout warn">
+      <div class="callout-title">Avoid :latest</div>
+      The <code>:latest</code> tag is mutable -- it silently changes when a new image is pushed. This makes builds non-reproducible and rollbacks impossible. Use immutable tags instead.
+    </div>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Semver</div>
+        <p><code>myapp:1.4.2</code> -- clear version, easy to reason about, standard for releases.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Git SHA</div>
+        <p><code>myapp:a1b2c3d</code> -- ties image to exact commit. Great for CI/CD traceability.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Combined</div>
+        <p><code>myapp:1.4.2-a1b2c3d</code> -- human-readable version plus exact commit for debugging.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Compose & Security</div>
+    <h2>Multi-Container Apps & Hardening</h2>
+
+    <h3>Docker Compose</h3>
+    <p>Compose defines multi-container applications in a single YAML file. Each service gets its own container, and Compose handles networking, volumes, and startup order.</p>
+
+    <pre><code># docker-compose.yml
+services:
+  web:
+    build: .
+    ports:
+      - "8080:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://user:pass@db:5432/mydb
+
+  db:
+    image: postgres:16
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 5s
+      retries: 5
+
+volumes:
+  pgdata:</code></pre>
+
+    <div class="callout">
+      <div class="callout-title">depends_on is not enough</div>
+      <code>depends_on</code> only controls startup <em>order</em>, not readiness. Use <code>condition: service_healthy</code> with a <code>healthcheck</code> to wait for the dependency to actually be ready.
+    </div>
+
+    <h3>Container Security</h3>
+    <p>Containers share the host kernel, so the security boundary is thinner than a VM. Every layer of defense matters.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Non-root user</div>
+        <p>Add <code>USER nonroot</code> in your Dockerfile. Running as root inside a container means root on the host if the container escapes.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Read-only FS</div>
+        <p>Run with <code>--read-only</code> and use tmpfs for directories that need writes. Prevents attackers from modifying binaries.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Minimal base images</div>
+        <p>Use <code>alpine</code> (~5 MB) or <code>distroless</code> (no shell at all). Fewer packages means fewer CVEs.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Image scanning</div>
+        <p>Scan images with <code>docker scout</code>, Trivy, or Snyk in CI. Block deployment if critical CVEs are found.</p>
+      </div>
+    </div>
+
+    <pre><code># Hardened Dockerfile example
+FROM node:20-slim AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --production
+
+FROM gcr.io/distroless/nodejs20
+COPY --from=builder /app /app
+WORKDIR /app
+COPY . .
+USER nonroot
+CMD ["server.js"]</code></pre>
+
+    <div class="callout good">
+      <div class="callout-title">Defense in depth</div>
+      Combine multiple controls: non-root user + read-only filesystem + minimal base + no capabilities (<code>--cap-drop ALL</code>) + image scanning in CI. No single measure is sufficient alone.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">Which three Linux kernel features combine to create a container?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Hypervisor, virtual NICs, virtual disk</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> SELinux, AppArmor, seccomp</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Namespaces, cgroups, layered filesystem</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Cgroups, iptables, chroot</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">Namespaces isolate what a process can see, cgroups limit resource usage, and a layered filesystem (e.g., OverlayFS) provides the root filesystem. Together these create the container abstraction.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">What is the key difference between CMD and ENTRYPOINT in a Dockerfile?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> CMD runs at build time, ENTRYPOINT runs at container start</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> CMD provides default arguments that can be overridden; ENTRYPOINT sets the fixed executable</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> They are interchangeable -- both set the startup command</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> ENTRYPOINT can only be used with shell form</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">ENTRYPOINT defines the executable that always runs. CMD provides default arguments to it, which can be overridden by passing arguments to <code>docker run</code>.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">Why should you COPY package.json before COPY . . in a Node.js Dockerfile?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> So the npm install layer is cached when only source code changes</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Because Docker requires package.json to be copied first</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> To reduce the final image size</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It prevents npm from installing devDependencies</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">Docker layer caching rebuilds from the first changed instruction onward. By copying package.json separately, the expensive <code>npm install</code> layer stays cached as long as dependencies don't change -- even when source files do.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What is the main benefit of a multi-stage Docker build?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It allows running multiple containers from one Dockerfile</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It speeds up the build by parallelizing stages</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It enables using different CPU architectures</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The final image only contains the runtime artifact, not build tools or source code</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">Multi-stage builds let you use a full build environment in one stage and copy only the compiled artifact to a minimal final image. Build tools, source code, and dev dependencies are discarded.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">Which Docker network driver allows containers on different hosts to communicate?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> bridge</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> host</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> overlay</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> none</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">The overlay driver creates a distributed network across multiple Docker daemons using VXLAN tunneling. It is used in Docker Swarm and can be integrated with Kubernetes networking.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">What is the problem with using the :latest tag in production?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It is slower to pull than versioned tags</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It is mutable -- it silently changes when a new image is pushed, breaking reproducibility</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Docker Hub rate-limits pulls of :latest images</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It always points to the oldest version of the image</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">The <code>:latest</code> tag is mutable. When someone pushes a new image, <code>:latest</code> points to the new version. This means the same tag can resolve to different images over time, making builds non-reproducible and rollbacks impossible.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="a" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">Which storage option keeps data only in RAM and never writes to disk?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> tmpfs mount</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Named volume</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Bind mount</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> OverlayFS layer</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">A tmpfs mount stores data in the host's RAM only. It is useful for sensitive data like secrets because nothing is ever written to the host filesystem.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="d" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">Why should you run containers as a non-root user?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Root processes consume more memory</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Docker does not support running processes as root</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Non-root containers start faster</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> If the container escapes, the attacker has root access to the host</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">Containers share the host kernel. If a container running as root exploits a kernel vulnerability to escape, the attacker gains root access on the host. Running as non-root limits the blast radius of a container escape.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">In Docker Compose, what does depends_on (without a health condition) actually guarantee?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The dependency is fully ready and accepting connections</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The dependency's health check has passed</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Only that the dependency container has started, not that it is ready</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The dependency has finished executing its CMD</button>
+      </div>
+      <div class="q-explanation" id="q9-exp"><code>depends_on</code> without a condition only controls startup order -- it starts the dependency first but does not wait for it to be ready. Use <code>condition: service_healthy</code> with a healthcheck to wait for actual readiness.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">What role does runc play in the container runtime stack?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It pulls and stores container images from registries</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It is the low-level OCI runtime that creates and runs containers using kernel primitives</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It provides the CLI interface for users to manage containers</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It manages container networking and DNS resolution</button>
+      </div>
+      <div class="q-explanation" id="q10-exp"><code>runc</code> is the reference implementation of the OCI runtime spec. It is the lowest layer in the stack that actually calls Linux kernel APIs (namespaces, cgroups) to create and start container processes. Higher-level runtimes like containerd manage images and lifecycle on top of runc.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="/">&#8592; all topics</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

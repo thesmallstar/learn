@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TLS & HTTPS — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── HANDSHAKE DIAGRAM ── */
+.handshake {
+  text-align: left;
+  font-size: 0.72rem;
+}
+.hs-row {
+  display: flex;
+  align-items: center;
+  margin: 0.3rem 0;
+  gap: 0.5rem;
+}
+.hs-label {
+  min-width: 60px;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.hs-arrow-right {
+  flex: 1;
+  border-top: 1px solid var(--accent);
+  position: relative;
+  margin: 0 0.3rem;
+}
+.hs-arrow-right::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: -4px;
+  border: 4px solid transparent;
+  border-left: 6px solid var(--accent);
+}
+.hs-arrow-left {
+  flex: 1;
+  border-top: 1px solid var(--green);
+  position: relative;
+  margin: 0 0.3rem;
+}
+.hs-arrow-left::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: -4px;
+  border: 4px solid transparent;
+  border-right: 6px solid var(--green);
+}
+.hs-msg {
+  font-size: 0.68rem;
+  color: var(--text2);
+  white-space: nowrap;
+}
+.hs-col {
+  min-width: 50px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: var(--text);
+  padding: 0.3rem 0;
+}
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="/tls-https/">Cryptography & Security</a>
+    <span>/</span>
+    <span style="color:var(--text);">TLS & HTTPS</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Cryptography & Security</div>
+  <h1>TLS <span class="thin">&</span> HTTPS</h1>
+  <p class="header-sub">How the web secures data in transit -- from the TLS handshake and certificate chains to cipher suites, perfect forward secrecy, and modern protocols like TLS 1.3.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / TLS Overview</div>
+    <h2>What TLS Provides</h2>
+    <p>Transport Layer Security (TLS) is a cryptographic protocol that sits between the transport layer (TCP) and the application layer (HTTP). HTTPS is simply HTTP running over a TLS-secured connection. TLS delivers three fundamental guarantees:</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Confidentiality</div>
+        <p>Data is encrypted so that only the intended recipient can read it. Even if an attacker intercepts packets on the wire, the payload is indecipherable without the session keys.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Integrity</div>
+        <p>Every TLS record includes a Message Authentication Code (MAC). Any tampering -- inserting, deleting, or modifying bytes -- is detected and the record is rejected.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Authentication</div>
+        <p>The server proves its identity with a digital certificate signed by a trusted Certificate Authority (CA). Optionally, the client can authenticate too (mTLS).</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">TLS vs SSL</div>
+      SSL (Secure Sockets Layer) was the predecessor to TLS. SSL 3.0 was deprecated in 2015 due to the POODLE attack. When people say "SSL certificate" today, they almost always mean a certificate used with TLS.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / TLS 1.2 Handshake</div>
+    <h2>The TLS 1.2 Handshake</h2>
+    <p>TLS 1.2 requires two round-trips (2-RTT) before encrypted application data can flow. Here is the full message exchange:</p>
+
+    <div class="diagram">
+      <div class="diagram-label">TLS 1.2 Full Handshake (2-RTT)</div>
+      <div style="display:flex;justify-content:space-between;padding:0 2rem;margin-bottom:0.8rem;">
+        <div class="hs-col">Client</div>
+        <div class="hs-col">Server</div>
+      </div>
+      <div class="handshake" style="padding:0 2rem;">
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:140px;text-align:right;">ClientHello</div>
+          <div class="hs-arrow-right"></div>
+          <div class="hs-msg" style="min-width:140px;">&nbsp;</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:140px;text-align:right;">&nbsp;</div>
+          <div class="hs-arrow-left"></div>
+          <div class="hs-msg" style="min-width:140px;">ServerHello + Cert</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:140px;text-align:right;">&nbsp;</div>
+          <div class="hs-arrow-left"></div>
+          <div class="hs-msg" style="min-width:140px;">ServerKeyExchange</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:140px;text-align:right;">&nbsp;</div>
+          <div class="hs-arrow-left"></div>
+          <div class="hs-msg" style="min-width:140px;">ServerHelloDone</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:140px;text-align:right;">ClientKeyExchange</div>
+          <div class="hs-arrow-right"></div>
+          <div class="hs-msg" style="min-width:140px;">&nbsp;</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:140px;text-align:right;">ChangeCipherSpec</div>
+          <div class="hs-arrow-right"></div>
+          <div class="hs-msg" style="min-width:140px;">&nbsp;</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:140px;text-align:right;">Finished</div>
+          <div class="hs-arrow-right"></div>
+          <div class="hs-msg" style="min-width:140px;">&nbsp;</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:140px;text-align:right;">&nbsp;</div>
+          <div class="hs-arrow-left"></div>
+          <div class="hs-msg" style="min-width:140px;">ChangeCipherSpec</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:140px;text-align:right;">&nbsp;</div>
+          <div class="hs-arrow-left"></div>
+          <div class="hs-msg" style="min-width:140px;">Finished</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Step by Step</h3>
+    <p><strong>ClientHello:</strong> The client sends supported TLS versions, a random nonce, a list of cipher suites, and extensions (including SNI -- the hostname it wants to reach).</p>
+    <p><strong>ServerHello:</strong> The server selects a TLS version and cipher suite, sends its own random nonce, and attaches its certificate chain.</p>
+    <p><strong>ServerKeyExchange:</strong> When using ECDHE, the server sends its ephemeral public key, signed with its private key for authentication.</p>
+    <p><strong>ClientKeyExchange:</strong> The client sends its ephemeral public key. Both sides now independently compute the same pre-master secret via the Diffie-Hellman algorithm.</p>
+    <p><strong>Finished:</strong> Both sides derive session keys from the pre-master secret and the two random nonces, then send a Finished message encrypted with the new keys to verify the handshake was not tampered with.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">RSA Key Exchange (Legacy)</div>
+      In RSA key exchange (no "DHE" in the cipher suite), the client generates the pre-master secret and encrypts it with the server's public key. This works but does NOT provide forward secrecy -- if the server's private key is later compromised, all past sessions can be decrypted.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / TLS 1.3</div>
+    <h2>TLS 1.3 Improvements</h2>
+    <p>TLS 1.3 (RFC 8446, finalized 2018) is a major overhaul that reduces latency, removes insecure options, and simplifies the protocol.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">TLS 1.3 Full Handshake (1-RTT)</div>
+      <div style="display:flex;justify-content:space-between;padding:0 2rem;margin-bottom:0.8rem;">
+        <div class="hs-col">Client</div>
+        <div class="hs-col">Server</div>
+      </div>
+      <div class="handshake" style="padding:0 2rem;">
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:160px;text-align:right;">ClientHello + KeyShare</div>
+          <div class="hs-arrow-right"></div>
+          <div class="hs-msg" style="min-width:160px;">&nbsp;</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:160px;text-align:right;">&nbsp;</div>
+          <div class="hs-arrow-left"></div>
+          <div class="hs-msg" style="min-width:160px;">ServerHello + KeyShare</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:160px;text-align:right;">&nbsp;</div>
+          <div class="hs-arrow-left"></div>
+          <div class="hs-msg" style="min-width:160px;">{Cert, CertVerify, Finished}</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-msg" style="min-width:160px;text-align:right;">{Finished}</div>
+          <div class="hs-arrow-right"></div>
+          <div class="hs-msg" style="min-width:160px;">&nbsp;</div>
+        </div>
+      </div>
+      <p style="font-size:0.68rem;color:var(--muted);margin-top:0.8rem;">{Braces} indicate encrypted messages. Application data can flow immediately after the client's Finished.</p>
+    </div>
+
+    <table class="cmp-table">
+      <thead><tr><th>Feature</th><th>TLS 1.2</th><th>TLS 1.3</th></tr></thead>
+      <tbody>
+        <tr><td>Handshake round-trips</td><td>2-RTT</td><td>1-RTT (0-RTT with resumption)</td></tr>
+        <tr><td>RSA key exchange</td><td>Supported</td><td>Removed entirely</td></tr>
+        <tr><td>Forward secrecy</td><td>Optional (only with DHE/ECDHE)</td><td>Mandatory (ECDHE only)</td></tr>
+        <tr><td>Cipher suites</td><td>~37 options</td><td>5 options</td></tr>
+        <tr><td>Server Finished encrypted?</td><td>No</td><td>Yes</td></tr>
+        <tr><td>0-RTT resumption</td><td>No</td><td>Yes (with replay risk caveats)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>0-RTT Resumption</h3>
+    <p>If a client has connected to a server before, TLS 1.3 allows it to send encrypted application data in the very first flight (0-RTT) using a pre-shared key (PSK) from the previous session. This eliminates the handshake latency entirely for repeat connections.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">0-RTT Replay Risk</div>
+      0-RTT data is not protected against replay attacks. An attacker can capture and resend the first flight. Servers must ensure 0-RTT is only used for idempotent requests (e.g., GET) and implement anti-replay measures like single-use session tickets or time-window checks.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Certificate Chain</div>
+    <h2>Certificate Chain & X.509</h2>
+    <p>Trust on the web is bootstrapped through a hierarchy of Certificate Authorities (CAs). A server does not just send its own certificate -- it sends a chain that lets the client trace trust back to a pre-installed root.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Certificate Chain of Trust</div>
+      <div class="flow-row">
+        <div class="flow-box" style="background:var(--green-bg);border-color:rgba(27,125,70,0.25);color:var(--green);">Root CA</div>
+        <div class="flow-arrow">signs</div>
+        <div class="flow-box" style="background:var(--purple-bg);border-color:rgba(124,58,237,0.25);color:var(--purple);">Intermediate CA</div>
+        <div class="flow-arrow">signs</div>
+        <div class="flow-box">Server Certificate</div>
+      </div>
+      <p style="font-size:0.68rem;color:var(--muted);margin-top:0.8rem;">The root CA's certificate is self-signed and pre-installed in the OS/browser trust store. The server sends its leaf cert + intermediate(s); the client chains up to the root.</p>
+    </div>
+
+    <h3>X.509 Certificate Fields</h3>
+    <p>Certificates follow the X.509 v3 standard. Key fields include:</p>
+    <table class="cmp-table">
+      <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>Subject</code></td><td>Entity the cert belongs to (CN, O, etc.)</td></tr>
+        <tr><td><code>Issuer</code></td><td>CA that signed this certificate</td></tr>
+        <tr><td><code>Subject Alternative Name</code></td><td>Hostnames/IPs the cert is valid for (replaces CN matching)</td></tr>
+        <tr><td><code>Validity (Not Before / Not After)</code></td><td>Time window during which the cert is valid</td></tr>
+        <tr><td><code>Public Key</code></td><td>The server's public key (RSA or ECDSA)</td></tr>
+        <tr><td><code>Signature</code></td><td>Digital signature from the issuer, proving authenticity</td></tr>
+        <tr><td><code>Extensions</code></td><td>Key Usage, Basic Constraints (is it a CA?), CRL/OCSP endpoints</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Certificate Signing Request (CSR)</h3>
+    <p>To get a certificate, the server operator generates a key pair, creates a CSR containing the public key and identity info, and sends it to a CA. The CA verifies domain ownership (for DV certs) or organization identity (for OV/EV certs), then signs the certificate with its private key.</p>
+
+    <div class="callout good">
+      <div class="callout-title">Trust Stores</div>
+      Operating systems and browsers ship with a curated list of ~100-150 root CA certificates. On macOS this is the System Keychain; on Linux it is typically <code>/etc/ssl/certs</code>; browsers like Firefox maintain their own store (Mozilla NSS). Any certificate chain that terminates at one of these roots is considered trusted.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Validation & Revocation</div>
+    <h2>Certificate Validation</h2>
+    <p>When a TLS client receives a certificate, it performs several checks before trusting it:</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Hostname Match</div>
+        <p>The requested hostname must match the cert's Subject Alternative Name (SAN) entries. Wildcard certs (<code>*.example.com</code>) match one subdomain level.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Expiry Check</div>
+        <p>The current time must fall within the cert's Not Before and Not After window. Expired certs are rejected.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Chain of Trust</div>
+        <p>Each cert in the chain must be validly signed by the next, terminating at a trusted root in the local trust store.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Signature Verification</div>
+        <p>The client verifies each certificate's digital signature using the issuer's public key to ensure the cert has not been forged.</p>
+      </div>
+    </div>
+
+    <h3>Revocation Checking</h3>
+    <p>Sometimes certificates need to be revoked before expiry (e.g., private key compromise). There are several mechanisms for this:</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Mechanism</th><th>How It Works</th><th>Downsides</th></tr></thead>
+      <tbody>
+        <tr><td><strong>CRL</strong></td><td>CA publishes a signed list of revoked cert serial numbers. Client downloads and checks it.</td><td>Lists grow large; latency of downloading; infrequent updates.</td></tr>
+        <tr><td><strong>OCSP</strong></td><td>Client queries the CA's OCSP responder in real-time with the cert's serial number.</td><td>Privacy concern (CA sees which sites you visit); adds latency; single point of failure.</td></tr>
+        <tr><td><strong>OCSP Stapling</strong></td><td>Server periodically fetches its own OCSP response and "staples" it to the TLS handshake.</td><td>Best approach -- no privacy leak, no extra round-trip. But requires server support.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Certificate Transparency (CT)</h3>
+    <p>CT logs are append-only public ledgers where CAs must log every certificate they issue. This allows domain owners and the community to detect mis-issued certificates. Browsers like Chrome require certificates to include Signed Certificate Timestamps (SCTs) proving they were logged.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Cipher Suites & Advanced Topics</div>
+    <h2>Cipher Suites, PFS, SNI, and mTLS</h2>
+
+    <h3>Cipher Suite Anatomy</h3>
+    <p>A cipher suite specifies four algorithms. In TLS 1.2 notation, a suite like <code>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</code> breaks down as:</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Cipher Suite Components</div>
+      <div class="flow-row">
+        <div class="flow-box" style="background:var(--green-bg);border-color:rgba(27,125,70,0.25);color:var(--green);">ECDHE<br><span style="font-size:0.6rem;font-weight:400;">Key Exchange</span></div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box" style="background:var(--purple-bg);border-color:rgba(124,58,237,0.25);color:var(--purple);">RSA / ECDSA<br><span style="font-size:0.6rem;font-weight:400;">Authentication</span></div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box" style="background:var(--orange-bg);border-color:rgba(212,115,14,0.25);color:var(--orange);">AES-GCM / ChaCha20<br><span style="font-size:0.6rem;font-weight:400;">Bulk Encryption</span></div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box">SHA-256 / SHA-384<br><span style="font-size:0.6rem;font-weight:400;">MAC / PRF</span></div>
+      </div>
+    </div>
+
+    <p>In TLS 1.3, key exchange is negotiated separately (always ECDHE), so suites are simpler: <code>TLS_AES_128_GCM_SHA256</code> or <code>TLS_CHACHA20_POLY1305_SHA256</code>.</p>
+
+    <h3>Perfect Forward Secrecy (PFS)</h3>
+    <p>PFS means that session keys are not derived from the server's long-term private key. Instead, both sides generate ephemeral Diffie-Hellman keys for each session. Even if the server's private key is stolen later, past recorded traffic cannot be decrypted because the ephemeral keys were discarded after the session ended.</p>
+
+    <div class="callout good">
+      <div class="callout-title">PFS in Practice</div>
+      Any cipher suite containing "DHE" or "ECDHE" provides forward secrecy. TLS 1.3 mandates ECDHE, so all TLS 1.3 connections have PFS by default.
+    </div>
+
+    <h3>Server Name Indication (SNI)</h3>
+    <p>SNI is a TLS extension where the client includes the requested hostname in the ClientHello (in plaintext). This allows a single IP address to host multiple HTTPS domains, each with its own certificate. Without SNI, the server would not know which certificate to present before the connection is encrypted.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">SNI Privacy</div>
+      Because SNI is sent in cleartext during the handshake, a network observer can see which hostname the client is connecting to. Encrypted Client Hello (ECH), formerly called ESNI, is a TLS 1.3 extension that encrypts the SNI field to address this privacy leak.
+    </div>
+
+    <h3>Mutual TLS (mTLS)</h3>
+    <p>In standard TLS, only the server authenticates. In mTLS, the server also requests a certificate from the client during the handshake (<code>CertificateRequest</code> message). The client sends its certificate and proves possession of the private key. This is commonly used in service-to-service communication, zero-trust networks, and API authentication.</p>
+
+    <h3>Let's Encrypt & ACME</h3>
+    <p>Let's Encrypt is a free, automated CA that has issued billions of certificates. It uses the ACME (Automatic Certificate Management Environment) protocol, where the client proves domain control via an HTTP-01 or DNS-01 challenge, and the CA automatically issues a 90-day DV certificate. Tools like <code>certbot</code> handle the entire lifecycle -- issuance, installation, and renewal.</p>
+
+    <pre><code># Obtain a certificate with certbot
+sudo certbot certonly --webroot -w /var/www/html -d example.com
+
+# Auto-renewal (typically via cron or systemd timer)
+sudo certbot renew --quiet</code></pre>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">Which three properties does TLS provide?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Availability, compression, authentication</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Confidentiality, integrity, non-repudiation</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Confidentiality, integrity, authentication</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Encryption, hashing, digital signatures</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">TLS provides confidentiality (encryption), integrity (MAC on every record), and authentication (server proves identity via certificate). Non-repudiation is a property of digital signatures, not TLS itself.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">How many round-trips does a full TLS 1.3 handshake require?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 0-RTT</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 1-RTT</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 2-RTT</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> 3-RTT</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">A full TLS 1.3 handshake completes in 1-RTT. The client sends ClientHello + KeyShare, and the server responds with ServerHello + KeyShare + encrypted certificate and Finished. 0-RTT is available only for session resumption.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">Why was RSA key exchange removed in TLS 1.3?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It does not provide forward secrecy</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> RSA is computationally too slow</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> RSA keys are too large for mobile devices</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> RSA has been mathematically broken</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">RSA key exchange encrypts the pre-master secret with the server's long-term RSA key. If that key is later compromised, all past recorded sessions can be decrypted. TLS 1.3 mandates ECDHE to ensure forward secrecy.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">In a certificate chain, which certificate is self-signed?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The server (leaf) certificate</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The intermediate CA certificate</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The CSR</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The root CA certificate</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">Root CA certificates are self-signed -- the issuer and subject are the same entity. They are trusted because they are pre-installed in the operating system or browser trust store, not because of a signature chain.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What is the main advantage of OCSP stapling over plain OCSP?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It uses smaller certificates</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It encrypts the certificate chain</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It avoids the client querying the CA, improving privacy and latency</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It eliminates the need for certificate expiry dates</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">With OCSP stapling, the server fetches its own OCSP response and includes it in the TLS handshake. The client does not need to contact the CA's OCSP responder, so the CA cannot track which sites a user visits, and there is no extra round-trip latency.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">What does Perfect Forward Secrecy (PFS) guarantee?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Certificates never expire</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Compromising the server's long-term key does not reveal past session keys</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> All cipher suites use AES-256</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The TLS handshake uses zero round-trips</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">PFS ensures that session keys are ephemeral. Each session uses a new Diffie-Hellman key pair that is discarded after use. Even if the server's long-term private key is stolen, previously recorded encrypted traffic cannot be decrypted.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="a" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">Why is SNI sent in plaintext during the TLS handshake?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The server needs to know the hostname to select the correct certificate before encryption is established</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Encrypting SNI would violate the TLS specification</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> SNI is not sensitive information</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> DNS already reveals the hostname anyway</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">The server must read the hostname before it can select which certificate to present. Since the ClientHello is sent before any encryption keys are established, SNI is necessarily in plaintext. Encrypted Client Hello (ECH) is a newer extension that addresses this by encrypting the SNI using a key published in DNS.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="d" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">In the cipher suite <code>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</code>, what role does RSA play?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Bulk data encryption</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Key exchange</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Hashing the handshake transcript</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Server authentication (signing the key exchange parameters)</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">In this cipher suite, ECDHE handles key exchange and AES-128-GCM handles bulk encryption. RSA is used for authentication -- the server signs the ephemeral ECDHE parameters with its RSA private key to prove it owns the certificate.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">What is the main risk of TLS 1.3's 0-RTT resumption?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It uses weaker encryption</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It skips certificate validation</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 0-RTT data can be replayed by an attacker</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It requires client certificates</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">0-RTT data is encrypted but not protected against replay. An attacker who captures the initial flight can resend it, causing the server to process the same request again. This is why 0-RTT should only be used for idempotent operations like GET requests.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">What does mTLS add on top of standard TLS?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Encryption of DNS queries</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The client also authenticates with a certificate</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Multiple certificates per server</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Mandatory use of TLS 1.3</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">In mutual TLS (mTLS), both sides authenticate. The server sends a CertificateRequest message, and the client responds with its own certificate and a proof of possession of the corresponding private key. This is widely used for service-to-service authentication in microservice architectures.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="/">← all topics</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

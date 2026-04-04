@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Distributed Systems Fundamentals — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="/distributed-systems/">Distributed Systems</a>
+    <span>/</span>
+    <span style="color:var(--text);">Fundamentals</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Distributed Systems</div>
+  <h1>Distributed Systems <span class="thin">Fundamentals</span></h1>
+  <p class="header-sub">The core principles behind building reliable systems across multiple machines: time, consensus, consistency, replication, partitioning, transactions, and failure handling.</p>
+</header>
+
+<div class="content">
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-num">01 / Fallacies & Foundations</div>
+    <h2>The 8 Fallacies of Distributed Computing</h2>
+    <p>Peter Deutsch (and James Gosling) identified eight false assumptions that developers new to distributed systems invariably make. Every design decision in this field stems from accepting that these assumptions are wrong.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">1. The network is reliable</div>
+        <p>Packets get dropped, cables get cut, switches fail. You must design for message loss.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">2. Latency is zero</div>
+        <p>Every network hop adds delay. Cross-datacenter calls can be 50-150ms. Design accordingly.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">3. Bandwidth is infinite</div>
+        <p>Serialization overhead and network saturation are real constraints on throughput.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">4. The network is secure</div>
+        <p>Every network boundary is an attack surface. Encrypt, authenticate, authorize.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">5. Topology doesn't change</div>
+        <p>Servers come and go. Cloud instances are ephemeral. Service discovery matters.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">6. There is one administrator</div>
+        <p>Multiple teams, orgs, and cloud providers own different parts of the infrastructure.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">7. Transport cost is zero</div>
+        <p>Serialization, deserialization, and moving data across the wire all have real costs.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">8. The network is homogeneous</div>
+        <p>Different hardware, OS versions, protocols, and software stacks must interoperate.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">Why This Matters</div>
+      Every protocol, algorithm, and pattern in distributed systems exists because one or more of these fallacies was violated. When you see retry logic, timeouts, consensus protocols, or replication -- they all trace back to these realities.
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-num">02 / Time & Ordering</div>
+    <h2>Clocks in Distributed Systems</h2>
+    <p>There is no global clock. Physical clocks drift, and NTP can only reduce -- not eliminate -- skew. Distributed systems need logical or hybrid clocks to establish event ordering.</p>
+
+    <h3>Lamport Timestamps</h3>
+    <p>Each process maintains a counter. On local events, increment. On send, attach the counter. On receive, set counter to <code>max(local, received) + 1</code>. This gives a <strong>partial order</strong>: if <code>a &rarr; b</code> then <code>L(a) &lt; L(b)</code>, but the converse is not true.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Lamport Clock Rules</div>
+      <div class="flow-row">
+        <div class="flow-box">Local event: C++</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Send: attach C</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Receive: C = max(C, msg.C) + 1</div>
+      </div>
+    </div>
+
+    <h3>Vector Clocks</h3>
+    <p>Each process maintains a vector of counters, one per process. This captures <strong>causal ordering</strong>: you can determine if two events are causally related or concurrent. The tradeoff is O(N) space where N is the number of processes.</p>
+
+    <div class="callout">
+      <div class="callout-title">Vector Clock Comparison</div>
+      <code>VC(a) &lt; VC(b)</code> iff every entry in a is &le; b and at least one is strictly less. If neither dominates, the events are <strong>concurrent</strong>.
+    </div>
+
+    <h3>Hybrid Logical Clocks (HLC)</h3>
+    <p>Combines physical time with a logical counter. Uses the physical timestamp when possible, falls back to the logical component to break ties. Gives you causality tracking with timestamps that are close to wall-clock time. Used in CockroachDB.</p>
+
+    <h3>Google TrueTime</h3>
+    <p>Hardware-assisted: GPS receivers and atomic clocks in every datacenter. The API returns an <strong>interval</strong> <code>[earliest, latest]</code> instead of a point. Spanner waits out the uncertainty window before committing, guaranteeing external consistency. Achieves ~1-7ms uncertainty bounds.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Clock</th><th>Ordering</th><th>Space</th><th>Needs Special HW</th></tr></thead>
+      <tbody>
+        <tr><td>Lamport</td><td>Partial (happens-before)</td><td>O(1)</td><td>No</td></tr>
+        <tr><td>Vector</td><td>Causal</td><td>O(N)</td><td>No</td></tr>
+        <tr><td>HLC</td><td>Causal + wall-clock approx</td><td>O(1)</td><td>No</td></tr>
+        <tr><td>TrueTime</td><td>External consistency</td><td>O(1)</td><td>Yes (GPS/atomic)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-num">03 / Consensus & Consistency</div>
+    <h2>Agreement and Consistency Models</h2>
+
+    <h3>FLP Impossibility</h3>
+    <p>Fischer, Lynch, and Paterson proved (1985) that in an asynchronous system where even one process can crash, <strong>no deterministic consensus algorithm can guarantee termination</strong>. In practice, we work around FLP by using timeouts (partial synchrony), randomization, or failure detectors.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">FLP Implication</div>
+      FLP does not say consensus is impossible -- it says you cannot have all three of safety, liveness, and fault tolerance in a purely asynchronous model. Real systems use timeouts to escape this bound.
+    </div>
+
+    <h3>Paxos (Conceptual)</h3>
+    <p>Lamport's protocol for reaching consensus on a single value. Three roles: proposers, acceptors, learners. Two phases: <strong>Prepare/Promise</strong> (proposer claims a ballot number) and <strong>Accept/Accepted</strong> (proposer sends value, acceptors agree). Correct but notoriously difficult to implement and extend to multi-decree (log) use cases.</p>
+
+    <h3>Raft</h3>
+    <p>Designed for understandability. Decomposes consensus into three sub-problems:</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Raft Sub-Problems</div>
+      <div class="flow-row">
+        <div class="flow-box">Leader Election</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Log Replication</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Safety</div>
+      </div>
+    </div>
+
+    <p><strong>Leader Election:</strong> Nodes start as followers. If a follower receives no heartbeat within its election timeout, it becomes a candidate, increments its <code>term</code>, and requests votes. A candidate wins with a majority. Each term has at most one leader.</p>
+
+    <p><strong>Log Replication:</strong> The leader receives client requests, appends entries to its log, and replicates them to followers via <code>AppendEntries</code> RPCs. An entry is committed once a majority of nodes have persisted it. Followers apply committed entries to their state machines.</p>
+
+    <p><strong>Terms:</strong> Monotonically increasing logical clock. Every RPC includes the sender's term. If a node receives a higher term, it steps down. Stale-term messages are rejected.</p>
+
+    <h3>Consistency Models</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Model</th><th>Guarantee</th><th>Example Systems</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Linearizability</strong></td><td>Operations appear instantaneous at some point between invocation and response. Strongest single-object model.</td><td>Zookeeper (writes), etcd</td></tr>
+        <tr><td><strong>Sequential</strong></td><td>All processes see the same order of operations, consistent with each process's program order.</td><td>Zookeeper (reads)</td></tr>
+        <tr><td><strong>Causal</strong></td><td>Causally related operations are seen in order; concurrent operations may be seen in any order.</td><td>MongoDB (causal sessions)</td></tr>
+        <tr><td><strong>Eventual</strong></td><td>If no new updates, all replicas converge to the same value. No ordering guarantees during convergence.</td><td>DynamoDB, Cassandra</td></tr>
+        <tr><td><strong>Tunable</strong></td><td>Application chooses consistency per operation via quorum settings (R, W, N).</td><td>Cassandra, Riak</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">Practical Rule</div>
+      Linearizability is expensive (coordination required). Most systems pick the weakest consistency model their application can tolerate, then strengthen it only where needed (e.g., for payments, locks, or leader election).
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-num">04 / Replication</div>
+    <h2>Replication Strategies</h2>
+    <p>Replication provides fault tolerance and read scalability. The key question is: who accepts writes?</p>
+
+    <h3>Single-Leader (Primary-Backup)</h3>
+    <p>One node (leader) handles all writes and streams changes to followers. Followers serve reads. Simple, but the leader is a bottleneck and a single point of failure until failover completes. Replication can be synchronous (strong consistency, higher latency) or asynchronous (risk of data loss on leader failure).</p>
+
+    <h3>Multi-Leader</h3>
+    <p>Multiple nodes accept writes, each replicating to others. Useful for multi-datacenter setups. The hard problem is <strong>conflict resolution</strong>: last-writer-wins (LWW), merge functions, or CRDTs. Operational complexity is significantly higher.</p>
+
+    <h3>Leaderless (Dynamo-style)</h3>
+    <p>Any replica accepts reads and writes. Uses quorum parameters: with <code>N</code> replicas, write to <code>W</code> and read from <code>R</code>. As long as <code>R + W &gt; N</code>, reads and writes overlap and you are guaranteed to see the latest write.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Quorum Overlap (N=3, W=2, R=2)</div>
+      <div class="flow-row">
+        <div class="flow-box">Replica A (W, R)</div>
+        <div class="flow-box">Replica B (W, R)</div>
+        <div class="flow-box">Replica C</div>
+      </div>
+      <p style="margin-top:0.8rem;font-size:0.72rem;color:var(--muted);">At least one replica in both the write set and read set has the latest value.</p>
+    </div>
+
+    <table class="cmp-table">
+      <thead><tr><th>Strategy</th><th>Write Throughput</th><th>Consistency</th><th>Conflict Handling</th></tr></thead>
+      <tbody>
+        <tr><td>Single-leader</td><td>Limited by leader</td><td>Strong (sync) or eventual (async)</td><td>None (single writer)</td></tr>
+        <tr><td>Multi-leader</td><td>Higher (parallel writes)</td><td>Eventual + conflict resolution</td><td>LWW, CRDTs, custom merge</td></tr>
+        <tr><td>Leaderless</td><td>High</td><td>Tunable via R, W, N</td><td>Read repair, anti-entropy</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-num">05 / Partitioning</div>
+    <h2>Data Partitioning (Sharding)</h2>
+    <p>When data outgrows a single node, you split it across partitions. The goals: even data distribution and even query load.</p>
+
+    <h3>Hash Partitioning</h3>
+    <p>Apply a hash function to the key and assign to a partition based on the hash. Good distribution but destroys key ordering -- range queries require scatter-gather across all partitions.</p>
+
+    <h3>Consistent Hashing</h3>
+    <p>Nodes are placed on a hash ring. Each key is assigned to the next node clockwise from its hash position. Adding or removing a node only affects its neighbors, not the entire cluster.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Consistent Hash Ring</div>
+      <div class="flow-row">
+        <div class="flow-box">Node A @ 90&deg;</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Node B @ 180&deg;</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Node C @ 270&deg;</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Node D @ 0&deg;</div>
+      </div>
+    </div>
+
+    <p><strong>Virtual Nodes (vnodes):</strong> Each physical node gets many positions on the ring. This smooths out load imbalances caused by uneven hash distribution or heterogeneous hardware. Cassandra and DynamoDB use vnodes.</p>
+
+    <h3>Range Partitioning</h3>
+    <p>Keys are sorted and split into contiguous ranges. Preserves ordering (efficient range scans) but risks hot spots if keys are not uniformly distributed (e.g., timestamp-prefixed keys).</p>
+
+    <h3>Rebalancing</h3>
+    <p>When nodes join or leave, data must be redistributed. Strategies: fixed number of partitions (only move partitions, not split them), dynamic splitting (split when partitions get too large), or proportional to node count. Rebalancing should be gradual and not block reads/writes.</p>
+
+    <div class="callout">
+      <div class="callout-title">Key Tradeoff</div>
+      Hash partitioning gives even distribution but kills range queries. Range partitioning preserves order but can create hot spots. Many systems (e.g., DynamoDB) let you choose per table.
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-num">06 / Transactions & Failures</div>
+    <h2>Distributed Transactions and Failure Handling</h2>
+
+    <h3>Two-Phase Commit (2PC)</h3>
+    <p>A coordinator asks all participants to <strong>prepare</strong> (vote yes/no). If all vote yes, it sends <strong>commit</strong>; otherwise <strong>abort</strong>. The problem: if the coordinator crashes after prepare but before commit/abort, participants are <strong>blocked</strong> -- they cannot proceed and hold locks indefinitely.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">2PC Protocol</div>
+      <div class="flow-row">
+        <div class="flow-box">Coordinator: Prepare</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Participants: Vote</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Coordinator: Commit/Abort</div>
+      </div>
+    </div>
+
+    <h3>Saga Pattern</h3>
+    <p>Breaks a distributed transaction into a sequence of local transactions, each with a <strong>compensating action</strong> (undo). If step N fails, compensating actions for steps N-1 through 1 are executed in reverse.</p>
+
+    <p><strong>Choreography:</strong> Each service publishes events; the next service reacts. Simple but hard to track and debug as the number of steps grows.</p>
+    <p><strong>Orchestration:</strong> A central orchestrator directs the saga, calling each service in sequence. Easier to reason about but introduces a single coordination point.</p>
+
+    <h3>Transactional Outbox Pattern</h3>
+    <p>Write the business data and the outgoing message/event to the <strong>same database</strong> in a local transaction. A separate process (poller or CDC) reads the outbox table and publishes to the message broker. Guarantees at-least-once delivery without distributed transactions.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Outbox Pattern</div>
+      <div class="flow-row">
+        <div class="flow-box">App: Write data + outbox row (single txn)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Poller/CDC reads outbox</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Publish to broker</div>
+      </div>
+    </div>
+
+    <h3>Failure Handling</h3>
+
+    <p><strong>Split-Brain:</strong> A network partition causes two groups of nodes to each believe they are the active cluster. Both accept writes, leading to divergence. Prevented by requiring a quorum (majority) to operate, or by using fencing.</p>
+
+    <p><strong>Fencing Tokens:</strong> When a leader is elected or a lock is acquired, a monotonically increasing token is issued. Storage services reject requests with stale tokens. This prevents a "zombie" leader (one that was partitioned but thinks it's still leader) from making writes.</p>
+
+    <p><strong>Idempotency:</strong> Design operations so that executing them multiple times has the same effect as once. Critical for safe retries. Common approach: assign a unique request ID and deduplicate on the server side.</p>
+
+    <p><strong>Failure Detectors:</strong> Used to suspect that a node has crashed. Based on heartbeat timeouts. Can be tuned for accuracy vs. speed. The phi accrual failure detector (used in Akka, Cassandra) outputs a suspicion level rather than a binary alive/dead.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">The Zombie Leader Problem</div>
+      A leader that was network-partitioned may come back and still believe it is leader. Without fencing tokens, it can overwrite data written by the new leader. Always use fencing or epoch numbers to guard against this.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">Which of the 8 fallacies does NTP attempt to mitigate (but cannot fully solve)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The network is reliable</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Bandwidth is infinite</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Latency is zero (clock sync depends on measuring round-trip time)</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The network is homogeneous</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">NTP synchronizes clocks by measuring network round-trip time, but because latency is variable and non-zero, it can never achieve perfect synchronization. The residual uncertainty is why we need logical/hybrid clocks.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">What can vector clocks determine that Lamport timestamps cannot?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The exact wall-clock time of an event</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Whether two events are concurrent (causally unrelated)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The total number of messages sent</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Which process is the leader</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">Lamport timestamps only give a partial order: L(a) < L(b) does not mean a happened before b. Vector clocks can distinguish causality from concurrency -- if neither vector dominates the other, the events are concurrent.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="d" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">In Raft, what happens when a follower receives an AppendEntries RPC with a term lower than its own?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It accepts the entry and updates its term</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It starts a new election</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It forwards the entry to the current leader</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It rejects the RPC</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">In Raft, any message with a stale (lower) term is rejected. This ensures that deposed leaders cannot continue replicating entries. The sender will discover it is no longer leader when it receives the rejection.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="a" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What does linearizability guarantee?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Each operation appears to take effect instantaneously at some point between its invocation and response</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> All replicas will eventually converge to the same state</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Causally related operations are ordered, but concurrent ones are not</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Transactions are isolated from each other</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">Linearizability is the strongest single-object consistency model. It requires that operations appear atomic and ordered consistently with real-time -- each op takes effect at a single point between call and return.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">In a leaderless replication system with N=5, what is the minimum W such that R=3 guarantees overlap?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> W = 1</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> W = 2</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> W = 3</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> W = 5</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">The quorum condition is R + W > N. With N=5 and R=3, we need W > 2, so W = 3 is the minimum. This ensures at least one node is in both the read set and write set.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">What is the main advantage of consistent hashing over simple hash-mod-N partitioning?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It preserves key ordering for range queries</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Adding/removing a node only moves data to/from neighbors, not all partitions</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It eliminates the need for replication</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It guarantees perfectly even data distribution without vnodes</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">With hash-mod-N, changing N reshuffles almost all keys. Consistent hashing places nodes on a ring, so adding or removing a node only affects the keys between it and its neighbor. Vnodes further smooth the distribution.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="d" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">What is the fundamental weakness of two-phase commit (2PC)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It cannot handle more than two participants</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It does not guarantee atomicity</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It requires all participants to be in the same datacenter</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> If the coordinator crashes after prepare, participants are blocked and hold locks</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">2PC is a blocking protocol. After voting "yes" in the prepare phase, a participant cannot unilaterally decide to commit or abort -- it must wait for the coordinator. If the coordinator crashes, participants are stuck holding locks until it recovers.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What does the transactional outbox pattern guarantee?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> At-least-once delivery of events without distributed transactions</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Exactly-once delivery of events</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Strong consistency across all services</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Zero-latency event propagation</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">The outbox pattern writes the event to a local table in the same transaction as the business data. A separate process publishes it. Since the poller/CDC may re-read rows, it guarantees at-least-once (not exactly-once). Consumers must be idempotent.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">How do fencing tokens prevent the zombie leader problem?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> They kill the old leader process remotely</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> They encrypt all messages from the new leader</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Storage rejects writes with a token lower than the highest it has seen</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> They force the old leader to check its lease before every write</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">Each leader election produces a monotonically increasing fencing token. The storage layer tracks the highest token it has accepted. When a zombie leader (with an old, lower token) tries to write, the storage rejects it because its token is stale.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">What does the FLP impossibility result state?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Consensus is impossible in any distributed system</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> No deterministic consensus protocol can guarantee termination in an asynchronous system with even one crash failure</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Byzantine fault tolerance requires at least 3f+1 nodes</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> A distributed system cannot be both available and partition-tolerant</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">FLP (1985) proves that in a purely asynchronous model, even one possible crash makes deterministic consensus unsolvable (liveness cannot be guaranteed while maintaining safety). Real systems sidestep this with timeouts and partial synchrony assumptions.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="/">← all topics</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Processes — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── MEMORY LAYOUT ── */
+.mem-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin: 0.5rem 0;
+}
+.mem-block {
+  width: 260px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.mem-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  margin: 0.2rem 0;
+  letter-spacing: 0.08em;
+}
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+  .mem-block{width:100%}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="/operating-systems-overview/">Operating Systems</a>
+    <span>/</span>
+    <span style="color:var(--text);">Processes</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Operating Systems</div>
+  <h1>Processes</h1>
+  <p class="header-sub">A process is a program in execution. Understanding how the OS creates, schedules, and manages processes is fundamental to systems programming and performance engineering.</p>
+</header>
+
+<div class="content">
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-num">01 / What Is a Process</div>
+    <h2>Anatomy of a Process</h2>
+    <p>A process is more than just running code. The kernel tracks each process through a <strong>Process Control Block (PCB)</strong>, a data structure (called <code>task_struct</code> in Linux, ~6 KB) containing everything the OS needs: PID, register state, memory maps, open file descriptors, signal handlers, scheduling priority, and more.</p>
+
+    <p>Every process exists in one of several well-defined states. The kernel transitions processes between these states in response to system calls, interrupts, and scheduling decisions.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Process State Diagram</div>
+      <div class="flow-row">
+        <div class="flow-box">Created</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Ready</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Running</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Terminated</div>
+      </div>
+      <div class="flow-row" style="margin-top: 0.8rem;">
+        <div class="flow-box" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange);">Waiting (Blocked)</div>
+      </div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:0.6rem;">
+        Running &rarr; Waiting: process requests I/O or waits on lock<br>
+        Waiting &rarr; Ready: I/O completes or resource becomes available<br>
+        Running &rarr; Ready: preempted by scheduler (time slice expired)
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      A process in the <strong>Ready</strong> state has everything it needs to run but is waiting for CPU time. A process in the <strong>Waiting</strong> state is blocked on an external event (disk I/O, network, mutex). The scheduler only picks from the ready queue.
+    </div>
+
+    <h3>What the PCB Holds</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>PID / PPID</td><td>Unique identifier and parent's PID</td></tr>
+        <tr><td>Register state</td><td>Saved CPU registers for context switching</td></tr>
+        <tr><td>Memory maps</td><td>Page table pointer, virtual address space layout</td></tr>
+        <tr><td>File descriptors</td><td>Table of open files, sockets, pipes</td></tr>
+        <tr><td>Signal handlers</td><td>Registered handlers for each signal type</td></tr>
+        <tr><td>Scheduling info</td><td>Priority, nice value, CPU time consumed</td></tr>
+        <tr><td>Credentials</td><td>UID, GID, capabilities</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-num">02 / Process Creation</div>
+    <h2>Fork, Exec, and the Process Tree</h2>
+    <p>On Unix, new processes are created via the <code>fork()</code> + <code>exec()</code> pattern. <code>fork()</code> creates a child process that is a near-exact copy of the parent. <code>exec()</code> replaces the child's address space with a new program.</p>
+
+    <pre><code>pid_t pid = fork();          // create child
+if (pid == 0) {
+    // child process
+    execvp("ls", args);      // replace with new program
+} else {
+    // parent process
+    waitpid(pid, &status, 0); // wait for child
+}</code></pre>
+
+    <h3>Copy-on-Write (CoW)</h3>
+    <p><code>fork()</code> does not actually copy all memory. Instead, parent and child share the same physical pages marked as read-only. Only when either process writes to a page does the kernel copy it. This makes <code>fork()</code> extremely fast, often completing in under 1 ms even for processes with GBs of memory.</p>
+
+    <h3>PID 1 and the Process Tree</h3>
+    <p>Every process has a parent (<code>PPID</code>). The first userspace process is <code>init</code> (or <code>systemd</code>) with PID 1. All other processes descend from it, forming a tree visible via <code>pstree</code>.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Orphans and Zombies</div>
+      <strong>Orphan:</strong> A child whose parent exits. The kernel re-parents it to PID 1, which calls <code>wait()</code> to reap it.<br>
+      <strong>Zombie:</strong> A child that has exited but whose parent hasn't called <code>wait()</code>. It occupies a slot in the process table (no memory, but a PID). Too many zombies can exhaust the PID space. Fix: the parent must call <code>wait()</code> or handle <code>SIGCHLD</code>.
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-num">03 / Memory Layout</div>
+    <h2>Process Memory Layout</h2>
+    <p>Each process gets its own virtual address space. The kernel maps virtual addresses to physical frames via page tables. The layout follows a standard convention on modern systems.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Virtual Address Space (high to low)</div>
+      <div class="mem-layout">
+        <div class="mem-label">&uarr; High addresses (0xFFFF...)</div>
+        <div class="mem-block" style="background:var(--purple-bg);color:var(--purple);">Kernel Space (inaccessible to user)</div>
+        <div class="mem-block" style="background:var(--red-bg);color:var(--red);">Stack (grows downward)</div>
+        <div class="mem-label">&darr; grows down</div>
+        <div class="mem-block" style="background:var(--surface2);color:var(--muted);">... unmapped gap ...</div>
+        <div class="mem-block" style="background:var(--orange-bg);color:var(--orange);">mmap / Shared Libraries</div>
+        <div class="mem-block" style="background:var(--surface2);color:var(--muted);">... unmapped gap ...</div>
+        <div class="mem-block" style="background:var(--green-bg);color:var(--green);">Heap (grows upward)</div>
+        <div class="mem-label">&uarr; grows up</div>
+        <div class="mem-block" style="background:var(--accent-light);color:var(--accent);">BSS (uninitialized globals, zeroed)</div>
+        <div class="mem-block" style="background:var(--accent-light);color:var(--accent);">Data (initialized globals)</div>
+        <div class="mem-block" style="background:var(--accent-light);color:var(--accent);">Text (executable code, read-only)</div>
+        <div class="mem-label">&darr; Low addresses (0x0000...)</div>
+      </div>
+    </div>
+
+    <h3>Key Segments</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Segment</th><th>Contents</th><th>Growth</th></tr></thead>
+      <tbody>
+        <tr><td><code>text</code></td><td>Machine code instructions</td><td>Fixed, read-only</td></tr>
+        <tr><td><code>data</code></td><td>Initialized global/static variables</td><td>Fixed</td></tr>
+        <tr><td><code>BSS</code></td><td>Uninitialized globals (zeroed by kernel)</td><td>Fixed</td></tr>
+        <tr><td><code>heap</code></td><td><code>malloc()</code>/<code>brk()</code> allocations</td><td>Grows upward</td></tr>
+        <tr><td><code>mmap</code></td><td>Shared libraries, memory-mapped files</td><td>Middle region</td></tr>
+        <tr><td><code>stack</code></td><td>Local variables, return addresses, frames</td><td>Grows downward</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">ASLR - Address Space Layout Randomization</div>
+      Modern kernels randomize the base addresses of the stack, heap, mmap region, and shared libraries on each execution. This makes buffer overflow exploits significantly harder since attackers cannot predict where code or data lives. Check with <code>cat /proc/self/maps</code>.
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-num">04 / Scheduling</div>
+    <h2>CPU Scheduling</h2>
+    <p>The scheduler decides which ready process gets the CPU next. This decision profoundly affects system responsiveness and throughput.</p>
+
+    <h3>Preemptive vs Cooperative</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Aspect</th><th>Preemptive</th><th>Cooperative</th></tr></thead>
+      <tbody>
+        <tr><td>Who decides</td><td>OS forces context switch via timer interrupt</td><td>Process voluntarily yields</td></tr>
+        <tr><td>Fairness</td><td>Guaranteed, no starvation</td><td>One misbehaving process can hog CPU</td></tr>
+        <tr><td>Complexity</td><td>Needs careful synchronization</td><td>Simpler, fewer race conditions</td></tr>
+        <tr><td>Used in</td><td>All modern OS kernels</td><td>Event loops (Node.js), coroutines, early Mac OS</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Linux CFS (Completely Fair Scheduler)</h3>
+    <p>Linux uses CFS as the default scheduler. Instead of fixed time slices, CFS tracks <code>vruntime</code> (virtual runtime) for each process. The process with the lowest vruntime gets the CPU next. CFS uses a red-black tree to find this process in O(log n).</p>
+
+    <p>CFS aims for perfect fairness: if two processes have equal priority, each should get exactly 50% of CPU time. In practice, it achieves near-perfect fairness with sub-millisecond granularity.</p>
+
+    <div class="callout">
+      <div class="callout-title">Nice Values</div>
+      Nice values range from -20 (highest priority) to +19 (lowest). A process with nice -20 gets roughly 10x more CPU time than one with nice +19. Only root can set negative nice values. Use <code>nice -n 10 ./my_program</code> or <code>renice -n 5 -p PID</code>.
+    </div>
+
+    <h3>CPU-bound vs I/O-bound</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">CPU-bound</div>
+        <p>Spends most time computing (video encoding, ML training). Benefits from longer time slices. Throughput-sensitive.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">I/O-bound</div>
+        <p>Spends most time waiting on I/O (web servers, databases). Needs low latency to resume quickly. CFS naturally boosts these because their vruntime stays low.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-num">05 / Context Switching</div>
+    <h2>Context Switching</h2>
+    <p>When the scheduler decides to run a different process, the kernel performs a <strong>context switch</strong>: saving the current process's state and loading the next one's. This is pure overhead &mdash; no useful work happens during a context switch.</p>
+
+    <h3>What Gets Saved</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">CPU Registers</div>
+        <p>General-purpose registers, program counter, stack pointer, flags register. Saved to the PCB's kernel stack.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Page Table Pointer</div>
+        <p>CR3 register on x86. Points to the process's page table. Changing it switches the virtual address space.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">FPU / SIMD State</div>
+        <p>Floating point and vector registers (SSE, AVX). Can be lazily saved/restored to reduce overhead.</p>
+      </div>
+    </div>
+
+    <h3>The Cost</h3>
+    <p>A context switch itself takes 1-10 microseconds of direct CPU time. But the indirect cost is much larger: the TLB (Translation Lookaside Buffer) gets flushed, and CPU caches go cold. This can cause thousands of cache misses as the new process warms up, adding 10-100 microseconds of effective cost.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">TLB Flush</div>
+      Switching page tables invalidates TLB entries because virtual-to-physical mappings differ between processes. Modern CPUs use PCID (Process Context ID) to tag TLB entries and avoid full flushes, reducing context switch cost by 20-40%. Check for PCID support: <code>grep pcid /proc/cpuinfo</code>.
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-num">06 / Inter-Process Communication</div>
+    <h2>IPC Mechanisms</h2>
+    <p>Processes have isolated address spaces, so they need explicit mechanisms to communicate. The kernel provides several IPC primitives, each with different tradeoffs.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Pipes</div>
+        <p>Unidirectional byte stream between related processes. Created with <code>pipe()</code>. Shell pipes (<code>|</code>) use this. Named pipes (FIFOs) work between unrelated processes.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Message Queues</div>
+        <p>Kernel-managed queue of typed messages. Processes send/receive discrete messages. POSIX (<code>mq_open</code>) or System V (<code>msgget</code>) variants.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Shared Memory</div>
+        <p>Fastest IPC: multiple processes map the same physical pages. No kernel involvement for reads/writes. Needs synchronization (semaphores/mutexes). <code>shmget()</code> or <code>mmap()</code> with <code>MAP_SHARED</code>.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Semaphores</div>
+        <p>Synchronization primitive, not data transfer. Controls access to shared resources. <code>sem_wait()</code> decrements, <code>sem_post()</code> increments. Often used alongside shared memory.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Signals</div>
+        <p>Asynchronous notifications: SIGTERM, SIGKILL, SIGCHLD, SIGUSR1, etc. Limited bandwidth (just a number), but useful for control flow. Cannot be ignored: SIGKILL, SIGSTOP.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Unix Domain Sockets</div>
+        <p>Full-duplex, connection-oriented IPC via filesystem path. Same API as network sockets but ~2x faster (no TCP/IP stack). Used by Docker, PostgreSQL, systemd.</p>
+      </div>
+    </div>
+
+    <h3>IPC Performance Comparison</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Mechanism</th><th>Throughput</th><th>Latency</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td>Shared Memory</td><td>Highest (memcpy speed)</td><td>Lowest</td><td>High-throughput data sharing</td></tr>
+        <tr><td>Unix Domain Socket</td><td>High (~6 GB/s)</td><td>Low (~2 us)</td><td>Client-server on same host</td></tr>
+        <tr><td>Pipe</td><td>Moderate (~3 GB/s)</td><td>Low (~3 us)</td><td>Parent-child streaming</td></tr>
+        <tr><td>Message Queue</td><td>Moderate</td><td>Moderate</td><td>Decoupled message passing</td></tr>
+        <tr><td>Signal</td><td>Minimal (just signal number)</td><td>Low</td><td>Process control, notifications</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">8</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">What data structure does the Linux kernel use to represent a process?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> process_block</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> proc_info</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> task_struct</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> sched_entity</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">Linux represents each process (and thread) with a <code>task_struct</code>. The <code>sched_entity</code> is a sub-structure within it used specifically by the scheduler.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">What is a zombie process?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> A process that lost its parent and was adopted by init</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> A process that has exited but whose parent hasn't called wait()</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> A process stuck in an infinite loop consuming CPU</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> A process that was killed by SIGKILL but hasn't stopped yet</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">A zombie is a process that has finished execution but still has an entry in the process table because its parent hasn't called <code>wait()</code> to read its exit status. Option A describes an orphan process.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">How does fork() avoid copying the entire address space of the parent?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Copy-on-Write: pages are shared read-only and copied only on write</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It uses shared memory segments for all data</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It only copies the stack, not the heap</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It compresses memory pages during the copy</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">Copy-on-Write (CoW) marks all shared pages as read-only. When either process writes to a page, a page fault triggers the kernel to copy just that page. This makes fork() nearly instantaneous regardless of process memory size.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">In the process memory layout, which segment grows downward toward lower addresses?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Heap</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> BSS</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Text</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Stack</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">The stack grows downward from high addresses. The heap grows upward from low addresses. They grow toward each other, with a large unmapped gap between them.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What data structure does Linux CFS use to find the process with the lowest vruntime?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Hash table</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Linked list sorted by priority</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Red-black tree</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Min-heap</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">CFS stores all runnable processes in a red-black tree keyed by vruntime. The leftmost node (minimum vruntime) is the next process to run. Insertion and lookup are both O(log n).</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">What is the primary indirect cost of a context switch beyond the register save/restore?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Disk I/O for swapping the process out</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> TLB flush and cold CPU caches</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Re-opening file descriptors</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Reloading shared libraries from disk</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">When the page table pointer changes (CR3 on x86), TLB entries become invalid and CPU caches go cold. The new process suffers many cache misses as it warms up. This indirect cost (10-100 us) dwarfs the direct register save/restore (1-10 us).</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="d" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">Which IPC mechanism has the highest throughput because it avoids kernel involvement for data transfer?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Pipes</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Unix domain sockets</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Message queues</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Shared memory</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">Shared memory maps the same physical pages into multiple processes' address spaces. After setup, reads and writes are just memory operations with no system calls. The tradeoff: you must handle synchronization yourself.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What does ASLR protect against?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Buffer overflow exploits by randomizing memory layout</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Denial of service attacks by limiting process count</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Data corruption by adding checksums to memory pages</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Memory leaks by automatically freeing unused pages</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">Address Space Layout Randomization randomizes the positions of the stack, heap, mmap region, and libraries on each execution. An attacker cannot hardcode addresses for return-oriented programming (ROP) or shellcode injection.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="/">← all topics</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

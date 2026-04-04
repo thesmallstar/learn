@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CS Fundamentals — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent-light: rgba(43,94,167,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+
+  --hardware: #C05621;  --hardware-bg: rgba(192,86,33,0.07);
+  --os:       #1A6B3C;  --os-bg:       rgba(26,107,60,0.07);
+  --network:  #1B52A0;  --network-bg:  rgba(27,82,160,0.07);
+  --security: #6B21A8;  --security-bg: rgba(107,33,168,0.07);
+  --ds:       #0F766E;  --ds-bg:       rgba(15,118,110,0.07);
+  --algo:     #9D174D;  --algo-bg:     rgba(157,23,77,0.07);
+  --db:       #075985;  --db-bg:       rgba(7,89,133,0.07);
+  --infra:    #3F4F0F;  --infra-bg:    rgba(63,79,15,0.07);
+  --cloud:    #1E3A5F;  --cloud-bg:    rgba(30,58,95,0.07);
+  --perf:     #7C2D12;  --perf-bg:     rgba(124,45,18,0.07);
+  --arch:     #4C1D95;  --arch-bg:     rgba(76,29,149,0.07);
+  --web:      #065F46;  --web-bg:      rgba(6,95,70,0.07);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(43,94,167,0.06) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.65rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; transition: color 0.15s; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 2rem 5rem; }
+
+/* ── HERO ── */
+.hero {
+  padding: 4.5rem 0 3.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+}
+.hero-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text);
+}
+h1 em { font-style: italic; font-weight: 300; color: var(--muted); }
+.hero-sub {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 620px;
+  line-height: 1.7;
+}
+.hero-stats {
+  display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap;
+}
+.stat { font-size: 0.7rem; }
+.stat-num {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+  line-height: 1;
+  margin-bottom: 0.2rem;
+}
+.stat-label { color: var(--muted); }
+
+/* ── FILTERS ── */
+.filters {
+  display: flex; gap: 0.4rem; margin-bottom: 2rem; flex-wrap: wrap;
+}
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.75rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-btn:hover, .filter-btn.active {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex; align-items: baseline; gap: 1rem;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-header h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.section-header .section-count {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+}
+
+/* ── CARD GRID ── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.7rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.1rem 1.2rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  position: relative;
+}
+.card:hover {
+  border-color: var(--card-accent, var(--accent));
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+.card-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.card-tag {
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.18rem 0.5rem;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.card-arrow {
+  font-size: 0.8rem;
+  color: var(--dim);
+  transition: color 0.15s, transform 0.15s;
+}
+.card:hover .card-arrow {
+  color: var(--card-accent, var(--accent));
+  transform: translateX(3px);
+}
+.card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+.card-desc {
+  font-size: 0.68rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* category colour variants */
+.cat-hardware .card-tag { color: var(--hardware); background: var(--hardware-bg); }
+.cat-hardware { --card-accent: var(--hardware); }
+.cat-os .card-tag       { color: var(--os);       background: var(--os-bg); }
+.cat-os       { --card-accent: var(--os); }
+.cat-network .card-tag  { color: var(--network);  background: var(--network-bg); }
+.cat-network  { --card-accent: var(--network); }
+.cat-security .card-tag { color: var(--security); background: var(--security-bg); }
+.cat-security { --card-accent: var(--security); }
+.cat-ds .card-tag       { color: var(--ds);       background: var(--ds-bg); }
+.cat-ds       { --card-accent: var(--ds); }
+.cat-algo .card-tag     { color: var(--algo);     background: var(--algo-bg); }
+.cat-algo     { --card-accent: var(--algo); }
+.cat-db .card-tag       { color: var(--db);       background: var(--db-bg); }
+.cat-db       { --card-accent: var(--db); }
+.cat-infra .card-tag    { color: var(--infra);    background: var(--infra-bg); }
+.cat-infra    { --card-accent: var(--infra); }
+.cat-cloud .card-tag    { color: var(--cloud);    background: var(--cloud-bg); }
+.cat-cloud    { --card-accent: var(--cloud); }
+.cat-perf .card-tag     { color: var(--perf);     background: var(--perf-bg); }
+.cat-perf     { --card-accent: var(--perf); }
+.cat-arch .card-tag     { color: var(--arch);     background: var(--arch-bg); }
+.cat-arch     { --card-accent: var(--arch); }
+.cat-web .card-tag      { color: var(--web);      background: var(--web-bg); }
+.cat-web      { --card-accent: var(--web); }
+
+.empty { display: none; padding: 3rem 0; text-align: center; color: var(--dim); font-size: 0.75rem; }
+
+footer {
+  margin-top: 4rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.63rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin-left: auto; margin-right: auto;
+  padding-left: 2rem; padding-right: 2rem;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+@media(max-width:700px){
+  .wrap{padding:0 1.2rem 4rem}
+  .hero{padding:3rem 0 2.5rem}
+  .cards{grid-template-columns:1fr}
+  .hero-stats{gap:1.2rem}
+  footer{padding:1.5rem 1.2rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <span style="color:var(--text)">CS Fundamentals</span>
+  </div>
+  <a href="/">← all topics</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-label">learn.surkar.in / CS Fundamentals</div>
+  <h1>Senior Engineer<br><em>Fundamentals</em></h1>
+  <p class="hero-sub">The mental models, mechanisms, and trade-offs that separate engineers who <em>understand</em> systems from those who merely <em>use</em> them. Each page: deep theory + visual diagrams + a quiz to test yourself.</p>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num">36</span><span class="stat-label">topics</span></div>
+    <div class="stat"><span class="stat-num">12</span><span class="stat-label">domains</span></div>
+    <div class="stat"><span class="stat-num">300+</span><span class="stat-label">quiz questions</span></div>
+    <div class="stat"><span class="stat-num">~450h</span><span class="stat-label">estimated study time</span></div>
+  </div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="filter('all',this)">All</button>
+  <button class="filter-btn" onclick="filter('hardware',this)">Hardware</button>
+  <button class="filter-btn" onclick="filter('os',this)">OS</button>
+  <button class="filter-btn" onclick="filter('network',this)">Networking</button>
+  <button class="filter-btn" onclick="filter('web',this)">Web</button>
+  <button class="filter-btn" onclick="filter('security',this)">Security</button>
+  <button class="filter-btn" onclick="filter('ds',this)">Data Structures</button>
+  <button class="filter-btn" onclick="filter('algo',this)">Algorithms</button>
+  <button class="filter-btn" onclick="filter('db',this)">Databases</button>
+  <button class="filter-btn" onclick="filter('infra',this)">Infra</button>
+  <button class="filter-btn" onclick="filter('cloud',this)">Cloud</button>
+  <button class="filter-btn" onclick="filter('perf',this)">Performance</button>
+  <button class="filter-btn" onclick="filter('arch',this)">Architecture</button>
+</div>
+
+<!-- ─── HARDWARE & COMPUTE ─── -->
+<div class="section-group" data-group="hardware">
+  <div class="section-header">
+    <h2>Hardware & Compute</h2>
+    <span class="section-count">3 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-hardware" href="/cpu-architecture/" data-cat="hardware">
+      <div class="card-top"><span class="card-tag">Hardware</span><span class="card-arrow">→</span></div>
+      <div class="card-title">CPU Architecture</div>
+      <div class="card-desc">Fetch-decode-execute, pipelining, out-of-order execution, branch prediction, caches (MESI), SIMD, speculative execution & Spectre/Meltdown.</div>
+    </a>
+    <a class="card cat-hardware" href="/memory-hierarchy/" data-cat="hardware">
+      <div class="card-top"><span class="card-tag">Hardware</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Memory Hierarchy & RAM</div>
+      <div class="card-desc">Latency numbers every engineer must know, DRAM, virtual memory, TLB, page faults, mmap, CoW, allocators, garbage collection.</div>
+    </a>
+    <a class="card cat-hardware" href="/storage-io/" data-cat="hardware">
+      <div class="card-top"><span class="card-tag">Hardware</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Storage & I/O</div>
+      <div class="card-desc">HDD vs SSD internals, NVMe, RAID levels, file systems (ext4, XFS, ZFS), WAL, durability guarantees, fsync.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── OPERATING SYSTEMS ─── -->
+<div class="section-group" data-group="os">
+  <div class="section-header">
+    <h2>Operating Systems</h2>
+    <span class="section-count">5 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-os" href="/processes/" data-cat="os">
+      <div class="card-top"><span class="card-tag">OS</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Processes</div>
+      <div class="card-desc">PCB, process states, fork/exec, CoW, memory layout (text/data/heap/stack), CFS scheduler, context switching, IPC.</div>
+    </a>
+    <a class="card cat-os" href="/threads-concurrency/" data-cat="os">
+      <div class="card-top"><span class="card-tag">OS</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Threads & Concurrency</div>
+      <div class="card-desc">Threads vs processes, sync primitives (mutex/semaphore/CAS), deadlock, livelock, epoll/io_uring, actor model, async/await.</div>
+    </a>
+    <a class="card cat-os" href="/kernel-syscalls/" data-cat="os">
+      <div class="card-top"><span class="card-tag">OS</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Kernel & System Calls</div>
+      <div class="card-desc">Kernel space vs user space, syscall mechanics, monolithic vs microkernel, Linux subsystems, namespaces & cgroups (foundation of containers).</div>
+    </a>
+    <a class="card cat-os" href="/linux-internals/" data-cat="os">
+      <div class="card-top"><span class="card-tag">OS</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Linux Internals</div>
+      <div class="card-desc">Boot process, systemd, strace/perf/proc/sys, networking tools, file permissions, SELinux/AppArmor, seccomp, capabilities.</div>
+    </a>
+    <a class="card cat-os" href="/encoding-serialization/" data-cat="os">
+      <div class="card-top"><span class="card-tag">OS</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Encoding & Serialization</div>
+      <div class="card-desc">UTF-8, IEEE 754 (why 0.1+0.2≠0.3), Base64, protobuf/Avro/JSON comparison, schema evolution, gzip/Brotli/zstd/LZ4.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── NETWORKING ─── -->
+<div class="section-group" data-group="network">
+  <div class="section-header">
+    <h2>Networking</h2>
+    <span class="section-count">4 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-network" href="/networking-layers/" data-cat="network">
+      <div class="card-top"><span class="card-tag">Networking</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Network Models & Layers</div>
+      <div class="card-desc">OSI 7-layer model, TCP/IP model, encapsulation, Ethernet, ARP, VLANs, IPv4/IPv6, ICMP, BGP, OSPF.</div>
+    </a>
+    <a class="card cat-network" href="/tcp-deep-dive/" data-cat="network">
+      <div class="card-top"><span class="card-tag">Networking</span><span class="card-arrow">→</span></div>
+      <div class="card-title">TCP Deep Dive</div>
+      <div class="card-desc">3-way handshake, state machine, congestion control (CUBIC/BBR), sliding window, Nagle, TIME_WAIT, HOL blocking → QUIC.</div>
+    </a>
+    <a class="card cat-network" href="/dns/" data-cat="network">
+      <div class="card-top"><span class="card-tag">Networking</span><span class="card-arrow">→</span></div>
+      <div class="card-title">DNS</div>
+      <div class="card-desc">Resolution flow, all record types, DNSSEC, DoH/DoT, amplification attacks, split-horizon, service discovery.</div>
+    </a>
+    <a class="card cat-network" href="/http-protocol/" data-cat="network">
+      <div class="card-top"><span class="card-tag">Networking</span><span class="card-arrow">→</span></div>
+      <div class="card-title">HTTP & Web Protocols</div>
+      <div class="card-desc">HTTP/1.1 → 2 → 3 (QUIC), status codes, WebSockets, SSE, gRPC/protobuf, full version comparison.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── WEB FUNDAMENTALS ─── -->
+<div class="section-group" data-group="web">
+  <div class="section-header">
+    <h2>Web Fundamentals</h2>
+    <span class="section-count">2 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-web" href="/browser-internals/" data-cat="web">
+      <div class="card-top"><span class="card-tag">Web</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Browser Internals</div>
+      <div class="card-desc">Critical rendering path, V8 (hidden classes/JIT), event loop, microtasks vs macrotasks, service workers, Core Web Vitals.</div>
+    </a>
+    <a class="card cat-web" href="/web-security/" data-cat="web">
+      <div class="card-top"><span class="card-tag">Web</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Web Security</div>
+      <div class="card-desc">SOP, CORS, XSS (reflected/stored/DOM), CSRF, CSP, SameSite cookies, clickjacking, SSRF, OWASP Top 10.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── CRYPTOGRAPHY & SECURITY ─── -->
+<div class="section-group" data-group="security">
+  <div class="section-header">
+    <h2>Cryptography & Security</h2>
+    <span class="section-count">3 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-security" href="/symmetric-encryption/" data-cat="security">
+      <div class="card-top"><span class="card-tag">Security</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Symmetric Encryption</div>
+      <div class="card-desc">AES-GCM deep dive, ChaCha20-Poly1305, SHA-256/SHA-3 hashing, HMAC, KDFs (Argon2/bcrypt/PBKDF2), digital signatures.</div>
+    </a>
+    <a class="card cat-security" href="/tls-https/" data-cat="security">
+      <div class="card-top"><span class="card-tag">Security</span><span class="card-arrow">→</span></div>
+      <div class="card-title">TLS & HTTPS</div>
+      <div class="card-desc">TLS 1.2 vs 1.3 handshake, certificate chain, OCSP, PFS, cipher suites, SNI, mTLS, Let's Encrypt/ACME.</div>
+    </a>
+    <a class="card cat-security" href="/authentication/" data-cat="security">
+      <div class="card-top"><span class="card-tag">Security</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Authentication & Authorization</div>
+      <div class="card-desc">JWT pitfalls, OAuth 2.0 flows (PKCE, Client Credentials), OIDC, SAML, WebAuthn/FIDO2, RBAC vs ABAC.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── DATA STRUCTURES ─── -->
+<div class="section-group" data-group="ds">
+  <div class="section-header">
+    <h2>Data Structures</h2>
+    <span class="section-count">3 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-ds" href="/data-structures-linear/" data-cat="ds">
+      <div class="card-top"><span class="card-tag">Data Structures</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Arrays, Lists, Stacks & Queues</div>
+      <div class="card-desc">Contiguous vs linked, dynamic arrays (amortized O(1)), ring buffers, LRU cache, Bloom filter, skip list, Union-Find.</div>
+    </a>
+    <a class="card cat-ds" href="/hash-tables/" data-cat="ds">
+      <div class="card-top"><span class="card-tag">Data Structures</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Hash Tables</div>
+      <div class="card-desc">Hash functions, chaining vs open addressing, Robin Hood hashing, cuckoo hashing, consistent hashing, real-world internals.</div>
+    </a>
+    <a class="card cat-ds" href="/trees-data-structures/" data-cat="ds">
+      <div class="card-top"><span class="card-tag">Data Structures</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Trees</div>
+      <div class="card-desc">BST, AVL, Red-Black, B+ Tree (databases), heap (priority queue), trie (autocomplete), Segment Tree, Fenwick Tree.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── ALGORITHMS ─── -->
+<div class="section-group" data-group="algo">
+  <div class="section-header">
+    <h2>Algorithms</h2>
+    <span class="section-count">3 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-algo" href="/sorting-algorithms/" data-cat="algo">
+      <div class="card-top"><span class="card-tag">Algorithms</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Sorting Algorithms</div>
+      <div class="card-desc">O(n log n) lower bound proof, quicksort, mergesort, heapsort, Timsort, counting/radix/bucket sort, full comparison table.</div>
+    </a>
+    <a class="card cat-algo" href="/graph-algorithms/" data-cat="algo">
+      <div class="card-top"><span class="card-tag">Algorithms</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Graph Algorithms</div>
+      <div class="card-desc">BFS, DFS, Dijkstra, Bellman-Ford, A*, Floyd-Warshall, Kruskal/Prim MST, topological sort, SCC, max flow.</div>
+    </a>
+    <a class="card cat-algo" href="/dynamic-programming/" data-cat="algo">
+      <div class="card-top"><span class="card-tag">Algorithms</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Dynamic Programming</div>
+      <div class="card-desc">Overlapping subproblems, memoization vs tabulation, knapsack, LCS, edit distance, space optimization, DP vs greedy.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── DATABASES ─── -->
+<div class="section-group" data-group="db">
+  <div class="section-header">
+    <h2>Databases</h2>
+    <span class="section-count">2 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-db" href="/nosql-databases/" data-cat="db">
+      <div class="card-top"><span class="card-tag">Databases</span><span class="card-arrow">→</span></div>
+      <div class="card-title">NoSQL Databases</div>
+      <div class="card-desc">Document (MongoDB), key-value (Redis/DynamoDB), column-family (Cassandra), graph (Neo4j), time-series, CAP theorem, PACELC.</div>
+    </a>
+    <a class="card cat-db" href="/database-internals/" data-cat="db">
+      <div class="card-top"><span class="card-tag">Databases</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Database Internals</div>
+      <div class="card-desc">B-Tree vs LSM-Tree, WAL, buffer pool, query optimizer, MVCC, read/write/space amplification trade-offs, connection pooling.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── INFRASTRUCTURE ─── -->
+<div class="section-group" data-group="infra">
+  <div class="section-header">
+    <h2>Infrastructure</h2>
+    <span class="section-count">5 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-infra" href="/caching-strategies/" data-cat="infra">
+      <div class="card-top"><span class="card-tag">Infrastructure</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Caching Strategies</div>
+      <div class="card-desc">Cache-aside, write-through, write-behind, LRU/LFU/W-TinyLFU, stampede, penetration, avalanche, hot key, Redis, CDN.</div>
+    </a>
+    <a class="card cat-infra" href="/message-queues/" data-cat="infra">
+      <div class="card-top"><span class="card-tag">Infrastructure</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Message Queues & Events</div>
+      <div class="card-desc">Kafka (commit log, partitions, ISR), RabbitMQ (exchanges), SQS/SNS, event sourcing, CQRS, saga pattern.</div>
+    </a>
+    <a class="card cat-infra" href="/distributed-systems/" data-cat="infra">
+      <div class="card-top"><span class="card-tag">Infrastructure</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Distributed Systems</div>
+      <div class="card-desc">8 fallacies, Lamport/vector clocks, Raft consensus, consistency models, replication, consistent hashing, 2PC, saga, FLP impossibility.</div>
+    </a>
+    <a class="card cat-infra" href="/docker-containers/" data-cat="infra">
+      <div class="card-top"><span class="card-tag">Infrastructure</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Docker & Containers</div>
+      <div class="card-desc">Namespaces + cgroups + overlay FS, Dockerfile best practices, multi-stage builds, networking, volumes, security hardening.</div>
+    </a>
+    <a class="card cat-infra" href="/kubernetes/" data-cat="infra">
+      <div class="card-top"><span class="card-tag">Infrastructure</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Kubernetes</div>
+      <div class="card-desc">Control plane, core objects (Pod/Deployment/Service), networking (CNI, NetworkPolicy), HPA/VPA, scheduling, deployment strategies.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── CLOUD ─── -->
+<div class="section-group" data-group="cloud">
+  <div class="section-header">
+    <h2>Cloud Computing</h2>
+    <span class="section-count">2 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-cloud" href="/cloud-computing/" data-cat="cloud">
+      <div class="card-top"><span class="card-tag">Cloud</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Cloud Fundamentals</div>
+      <div class="card-desc">IaaS/PaaS/SaaS/FaaS, VPC (subnets, SG vs NACL), IAM (least privilege, policy evaluation), EC2, S3, RDS/Aurora, cost optimization.</div>
+    </a>
+    <a class="card cat-cloud" href="/cicd-devops/" data-cat="cloud">
+      <div class="card-top"><span class="card-tag">Cloud</span><span class="card-arrow">→</span></div>
+      <div class="card-title">CI/CD & DevOps</div>
+      <div class="card-desc">Git internals (DAG, index), CI pipelines, blue-green/canary deploys, feature flags, Terraform/GitOps, immutable infra.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── PERFORMANCE ─── -->
+<div class="section-group" data-group="perf">
+  <div class="section-header">
+    <h2>Performance & Observability</h2>
+    <span class="section-count">2 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-perf" href="/performance-engineering/" data-cat="perf">
+      <div class="card-top"><span class="card-tag">Performance</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Performance Engineering</div>
+      <div class="card-desc">P99 latency (why averages lie), Amdahl's Law, Little's Law, flame graphs, load/stress/soak testing, N+1, connection pooling.</div>
+    </a>
+    <a class="card cat-perf" href="/observability/" data-cat="perf">
+      <div class="card-top"><span class="card-tag">Performance</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Observability</div>
+      <div class="card-desc">Three pillars (logs/metrics/traces), RED & USE methods, Prometheus/Grafana, OpenTelemetry, SLOs, error budgets, burn rate alerting.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── ARCHITECTURE ─── -->
+<div class="section-group" data-group="arch">
+  <div class="section-header">
+    <h2>Architecture & Design</h2>
+    <span class="section-count">2 topics</span>
+  </div>
+  <div class="cards">
+    <a class="card cat-arch" href="/system-design/" data-cat="arch">
+      <div class="card-top"><span class="card-tag">Architecture</span><span class="card-arrow">→</span></div>
+      <div class="card-title">System Design</div>
+      <div class="card-desc">Requirements estimation, scalability, HA patterns, API design (idempotency/pagination/versioning), rate limiting, circuit breakers.</div>
+    </a>
+    <a class="card cat-arch" href="/software-architecture/" data-cat="arch">
+      <div class="card-top"><span class="card-tag">Architecture</span><span class="card-arrow">→</span></div>
+      <div class="card-title">Software Architecture</div>
+      <div class="card-desc">Monolith vs microservices, event-driven, hexagonal/clean architecture, DDD (bounded contexts, aggregates), SOLID, design patterns.</div>
+    </a>
+  </div>
+</div>
+
+<div class="empty" id="empty">No topics match that filter.</div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <span>learn.surkar.in / cs-fundamentals</span>
+  <a href="/">← all topics</a>
+</footer>
+
+<script>
+function filter(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const groups = document.querySelectorAll('.section-group');
+  const cards  = document.querySelectorAll('.card');
+  let anyVisible = false;
+
+  if (cat === 'all') {
+    groups.forEach(g => g.style.display = '');
+    cards.forEach(c => c.style.display = '');
+    anyVisible = true;
+  } else {
+    groups.forEach(g => {
+      const groupCat = g.dataset.group;
+      const match = groupCat === cat;
+      g.style.display = match ? '' : 'none';
+      if (match) anyVisible = true;
+    });
+  }
+
+  document.getElementById('empty').style.display = anyVisible ? 'none' : 'block';
+}
+</script>
+</body>
+</html>
