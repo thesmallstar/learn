@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Encoding, Serialization & Compression — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">Fundamentals</a>
+    <span>/</span>
+    <span style="color:var(--text);">Encoding, Serialization & Compression</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Fundamentals</div>
+  <h1>Encoding, Serialization <span class="thin">& Compression</span></h1>
+  <p class="header-sub">How data is represented, transformed, and shrunk — from character sets and number formats to wire protocols and compression algorithms.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Character Encoding</div>
+    <h2>From ASCII to UTF-8</h2>
+    <p>Every character you see on screen is stored as a number. The mapping from numbers to characters is called a <strong>character encoding</strong>. Getting it wrong produces <strong>mojibake</strong> — garbled text like <code>Ã©</code> instead of <code>e</code>.</p>
+
+    <h3>ASCII</h3>
+    <p>The original 7-bit encoding. Maps 128 characters (0-127): English letters, digits, punctuation, and control characters. Every byte's top bit is 0. Simple, but only covers English.</p>
+
+    <h3>Unicode</h3>
+    <p>A universal character set assigning a unique <strong>code point</strong> (e.g., U+0041 = A, U+1F600 = a smiley) to every character in every script. Unicode defines <em>what</em> characters exist; encodings define <em>how</em> to store them as bytes.</p>
+
+    <h3>UTF-8</h3>
+    <p>The dominant encoding on the web. Uses 1 to 4 bytes per character with a clever variable-length scheme:</p>
+    <table class="cmp-table">
+      <thead><tr><th>Byte Count</th><th>Code Point Range</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>1 byte</td><td>U+0000 — U+007F</td><td>A, z, 9 (ASCII range)</td></tr>
+        <tr><td>2 bytes</td><td>U+0080 — U+07FF</td><td>e, n, Cyrillic</td></tr>
+        <tr><td>3 bytes</td><td>U+0800 — U+FFFF</td><td>Chinese, Japanese, Korean</td></tr>
+        <tr><td>4 bytes</td><td>U+10000 — U+10FFFF</td><td>Emoji, rare scripts</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">Why UTF-8 Won</div>
+      UTF-8 is backward compatible with ASCII — any valid ASCII file is already valid UTF-8. It's self-synchronizing (you can find character boundaries from any position), and it wastes no space on English text. Over 98% of the web uses UTF-8.
+    </div>
+
+    <h3>UTF-16 and UTF-32</h3>
+    <p><strong>UTF-16</strong> uses 2 or 4 bytes per character. It's used internally by Java, JavaScript, and Windows. Characters outside the Basic Multilingual Plane need <em>surrogate pairs</em> (two 16-bit units).</p>
+    <p><strong>UTF-32</strong> uses exactly 4 bytes per character. Simple indexing but wasteful — rarely used for storage or transmission.</p>
+
+    <h3>Byte Order Mark (BOM)</h3>
+    <p>A special code point (U+FEFF) placed at the start of a file to indicate encoding and byte order. Essential for UTF-16 (which needs to signal big vs. little endian), but optional and generally discouraged for UTF-8.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Mojibake</div>
+      Mojibake happens when bytes are decoded with the wrong encoding. Example: the UTF-8 bytes for "cafe" (<code>63 61 66 C3 A9</code>) decoded as Latin-1 produce "cafÃ©". Always declare your encoding explicitly via HTTP headers or meta tags.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Number Encoding</div>
+    <h2>Integers, Floats & Endianness</h2>
+
+    <h3>Integer Representation: Two's Complement</h3>
+    <p>Modern CPUs represent signed integers using <strong>two's complement</strong>. The most significant bit is the sign bit (0 = positive, 1 = negative). To negate a number: flip all bits, then add 1.</p>
+    <pre><code> 5 in 8-bit:  00000101
+-5 in 8-bit:  11111011  (flip → 11111010, +1 → 11111011)</code></pre>
+    <p>This gives a range of -128 to +127 for 8-bit, and -2,147,483,648 to +2,147,483,647 for 32-bit. The beauty: addition and subtraction work identically for signed and unsigned values — no special hardware needed.</p>
+
+    <h3>IEEE 754 Floating Point</h3>
+    <p>Floats store real numbers as <code>sign × mantissa × 2^exponent</code>. A 64-bit double has 1 sign bit, 11 exponent bits, and 52 mantissa bits.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">IEEE 754 Double (64-bit) Layout</div>
+      <div class="flow-row">
+        <div class="flow-box">Sign (1 bit)</div>
+        <div class="flow-box">Exponent (11 bits)</div>
+        <div class="flow-box">Mantissa (52 bits)</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">Why 0.1 + 0.2 != 0.3</div>
+      0.1 in binary is a repeating fraction (like 1/3 in decimal). It gets rounded to the nearest representable value. When you add two rounded values, the rounding errors compound: <code>0.1 + 0.2 = 0.30000000000000004</code>. For exact decimal math, use libraries like BigDecimal or integer cents.
+    </div>
+
+    <h3>Endianness</h3>
+    <p>Multi-byte values can be stored with the most significant byte first (<strong>big-endian</strong>, aka network byte order) or least significant byte first (<strong>little-endian</strong>, used by x86/ARM). The integer <code>0x01020304</code>:</p>
+    <pre><code>Big-endian:    01 02 03 04
+Little-endian: 04 03 02 01</code></pre>
+    <p>Network protocols (TCP/IP) use big-endian. Most modern CPUs use little-endian. Serialization formats must specify or detect byte order to avoid silent data corruption.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Base Encoding</div>
+    <h2>Base64, Base32 & Hex</h2>
+    <p>Base encodings represent arbitrary binary data using a restricted alphabet of printable characters. They're essential when binary data must travel through text-only channels (email, JSON, URLs).</p>
+
+    <h3>Base64</h3>
+    <p>Encodes 3 bytes (24 bits) into 4 characters from a 64-character alphabet (<code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>+</code>, <code>/</code>). Adds ~33% overhead. Padding with <code>=</code> aligns the output to a multiple of 4 characters.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Base64 Encoding Process</div>
+      <div class="flow-row">
+        <div class="flow-box">3 bytes input</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Split into 4 × 6-bit groups</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Map each to Base64 char</div>
+      </div>
+    </div>
+
+    <pre><code>"Man" → TWFu
+
+M = 77 = 01001101
+a = 97 = 01100001
+n = 110 = 01101110
+
+010011 010110 000101 101110
+  T      W      F      u</code></pre>
+
+    <div class="callout">
+      <div class="callout-title">URL-Safe Base64</div>
+      Standard Base64 uses <code>+</code> and <code>/</code> which have special meaning in URLs. URL-safe Base64 replaces them with <code>-</code> and <code>_</code>. Some implementations also omit padding. Always know which variant you're using.
+    </div>
+
+    <h3>Base32 & Hex</h3>
+    <p><strong>Base32</strong> uses 32 characters (<code>A-Z</code>, <code>2-7</code>). Case-insensitive and avoids ambiguous characters. Used in TOTP codes and some file systems. 60% overhead.</p>
+    <p><strong>Hex (Base16)</strong> maps each byte to two characters (<code>0-9</code>, <code>a-f</code>). 100% overhead but trivial to read and debug. Used for hashes, colors, and memory addresses.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Encoding</th><th>Alphabet Size</th><th>Overhead</th><th>Use Case</th></tr></thead>
+      <tbody>
+        <tr><td>Hex</td><td>16</td><td>100%</td><td>Hashes, debugging</td></tr>
+        <tr><td>Base32</td><td>32</td><td>60%</td><td>TOTP, case-insensitive contexts</td></tr>
+        <tr><td>Base64</td><td>64</td><td>33%</td><td>Email attachments, data URIs, JWTs</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Serialization Formats</div>
+    <h2>Turning Objects into Bytes</h2>
+    <p>Serialization converts in-memory data structures into a format that can be stored or transmitted. The choice of format affects performance, interoperability, and developer experience.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">JSON</div>
+        <p>Human-readable, text-based. The lingua franca of web APIs. No schema, no comments, limited types (no integers vs. floats, no dates). ~verbose.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">XML</div>
+        <p>Verbose but powerful — supports namespaces, schemas (XSD), and transformations (XSLT). Still dominant in enterprise/SOAP. Large overhead.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Protocol Buffers</div>
+        <p>Google's binary format. Schema-defined (<code>.proto</code> files), compact, fast. Supports schema evolution. Not human-readable.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Avro</div>
+        <p>Schema embedded with data. Popular in Hadoop/Kafka. Schema evolution built-in. Good for data pipelines and long-term storage.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">MessagePack</div>
+        <p>Binary JSON — same data model, smaller and faster. No schema. Drop-in replacement where JSON is too slow or large.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">CBOR</div>
+        <p>Concise Binary Object Representation (RFC 8949). Like MessagePack but IETF-standardized. Supports tags for dates, bigints, etc. Used in WebAuthn and COSE.</p>
+      </div>
+    </div>
+
+    <h3>Protocol Buffers Deep Dive</h3>
+    <p>Protobuf assigns each field a numeric tag. The wire format encodes tag + type + value, skipping unset fields entirely. This makes it compact and allows schema evolution.</p>
+    <pre><code>// person.proto
+syntax = "proto3";
+
+message Person {
+  string name = 1;    // field tag 1
+  int32  age  = 2;    // field tag 2
+  string email = 3;   // field tag 3
+}</code></pre>
+
+    <table class="cmp-table">
+      <thead><tr><th>Property</th><th>JSON</th><th>Protobuf</th><th>Avro</th><th>MessagePack</th></tr></thead>
+      <tbody>
+        <tr><td>Format</td><td>Text</td><td>Binary</td><td>Binary</td><td>Binary</td></tr>
+        <tr><td>Schema</td><td>None</td><td>.proto file</td><td>Embedded</td><td>None</td></tr>
+        <tr><td>Human readable</td><td>Yes</td><td>No</td><td>No</td><td>No</td></tr>
+        <tr><td>Size</td><td>Large</td><td>Small</td><td>Small</td><td>Medium</td></tr>
+        <tr><td>Speed</td><td>Slow</td><td>Fast</td><td>Fast</td><td>Fast</td></tr>
+        <tr><td>Schema evolution</td><td>Ad hoc</td><td>Strong</td><td>Strong</td><td>Ad hoc</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Schema Evolution</div>
+    <h2>Changing Formats Without Breaking Things</h2>
+    <p>In distributed systems, producers and consumers of data are updated independently. Schema evolution rules ensure old readers can handle new data and vice versa.</p>
+
+    <h3>Compatibility Types</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Type</th><th>Meaning</th><th>Safe Operations</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Backward compatible</strong></td><td>New code reads old data</td><td>Add optional fields, remove fields (with defaults)</td></tr>
+        <tr><td><strong>Forward compatible</strong></td><td>Old code reads new data</td><td>Remove fields, add fields (old code ignores unknowns)</td></tr>
+        <tr><td><strong>Full compatible</strong></td><td>Both directions work</td><td>Only add/remove optional fields with defaults</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Golden Rules</div>
+      <strong>Never reuse field tags/numbers.</strong> Once a field is removed, its tag is retired forever. Never change a field's type. Always provide defaults for new fields. In Protobuf, every proto3 field is implicitly optional with a zero-value default.
+    </div>
+
+    <h3>Evolution in Practice</h3>
+    <pre><code>// v1: original schema
+message Event {
+  string id = 1;
+  string type = 2;
+}
+
+// v2: backward + forward compatible
+message Event {
+  string id = 1;
+  string type = 2;
+  int64 timestamp = 3;   // NEW — old readers ignore it
+  // field 4 reserved     // REMOVED field — tag retired
+}</code></pre>
+
+    <div class="diagram">
+      <div class="diagram-label">Schema Evolution Flow</div>
+      <div class="flow-row">
+        <div class="flow-box">Producer v2</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Message with new fields</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Consumer v1 (ignores unknown tags)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Compression</div>
+    <h2>Making Data Smaller</h2>
+    <p>Compression trades CPU time for smaller data. The right algorithm depends on whether you need speed (real-time streaming) or maximum size reduction (archival storage).</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Algorithm</th><th>Ratio</th><th>Speed</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td><strong>gzip / deflate</strong></td><td>Good</td><td>Moderate</td><td>HTTP responses, general files. Universal support.</td></tr>
+        <tr><td><strong>Brotli</strong></td><td>Excellent</td><td>Slow compress, fast decompress</td><td>Static web assets (pre-compressed). 15-25% smaller than gzip.</td></tr>
+        <tr><td><strong>zstd</strong></td><td>Excellent</td><td>Fast both ways</td><td>Databases, logs, real-time pipelines. Trainable dictionaries.</td></tr>
+        <tr><td><strong>LZ4</strong></td><td>Moderate</td><td>Extremely fast</td><td>In-memory caching, real-time streaming. Prioritizes speed.</td></tr>
+        <tr><td><strong>Snappy</strong></td><td>Moderate</td><td>Very fast</td><td>Google's internal format. Used in Bigtable, Hadoop. Speed over ratio.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">Decision Framework</div>
+      <strong>Maximum compression:</strong> Brotli (static assets) or zstd (dynamic data).<br>
+      <strong>Lowest latency:</strong> LZ4 or Snappy — decompress at memory-copy speeds.<br>
+      <strong>Universal compatibility:</strong> gzip — supported everywhere, good enough ratio.<br>
+      <strong>Best overall:</strong> zstd — near-Brotli ratios at near-LZ4 speeds. Increasingly the default choice.
+    </div>
+
+    <h3>HTTP Compression</h3>
+    <p>Browsers and servers negotiate compression via HTTP headers. The client advertises what it supports; the server picks the best match.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">HTTP Compression Negotiation</div>
+      <div class="flow-row">
+        <div class="flow-box">Client: Accept-Encoding: gzip, br, zstd</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Server picks best</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Content-Encoding: br</div>
+      </div>
+    </div>
+
+    <pre><code># Request
+GET /api/data HTTP/1.1
+Accept-Encoding: gzip, deflate, br
+
+# Response
+HTTP/1.1 200 OK
+Content-Encoding: br
+Vary: Accept-Encoding
+Content-Type: application/json
+
+[compressed body]</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">Don't Double-Compress</div>
+      Already-compressed formats (JPEG, PNG, MP4, ZIP) don't benefit from HTTP compression — they may even get larger. Configure your server to skip compression for these MIME types. Also avoid compressing small responses (&lt;1KB) where the overhead exceeds the savings.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">How many bytes does UTF-8 use to encode the emoji character U+1F600?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 1 byte</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 2 bytes</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 4 bytes</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> 3 bytes</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">U+1F600 falls in the range U+10000 — U+10FFFF, which requires 4 bytes in UTF-8. Only code points up to U+007F fit in 1 byte (ASCII range).</div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">Why does 0.1 + 0.2 not equal 0.3 in IEEE 754 floating point?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The CPU rounds results to 32 bits</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 0.1 and 0.2 cannot be represented exactly in binary, so rounding errors accumulate</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> JavaScript uses a non-standard floating point format</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The mantissa is too small to store the digit 3</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">0.1 in binary is a repeating fraction (like 1/3 in decimal). It must be rounded to fit the 52-bit mantissa. When two rounded values are added, their rounding errors compound, producing 0.30000000000000004 instead of 0.3.</div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">What is the approximate size overhead of Base64 encoding?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 33%</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 50%</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 100%</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> 25%</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">Base64 encodes 3 bytes (24 bits) into 4 characters (each representing 6 bits). So 3 bytes become 4 bytes — a 33% increase. Hex encoding, by contrast, has 100% overhead (1 byte becomes 2 characters).</div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">Which serialization format embeds the schema within the data itself?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Protocol Buffers</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> JSON</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> MessagePack</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Avro</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">Avro embeds the writer's schema with the data, so readers can always resolve differences between the writer's schema and their own. Protobuf uses separate .proto files, and JSON/MessagePack have no schema at all.</div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">In Protocol Buffers, why should you never reuse a retired field number?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The compiler will throw an error</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It causes a memory leak in the decoder</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Old data with the original field would be misinterpreted as the new field type</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Field numbers must always be sequential</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">Protobuf identifies fields by their numeric tag on the wire. If you reuse tag 4 for a new string field that was previously an int32, old messages still in storage or in-flight will have their int32 data decoded as a string, causing silent data corruption.</div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">Which compression algorithm offers the best balance of compression ratio and speed for dynamic data?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Brotli</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> zstd</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> LZ4</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> gzip</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">zstd achieves compression ratios close to Brotli while maintaining speeds close to LZ4. It also supports trainable dictionaries for small data. Brotli compresses better but is much slower for dynamic compression. LZ4 is faster but compresses less.</div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="q-card" data-correct="a" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">What HTTP header does a client send to indicate which compression algorithms it supports?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Accept-Encoding</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Content-Encoding</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Transfer-Encoding</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Content-Type</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">The client sends <code>Accept-Encoding: gzip, br, zstd</code> to tell the server what it can decompress. The server responds with <code>Content-Encoding: br</code> (or whichever it chose). <code>Transfer-Encoding</code> is for hop-by-hop encoding like chunked, not end-to-end compression.</div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="q-card" data-correct="d" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What does "backward compatible" mean in the context of schema evolution?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Old code can read data written by new code</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The schema can be converted back to an older version</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Data can be downgraded to a smaller format</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> New code can read data written by old code</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">Backward compatibility means new (updated) consumers can read data produced by old producers. Forward compatibility is the reverse — old consumers can read data from new producers. Full compatibility means both directions work.</div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">Which encoding is backward compatible with ASCII?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> UTF-16</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> UTF-32</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> UTF-8</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Base64</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">UTF-8 encodes ASCII characters (U+0000 to U+007F) as a single byte with the same value as ASCII. Any valid ASCII document is already valid UTF-8. UTF-16 and UTF-32 use different byte widths, so they are not byte-compatible with ASCII.</div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">In a little-endian system, how is the 32-bit integer 0x01020304 stored in memory?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 01 02 03 04</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 04 03 02 01</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 02 01 04 03</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> 03 04 01 02</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">Little-endian stores the least significant byte first. So 0x01020304 becomes 04 03 02 01 in memory. Big-endian (network byte order) would store it as 01 02 03 04.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

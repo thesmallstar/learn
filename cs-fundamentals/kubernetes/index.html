@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kubernetes — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">Infrastructure</a>
+    <span>/</span>
+    <span style="color:var(--text);">Kubernetes</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Infrastructure</div>
+  <h1>Kubernetes <span class="thin">container orchestration</span></h1>
+  <p class="header-sub">How Kubernetes manages containerized workloads at scale -- from the control plane and worker nodes to networking, scaling, scheduling, and deployment strategies.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1: ARCHITECTURE ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Architecture</div>
+    <h2>Control Plane &amp; Worker Nodes</h2>
+    <p>A Kubernetes cluster has two halves: the <strong>control plane</strong> that makes global decisions (scheduling, detecting failures, responding to events) and <strong>worker nodes</strong> that run your actual application containers.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Control Plane Components</div>
+      <div class="flow-row">
+        <div class="flow-box">API Server</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">etcd</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box">Scheduler</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Controller Manager</div>
+      </div>
+    </div>
+
+    <h3>Control Plane</h3>
+    <p><code>kube-apiserver</code> is the front door -- every kubectl command, every internal component, and every webhook hits this REST API. It validates requests, persists state to etcd, and serves as the hub for all cluster communication.</p>
+    <p><code>etcd</code> is the single source of truth: a distributed key-value store holding all cluster state. Losing etcd without backups means losing the cluster.</p>
+    <p><code>kube-scheduler</code> watches for newly created Pods with no assigned node, then picks the best node based on resource requirements, affinity rules, taints, and other constraints.</p>
+    <p><code>kube-controller-manager</code> runs a collection of control loops (Deployment controller, ReplicaSet controller, Node controller, etc.) that continuously reconcile desired state with actual state.</p>
+
+    <h3>Worker Nodes</h3>
+    <p><code>kubelet</code> is the node agent. It takes PodSpecs from the API server and ensures the described containers are running and healthy. It reports node status back to the control plane.</p>
+    <p><code>kube-proxy</code> maintains network rules on each node, implementing the Service abstraction by programming iptables or IPVS rules so that traffic to a Service ClusterIP reaches the right Pod.</p>
+    <p><strong>Container runtime</strong> (containerd, CRI-O) does the actual work of pulling images, creating containers, and managing their lifecycle via the Container Runtime Interface (CRI).</p>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      Kubernetes is declarative: you tell it <em>what</em> you want (desired state in etcd) and controllers continuously reconcile reality to match. This reconciliation loop is the core design pattern of the entire system.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2: CORE OBJECTS ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Core Objects</div>
+    <h2>Pods, Deployments, Services &amp; Ingress</h2>
+
+    <p>A <strong>Pod</strong> is the smallest deployable unit -- one or more containers sharing the same network namespace and storage volumes. Pods are ephemeral; they get an IP but that IP dies with the Pod.</p>
+    <p>A <strong>Deployment</strong> manages a ReplicaSet, which in turn manages Pods. It gives you declarative updates, rollback history, and scaling. You almost never create Pods directly.</p>
+
+    <h3>Service Types</h3>
+    <p>Because Pod IPs are transient, a <strong>Service</strong> provides a stable virtual IP (ClusterIP) and DNS name that load-balances traffic across matching Pods.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Service Type</th><th>Scope</th><th>Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><code>ClusterIP</code></td><td>Internal only</td><td>Default; inter-service communication within the cluster</td></tr>
+        <tr><td><code>NodePort</code></td><td>External via node IP:port</td><td>Dev/testing; exposes a static port (30000-32767) on every node</td></tr>
+        <tr><td><code>LoadBalancer</code></td><td>External via cloud LB</td><td>Production; provisions a cloud load balancer automatically</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Ingress</h3>
+    <p><strong>Ingress</strong> sits in front of Services and provides HTTP/HTTPS routing -- host-based and path-based rules, TLS termination, and more. It requires an Ingress Controller (NGINX, Traefik, or a cloud-native one) to function.</p>
+
+    <pre><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+spec:
+  rules:
+  - host: app.example.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-svc
+            port:
+              number: 80</code></pre>
+  </div>
+
+  <!-- ═══════════ SECTION 3: CONFIGURATION & STORAGE ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Configuration &amp; Workloads</div>
+    <h2>ConfigMap, Secret, Storage &amp; Specialized Workloads</h2>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">ConfigMap</div>
+        <p>Key-value config data injected as environment variables or mounted as files. Not for secrets -- data is stored in plaintext.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Secret</div>
+        <p>Base64-encoded sensitive data (passwords, tokens). Not encrypted at rest by default -- enable EncryptionConfiguration or use external secret managers.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">PV / PVC</div>
+        <p>PersistentVolume (PV) is a cluster-level storage resource. PersistentVolumeClaim (PVC) is a user's request for storage. Decouples storage provisioning from consumption.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">StatefulSet</div>
+        <p>Like a Deployment but gives each Pod a stable hostname (pod-0, pod-1) and persistent storage. Essential for databases and stateful apps.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">DaemonSet</div>
+        <p>Ensures a copy of a Pod runs on every node (or a subset). Used for log collectors, monitoring agents, and CNI plugins.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Job / CronJob</div>
+        <p>Job runs a Pod to completion. CronJob schedules Jobs on a cron schedule. Use for batch processing, backups, and periodic tasks.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Namespace</div>
+        <p>Virtual cluster partitioning. Provides scope for names, resource quotas, and RBAC policies. Default namespaces: default, kube-system, kube-public.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">Warning</div>
+      Kubernetes Secrets are base64-encoded, not encrypted. Anyone with API access can read them. For production, use sealed-secrets, HashiCorp Vault, or cloud KMS-backed encryption at rest.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4: NETWORKING ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Networking</div>
+    <h2>Pod Networking, CNI &amp; Service Mesh</h2>
+
+    <p>Kubernetes networking has one fundamental rule: every Pod gets its own IP, and any Pod can reach any other Pod without NAT. This flat network model is implemented by a <strong>CNI plugin</strong>.</p>
+
+    <h3>CNI Plugins</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Plugin</th><th>Approach</th><th>Strengths</th></tr></thead>
+      <tbody>
+        <tr><td><code>Calico</code></td><td>BGP routing or VXLAN overlay</td><td>Mature, strong NetworkPolicy support, scales to thousands of nodes</td></tr>
+        <tr><td><code>Cilium</code></td><td>eBPF-based dataplane</td><td>High performance, L7 visibility, transparent encryption, identity-based policies</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Network Policies</h3>
+    <p>By default, all Pods can talk to all Pods. A <strong>NetworkPolicy</strong> is a firewall rule scoped to a namespace that restricts ingress and/or egress traffic based on Pod labels, namespace selectors, or CIDR blocks.</p>
+
+    <pre><code>apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+spec:
+  podSelector: {}       # applies to all pods in namespace
+  policyTypes:
+  - Ingress             # deny all inbound by default</code></pre>
+
+    <h3>Service Mesh</h3>
+    <p>A service mesh (Istio, Linkerd) adds a sidecar proxy to every Pod, giving you mutual TLS, traffic shaping, retries, circuit breaking, and distributed tracing -- all without changing application code.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Service Mesh Data Path</div>
+      <div class="flow-row">
+        <div class="flow-box">App Container</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Sidecar Proxy (Envoy)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Network</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Sidecar Proxy</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">App Container</div>
+      </div>
+    </div>
+
+    <div class="callout good">
+      <div class="callout-title">Tip</div>
+      Cilium can replace kube-proxy entirely and handle service load balancing via eBPF, eliminating iptables overhead. It can also replace a service mesh for mTLS and L7 policies without sidecars.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5: SCALING & SCHEDULING ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Scaling &amp; Scheduling</div>
+    <h2>Autoscaling, Resource Management &amp; Pod Placement</h2>
+
+    <h3>Autoscaling</h3>
+    <p><strong>HPA</strong> (Horizontal Pod Autoscaler) adds or removes Pod replicas based on CPU, memory, or custom metrics. <strong>VPA</strong> (Vertical Pod Autoscaler) adjusts resource requests/limits on existing Pods. <strong>Cluster Autoscaler</strong> adds or removes nodes when Pods cannot be scheduled or nodes are underutilized.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Autoscaler</th><th>What it Scales</th><th>When to Use</th></tr></thead>
+      <tbody>
+        <tr><td>HPA</td><td>Pod count (horizontal)</td><td>Stateless workloads with variable traffic</td></tr>
+        <tr><td>VPA</td><td>Pod CPU/memory (vertical)</td><td>When you don't know right-sized requests; typically not used with HPA on same metric</td></tr>
+        <tr><td>Cluster Autoscaler</td><td>Node count</td><td>When pending Pods exist due to insufficient cluster capacity</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Resource Requests &amp; Limits</h3>
+    <p><code>requests</code> are what the scheduler uses to find a node with enough capacity. <code>limits</code> are the hard ceiling enforced by the kubelet -- exceed memory limits and your container gets OOMKilled; exceed CPU limits and it gets throttled.</p>
+
+    <div class="callout">
+      <div class="callout-title">QoS Classes</div>
+      Kubernetes assigns a QoS class based on how you set requests and limits:<br>
+      <strong>Guaranteed</strong> -- requests == limits for all containers. Highest priority, last to be evicted.<br>
+      <strong>Burstable</strong> -- at least one container has requests &lt; limits. Medium priority.<br>
+      <strong>BestEffort</strong> -- no requests or limits set. First to be evicted under pressure.
+    </div>
+
+    <h3>Scheduling Constraints</h3>
+    <p><strong>Taints &amp; Tolerations</strong>: A node taint repels Pods unless the Pod has a matching toleration. Used to reserve nodes (e.g., GPU nodes, dedicated tenant nodes).</p>
+    <p><strong>Node Affinity</strong>: Schedule Pods to nodes matching label expressions (required or preferred). Like a more expressive <code>nodeSelector</code>.</p>
+    <p><strong>Pod Affinity / Anti-Affinity</strong>: Co-locate Pods together (affinity) or spread them apart (anti-affinity) based on topology domains (zone, node). Anti-affinity is critical for HA -- ensuring replicas land on different nodes or zones.</p>
+    <p><strong>PodDisruptionBudget (PDB)</strong>: Limits how many Pods in a Deployment can be down simultaneously during voluntary disruptions (node drains, cluster upgrades). For example, <code>minAvailable: 2</code> ensures at least 2 replicas stay running.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 6: DEPLOYMENT STRATEGIES ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Deployment Strategies</div>
+    <h2>Rolling, Blue-Green &amp; Canary</h2>
+
+    <h3>Rolling Update (default)</h3>
+    <p>Kubernetes gradually replaces old Pods with new ones, controlled by <code>maxUnavailable</code> and <code>maxSurge</code>. Zero-downtime by default. Easy rollback with <code>kubectl rollout undo</code>.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Rolling Update Flow</div>
+      <div class="flow-row">
+        <div class="flow-box">v1 v1 v1</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">v1 v1 v2</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">v1 v2 v2</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">v2 v2 v2</div>
+      </div>
+    </div>
+
+    <h3>Blue-Green</h3>
+    <p>Run two identical environments (blue = current, green = new). Once the green environment is verified, switch the Service selector to point at green. Instant rollback by switching back. Downside: requires double the resources during transition.</p>
+
+    <h3>Canary</h3>
+    <p>Route a small percentage of traffic (e.g., 5%) to the new version. Monitor error rates and latency. Gradually increase traffic if metrics look good. Requires either weighted Service routing (via Istio, Linkerd, or Argo Rollouts) or manual ReplicaSet manipulation.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Strategy</th><th>Downtime</th><th>Resource Cost</th><th>Rollback Speed</th></tr></thead>
+      <tbody>
+        <tr><td>Rolling</td><td>None</td><td>Low (gradual)</td><td>Moderate (roll forward/back)</td></tr>
+        <tr><td>Blue-Green</td><td>None</td><td>High (2x resources)</td><td>Instant (switch selector)</td></tr>
+        <tr><td>Canary</td><td>None</td><td>Low-Medium</td><td>Fast (shift traffic back)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">Best Practice</div>
+      Use Argo Rollouts or Flagger for automated canary and blue-green deployments with metric-driven promotion. They integrate with Prometheus and your service mesh to auto-promote or rollback based on real error rates.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">Which control plane component is responsible for persisting all cluster state?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> kube-scheduler</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> kube-controller-manager</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> etcd</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> kube-apiserver</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">etcd is the distributed key-value store that holds all cluster state. The API server reads from and writes to etcd, but etcd is the actual persistence layer.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">What happens when a container exceeds its memory limit?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It gets CPU-throttled</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It gets OOMKilled</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It is evicted to another node</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The limit is automatically increased</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">Exceeding the memory limit triggers an OOMKill. The container is terminated and restarted according to its restartPolicy. CPU limits, by contrast, result in throttling rather than termination.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">Which Service type provisions an external cloud load balancer?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> LoadBalancer</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> ClusterIP</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> NodePort</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> ExternalName</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">LoadBalancer type tells the cloud provider to provision an external load balancer that forwards traffic to the Service. ClusterIP is internal-only, and NodePort exposes a port on each node without a dedicated LB.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">A Pod has requests == limits for all containers. What QoS class does it receive?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> BestEffort</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Burstable</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Standard</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Guaranteed</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">When every container in a Pod has requests equal to limits for both CPU and memory, Kubernetes assigns the Guaranteed QoS class. These Pods are the last to be evicted under node pressure.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">Which workload object provides stable network identities and persistent storage per replica?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Deployment</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> DaemonSet</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> StatefulSet</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> ReplicaSet</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">StatefulSet gives each Pod a stable hostname (pod-0, pod-1, ...) and can provision a PersistentVolumeClaim per replica. This makes it suitable for databases and other stateful applications.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">What mechanism prevents Pods from being scheduled on a node unless they explicitly opt in?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Node affinity</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Taints and tolerations</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Pod anti-affinity</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> PodDisruptionBudget</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">A taint on a node repels all Pods that don't have a matching toleration. This is the "opt-in" model -- Pods must explicitly tolerate the taint to be scheduled there. Node affinity attracts Pods but doesn't repel others.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="a" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">Which deployment strategy requires roughly double the cluster resources during the transition?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Blue-Green</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Rolling Update</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Canary</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Recreate</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">Blue-green runs two full environments simultaneously (the current "blue" and the new "green"), so you need double the resources during the transition window. Rolling and canary introduce new Pods gradually.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="d" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What does Cilium use as its underlying technology for high-performance packet processing?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> iptables</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> IPVS</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Open vSwitch</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> eBPF</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">Cilium uses eBPF (extended Berkeley Packet Filter) programs that run in the Linux kernel for high-performance, programmable packet processing without the overhead of iptables chains.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">By default, what is the Kubernetes pod-to-pod networking policy?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> All traffic is denied by default</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Only same-namespace traffic is allowed</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> All pods can communicate with all pods without NAT</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Traffic is allowed only if a NetworkPolicy permits it</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">The Kubernetes networking model requires a flat network where every Pod can reach every other Pod by IP without NAT. NetworkPolicies are additive restrictions on top of this default-allow model.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">Which autoscaler adds or removes cluster nodes based on pending Pod scheduling?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> HPA</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Cluster Autoscaler</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> VPA</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> KEDA</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">The Cluster Autoscaler watches for Pods stuck in Pending state due to insufficient node resources and triggers the cloud provider to add nodes. It also scales down underutilized nodes. HPA scales Pod replicas, and VPA adjusts Pod resource requests.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

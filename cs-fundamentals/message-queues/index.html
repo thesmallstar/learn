@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Message Queues & Event Systems — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">Infrastructure</a>
+    <span>/</span>
+    <span style="color:var(--text);">Message Queues & Event Systems</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">INFRASTRUCTURE</div>
+  <h1>Message Queues <span class="thin">& Event Systems</span></h1>
+  <p class="header-sub">How distributed systems communicate asynchronously: from fundamental queue semantics and delivery guarantees through Kafka, RabbitMQ, cloud-managed services, and event-driven architecture patterns like event sourcing and CQRS.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Fundamentals</div>
+    <h2>Queue Semantics & Delivery Guarantees</h2>
+    <p>A message queue decouples producers from consumers. The producer writes a message to a queue or topic, and one or more consumers read it asynchronously. This decoupling lets each side scale independently and absorb traffic spikes without data loss.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Basic message flow</div>
+      <div class="flow-row">
+        <div class="flow-box">Producer</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Queue / Topic</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Consumer</div>
+      </div>
+    </div>
+
+    <h3>Point-to-Point vs Pub-Sub</h3>
+    <p>In a <strong>point-to-point</strong> (P2P) model, each message is delivered to exactly one consumer. A work queue with competing consumers is the classic example: multiple workers pull from the same queue, but each message is processed once. In <strong>publish-subscribe</strong> (pub-sub), each message is broadcast to all subscribers. Every subscriber gets its own copy, enabling fan-out scenarios like sending the same order event to billing, inventory, and notifications simultaneously.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Property</th><th>Point-to-Point</th><th>Pub-Sub</th></tr></thead>
+      <tbody>
+        <tr><td>Delivery</td><td>One consumer per message</td><td>All subscribers get a copy</td></tr>
+        <tr><td>Use case</td><td>Task distribution, work queues</td><td>Event broadcasting, fan-out</td></tr>
+        <tr><td>Scaling</td><td>Add more competing consumers</td><td>Each subscriber scales independently</td></tr>
+        <tr><td>Example</td><td>SQS, RabbitMQ work queue</td><td>SNS, Kafka topics, RabbitMQ fanout exchange</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Delivery Guarantees</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">At-most-once</div>
+        <p>Fire and forget. Message may be lost but is never delivered twice. Fastest, used when occasional loss is acceptable (metrics, logs).</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">At-least-once</div>
+        <p>Message is retried until acknowledged. May produce duplicates. Consumer must be idempotent. Most common guarantee.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Exactly-once</div>
+        <p>Each message is processed exactly once. Requires coordination between broker and consumer (transactions, deduplication). Expensive. Kafka supports this via idempotent producers + transactional consumers.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      "Exactly-once" in distributed systems usually means "effectively-once" -- the broker may deliver more than once, but the consumer deduplicates using idempotency keys or transactional commits, making it appear as exactly-once to the application.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Apache Kafka</div>
+    <h2>The Distributed Commit Log</h2>
+    <p>Kafka models messaging as an immutable, append-only <strong>commit log</strong>. Messages are not deleted after consumption -- they are retained based on time or size policies. This fundamental design difference from traditional queues enables replay, multiple consumer groups reading at their own pace, and stream processing.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Kafka architecture</div>
+      <div class="flow-row">
+        <div class="flow-box">Producer</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Topic (Partitions)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Consumer Group</div>
+      </div>
+      <div class="flow-row" style="margin-top: 0.8rem;">
+        <div class="flow-box" style="background: var(--green-bg); border-color: rgba(27,125,70,0.2); color: var(--green);">Partition 0</div>
+        <div class="flow-box" style="background: var(--green-bg); border-color: rgba(27,125,70,0.2); color: var(--green);">Partition 1</div>
+        <div class="flow-box" style="background: var(--green-bg); border-color: rgba(27,125,70,0.2); color: var(--green);">Partition 2</div>
+      </div>
+    </div>
+
+    <h3>Topics, Partitions & Offsets</h3>
+    <p>A <strong>topic</strong> is a named feed of messages. Each topic is split into <strong>partitions</strong> -- ordered, immutable sequences of records. Each record within a partition gets a sequential <strong>offset</strong>. Producers choose a partition via a key hash (or round-robin). Partitions are the unit of parallelism: more partitions = more consumers working in parallel.</p>
+
+    <h3>Consumer Groups</h3>
+    <p>A <strong>consumer group</strong> is a set of consumers that cooperatively read from a topic. Each partition is assigned to exactly one consumer in the group (but one consumer may read multiple partitions). Different consumer groups read independently, each maintaining their own offsets. This gives you pub-sub across groups and P2P within a group.</p>
+
+    <h3>In-Sync Replicas (ISR) & Acks</h3>
+    <p>Each partition has a <strong>leader</strong> and zero or more <strong>follower replicas</strong>. The ISR set contains replicas that are caught up with the leader. The <code>acks</code> setting controls durability:</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>acks</th><th>Behavior</th><th>Durability</th><th>Latency</th></tr></thead>
+      <tbody>
+        <tr><td><code>0</code></td><td>Don't wait for any acknowledgment</td><td>Lowest -- messages can be lost</td><td>Fastest</td></tr>
+        <tr><td><code>1</code></td><td>Wait for leader to write</td><td>Medium -- lost if leader dies before replication</td><td>Low</td></tr>
+        <tr><td><code>all</code></td><td>Wait for all ISR replicas to write</td><td>Highest -- survives broker failures</td><td>Highest</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Retention & Compaction</h3>
+    <p><strong>Time/size-based retention</strong> deletes old segments after a configurable period (e.g., 7 days) or when the log exceeds a size limit. <strong>Log compaction</strong> keeps only the latest value for each key, effectively turning the topic into a changelog table. Compacted topics are ideal for maintaining state (e.g., user profiles, config) where you always want the latest value but don't need the full history.</p>
+
+    <div class="callout good">
+      <div class="callout-title">When to use Kafka</div>
+      High-throughput event streaming, log aggregation, change data capture (CDC), stream processing pipelines, and any scenario where you need message replay or multiple independent consumers reading the same data.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / RabbitMQ</div>
+    <h2>AMQP & Exchange-Based Routing</h2>
+    <p>RabbitMQ implements the <strong>AMQP</strong> (Advanced Message Queuing Protocol) standard. Unlike Kafka's log-based model, RabbitMQ is a traditional message broker: messages are routed through exchanges, delivered to queues, and deleted once acknowledged. It excels at complex routing, priority queues, and request-reply patterns.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">RabbitMQ message flow</div>
+      <div class="flow-row">
+        <div class="flow-box">Producer</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Exchange</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Binding</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Queue</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Consumer</div>
+      </div>
+    </div>
+
+    <h3>Exchange Types</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Direct</div>
+        <p>Routes messages to queues whose binding key exactly matches the message's routing key. Classic P2P pattern.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Fanout</div>
+        <p>Broadcasts every message to all bound queues, ignoring routing keys. Pure pub-sub.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Topic</div>
+        <p>Routes based on wildcard pattern matching on the routing key. <code>order.*</code> matches <code>order.created</code>, <code>#</code> matches everything.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Headers</div>
+        <p>Routes based on message header attributes instead of routing keys. Rarely used but flexible for complex matching.</p>
+      </div>
+    </div>
+
+    <h3>Queues & Bindings</h3>
+    <p>A <strong>binding</strong> connects an exchange to a queue with an optional routing key or pattern. Messages flow: producer &rarr; exchange &rarr; matching bindings &rarr; queues. Multiple queues can bind to the same exchange, and a queue can bind to multiple exchanges.</p>
+
+    <h3>Acknowledgment Modes</h3>
+    <p>RabbitMQ supports <strong>manual ack</strong> (consumer explicitly acknowledges after processing -- ensures at-least-once delivery), <strong>auto ack</strong> (message is considered delivered as soon as it's sent to the consumer -- at-most-once), and <strong>nack/reject</strong> with requeue to retry failed messages. Manual ack with prefetch count controls back-pressure.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Pitfall</div>
+      Setting auto-ack with no prefetch limit can overwhelm consumers. Always use manual ack in production and set a reasonable <code>prefetch_count</code> (e.g., 10-50) to control how many unacked messages a consumer holds.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Cloud-Managed Services</div>
+    <h2>SQS, SNS & Google Pub/Sub</h2>
+    <p>Managed message services eliminate the operational burden of running brokers. They handle scaling, replication, and availability automatically, trading some flexibility for reduced ops work.</p>
+
+    <h3>Amazon SQS</h3>
+    <p>A fully managed pull-based queue. Messages are polled by consumers and become invisible for a <strong>visibility timeout</strong> while being processed. If the consumer doesn't delete the message in time, it becomes visible again for retry.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Property</th><th>Standard Queue</th><th>FIFO Queue</th></tr></thead>
+      <tbody>
+        <tr><td>Ordering</td><td>Best-effort (mostly ordered)</td><td>Strict FIFO within message group</td></tr>
+        <tr><td>Delivery</td><td>At-least-once (occasional duplicates)</td><td>Exactly-once processing</td></tr>
+        <tr><td>Throughput</td><td>Nearly unlimited</td><td>300 msgs/sec (3000 with batching)</td></tr>
+        <tr><td>Deduplication</td><td>None</td><td>5-minute dedup window</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Amazon SNS</h3>
+    <p>A push-based pub-sub service. Publishers send messages to a <strong>topic</strong>, and SNS pushes them to all subscribers (SQS queues, Lambda functions, HTTP endpoints, email, SMS). The classic pattern is <strong>SNS + SQS fan-out</strong>: SNS topic pushes to multiple SQS queues, each consumed independently.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">SNS + SQS fan-out pattern</div>
+      <div class="flow-row">
+        <div class="flow-box">Publisher</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">SNS Topic</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">SQS Queue A</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box" style="visibility:hidden">Publisher</div>
+        <div class="flow-arrow" style="visibility:hidden">&rarr;</div>
+        <div class="flow-box" style="visibility:hidden">SNS Topic</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">SQS Queue B</div>
+      </div>
+    </div>
+
+    <h3>Google Cloud Pub/Sub</h3>
+    <p>A global, fully managed pub-sub system. Messages are published to <strong>topics</strong> and delivered to <strong>subscriptions</strong>. Each subscription is an independent consumer -- similar to Kafka consumer groups. Supports push (HTTP webhook) and pull delivery, at-least-once delivery with exactly-once processing via ack deadlines and ordering keys.</p>
+
+    <div class="callout">
+      <div class="callout-title">Choosing a managed service</div>
+      Use SQS for simple work queues, SNS+SQS for fan-out, and Google Pub/Sub or Amazon MSK (managed Kafka) when you need replay, ordering, or global distribution. All managed services trade fine-grained control for operational simplicity.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Event-Driven Patterns</div>
+    <h2>Event Notification & State Transfer</h2>
+    <p>Event-driven architecture uses events as the primary communication mechanism between services. Two core patterns define how much data travels with the event.</p>
+
+    <h3>Event Notification</h3>
+    <p>The event carries minimal data -- just enough to say "something happened." For example: <code>{"event": "order.placed", "orderId": "abc123"}</code>. The consumer must call back to the source service to fetch details. This keeps events small and the source authoritative, but creates runtime coupling (the callback must succeed).</p>
+
+    <h3>Event-Carried State Transfer</h3>
+    <p>The event carries the full state needed by consumers: <code>{"event": "order.placed", "orderId": "abc123", "items": [...], "total": 59.99, "customer": {...}}</code>. Consumers can process independently without callbacks. This eliminates runtime coupling but increases event size and raises the question of data staleness.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Aspect</th><th>Event Notification</th><th>Event-Carried State Transfer</th></tr></thead>
+      <tbody>
+        <tr><td>Event size</td><td>Small (IDs only)</td><td>Large (full payload)</td></tr>
+        <tr><td>Coupling</td><td>Runtime coupling (callback needed)</td><td>No runtime coupling</td></tr>
+        <tr><td>Consistency</td><td>Always fresh (reads from source)</td><td>Eventually consistent (snapshot in event)</td></tr>
+        <tr><td>Consumer autonomy</td><td>Low -- depends on source availability</td><td>High -- fully self-contained</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">Practical rule</div>
+      Prefer event-carried state transfer when consumer autonomy matters (microservices, different team boundaries). Use event notification when events are frequent, payloads would be large, and consumers always need the latest state anyway.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Event Sourcing & CQRS</div>
+    <h2>Storing Events as the Source of Truth</h2>
+    <p>Event sourcing flips the traditional model: instead of storing current state and losing history, you store every state change as an immutable <strong>event</strong> in an append-only <strong>event store</strong>. Current state is derived by replaying events.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Event sourcing flow</div>
+      <div class="flow-row">
+        <div class="flow-box">Command</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Validate & Emit Event</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Event Store (append)</div>
+      </div>
+      <div class="flow-row" style="margin-top: 0.8rem;">
+        <div class="flow-box" style="background: var(--purple-bg); border-color: rgba(124,58,237,0.2); color: var(--purple);">Replay Events</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box" style="background: var(--purple-bg); border-color: rgba(124,58,237,0.2); color: var(--purple);">Projection (Read Model)</div>
+      </div>
+    </div>
+
+    <h3>Projections & Snapshots</h3>
+    <p><strong>Projections</strong> are read-optimized views built by replaying events. A "current account balance" projection replays all deposit/withdrawal events. As event counts grow, replaying from the start becomes slow, so <strong>snapshots</strong> periodically capture the aggregate state. Rebuilding then starts from the latest snapshot plus subsequent events.</p>
+
+    <h3>CQRS (Command Query Responsibility Segregation)</h3>
+    <p>CQRS separates the write model (handles commands, enforces business rules, emits events) from the read model (projections optimized for queries). The write side uses the event store; the read side uses denormalized views in whatever database suits the query pattern. This separation lets each side scale and optimize independently.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">CQRS architecture</div>
+      <div class="flow-row">
+        <div class="flow-box">Command</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Write Model</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Event Store</div>
+      </div>
+      <div class="flow-row" style="margin-top: 0.5rem;">
+        <div class="flow-box" style="visibility:hidden">Command</div>
+        <div class="flow-arrow" style="visibility:hidden">&rarr;</div>
+        <div class="flow-box" style="visibility:hidden">Write Model</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Read Model (Projection)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Query</div>
+      </div>
+    </div>
+
+    <h3>Saga Pattern</h3>
+    <p>In distributed systems, a <strong>saga</strong> coordinates a multi-step transaction across services using a sequence of local transactions and compensating events. If step 3 fails, the saga emits compensating events to undo steps 1 and 2. Two flavors exist: <strong>choreography</strong> (each service listens and reacts -- simpler but harder to trace) and <strong>orchestration</strong> (a central coordinator directs the flow -- easier to reason about but adds a single point of logic).</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Complexity warning</div>
+      Event sourcing and CQRS add significant complexity. They shine when you need a complete audit trail, temporal queries ("what was the state at time T?"), or complex domain logic. For simple CRUD applications, they are overkill.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="b" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">In a point-to-point messaging model, how many consumers process each message?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> All subscribed consumers</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Exactly one consumer</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> A configurable number of consumers</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Zero or more, depending on availability</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">In P2P (competing consumers), each message is delivered to and processed by exactly one consumer. This contrasts with pub-sub where all subscribers receive a copy.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="c" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">What does Kafka's <code>acks=all</code> setting guarantee?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The message is written to the leader only</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The message is delivered to all consumers</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> All in-sync replicas have written the message before the producer gets an ack</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The message is replicated to every broker in the cluster</button>
+      </div>
+      <div class="q-explanation" id="q2-exp"><code>acks=all</code> means the producer waits until all replicas in the ISR (in-sync replica set) have written the message. It does not mean every broker -- only the replicas assigned to that partition.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="d" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">In Kafka, what is the unit of parallelism within a consumer group?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Topic</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Broker</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Consumer group</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Partition</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">Each partition is assigned to exactly one consumer within a group. You cannot have more active consumers than partitions in a group -- extra consumers sit idle. More partitions = more parallelism.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="a" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">Which RabbitMQ exchange type broadcasts messages to all bound queues regardless of routing key?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Fanout</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Direct</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Topic</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Headers</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">A fanout exchange ignores routing keys entirely and delivers a copy of every message to every bound queue -- pure broadcast/pub-sub behavior.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="b" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What happens to an SQS message if a consumer fails to delete it within the visibility timeout?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It is permanently deleted</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It becomes visible again for another consumer to process</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It is moved to a dead-letter queue immediately</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It is sent back to the producer</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">When the visibility timeout expires without the consumer deleting the message, SQS makes it visible again in the queue. After exceeding the max receive count, it moves to the dead-letter queue (if configured).</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="c" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">What is the key difference between "event notification" and "event-carried state transfer"?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Event notification uses HTTP, state transfer uses messaging</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Event notification is synchronous, state transfer is asynchronous</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Event notification carries minimal data (IDs), state transfer carries the full payload</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> They are different names for the same pattern</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">Event notification says "something happened" with minimal data (forcing a callback to the source), while event-carried state transfer includes the full payload so consumers can act independently without calling back.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="d" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">In event sourcing, what is a "projection"?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> A prediction of future events</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> A schema for validating events</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> A snapshot of the event store</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> A read-optimized view built by replaying events</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">A projection is a derived read model built by processing/replaying events from the event store. It is optimized for specific query patterns (e.g., "current balance", "order history") and can be rebuilt at any time from the events.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What does Kafka's log compaction do?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Retains only the latest value for each key, removing older records with the same key</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Compresses messages using gzip to reduce storage</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Deletes all messages older than the retention period</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Merges multiple partitions into one for efficiency</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">Log compaction keeps the most recent record for each message key and discards older records with the same key. This turns the topic into a snapshot of latest values -- ideal for changelogs and state replication.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="b" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">In the saga pattern, what happens when one step in a distributed transaction fails?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The entire database transaction is rolled back atomically</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Compensating events are emitted to undo previous steps</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The failed step is retried indefinitely</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> All services are notified to ignore the transaction</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">Sagas don't have atomic rollback across services. Instead, each completed step has a compensating action. When a step fails, the saga triggers compensating events to semantically undo the effects of previous steps.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="c" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">Why does CQRS separate the write model from the read model?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> To ensure strong consistency between reads and writes</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> To reduce the number of database tables needed</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> So each side can be optimized and scaled independently</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> To eliminate the need for an event store</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">CQRS separates reads and writes so the write model can enforce complex business rules and domain logic while the read model uses denormalized views optimized for fast queries. Each side scales independently based on its own load patterns.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Linux Administration & Internals — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">Operating Systems</a>
+    <span>/</span>
+    <span style="color:var(--text);">Linux Administration & Internals</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Operating Systems</div>
+  <h1>Linux Administration <span class="thin">& Internals</span></h1>
+  <p class="header-sub">From power-on to production: the boot chain, systemd orchestration, process introspection, networking, permissions, security frameworks, and performance tuning.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Boot Process</div>
+    <h2>From Power-On to PID 1</h2>
+    <p>When a Linux machine powers on, control passes through a precise chain of handoffs. Each stage validates the next before transferring execution, building up from raw firmware to a fully running userspace.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Linux Boot Chain</div>
+      <div class="flow-row">
+        <div class="flow-box">BIOS / UEFI</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">GRUB2</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Kernel</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">initramfs</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">systemd (PID 1)</div>
+      </div>
+    </div>
+
+    <h3>BIOS / UEFI</h3>
+    <p><strong>BIOS</strong> (legacy) reads the MBR from the first 512 bytes of the boot disk. <strong>UEFI</strong> reads an EFI System Partition (FAT32) and loads an EFI application directly, supporting Secure Boot signature verification.</p>
+
+    <h3>GRUB2</h3>
+    <p>The bootloader presents a menu, loads the kernel image (<code>vmlinuz</code>) and the initial ramdisk (<code>initramfs</code>) into memory, then passes kernel command-line parameters (e.g., <code>root=</code>, <code>quiet</code>, <code>rd.break</code>).</p>
+    <pre><code># View current kernel command line
+cat /proc/cmdline
+
+# Edit GRUB defaults
+vi /etc/default/grub
+grub2-mkconfig -o /boot/grub2/grub.cfg</code></pre>
+
+    <h3>Kernel &amp; initramfs</h3>
+    <p>The kernel decompresses itself, initializes hardware, and mounts <code>initramfs</code> as a temporary root filesystem. initramfs contains just enough drivers and scripts to find and mount the real root partition. Once the real root is mounted, the kernel executes <code>/sbin/init</code> (symlinked to systemd on modern distros).</p>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      initramfs exists because the kernel cannot include every possible storage driver. It is a CPIO archive (not a filesystem) that the kernel unpacks into a tmpfs. You can inspect it with <code>lsinitrd</code> (RHEL) or <code>lsinitramfs</code> (Debian).
+    </div>
+
+    <h3>systemd as PID 1</h3>
+    <p>systemd becomes the first userspace process. It reads its default target (typically <code>multi-user.target</code> or <code>graphical.target</code>), builds a dependency graph, and starts services in parallel. Every other process on the system is a descendant of PID 1.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / systemd</div>
+    <h2>Units, Targets &amp; Service Management</h2>
+    <p>systemd replaces SysVinit scripts with declarative unit files. It manages services, sockets, timers, mounts, and more through a unified dependency system.</p>
+
+    <h3>Unit Types</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Unit Type</th><th>Purpose</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><code>.service</code></td><td>Daemons and long-running processes</td><td><code>nginx.service</code></td></tr>
+        <tr><td><code>.socket</code></td><td>IPC/network socket activation</td><td><code>sshd.socket</code></td></tr>
+        <tr><td><code>.timer</code></td><td>Scheduled tasks (replaces cron)</td><td><code>logrotate.timer</code></td></tr>
+        <tr><td><code>.mount</code></td><td>Filesystem mount points</td><td><code>home.mount</code></td></tr>
+        <tr><td><code>.target</code></td><td>Grouping / synchronization points</td><td><code>multi-user.target</code></td></tr>
+        <tr><td><code>.slice</code></td><td>cgroup resource boundaries</td><td><code>user.slice</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Socket Activation</h3>
+    <p>systemd can listen on a socket and only start the actual service when a connection arrives. This speeds up boot (services start on demand) and provides automatic restart on crash.</p>
+    <pre><code># sshd.socket starts sshd.service only on incoming connection
+systemctl enable sshd.socket
+systemctl start sshd.socket
+systemctl disable sshd.service   # no need to auto-start the service</code></pre>
+
+    <h3>Dependencies &amp; Ordering</h3>
+    <p>Unit files declare dependencies with <code>Wants=</code>, <code>Requires=</code>, <code>After=</code>, and <code>Before=</code>. <code>Requires</code> is hard (failure propagates), <code>Wants</code> is soft (best-effort). Ordering is separate from dependency: <code>After=</code>/<code>Before=</code> control startup sequence.</p>
+
+    <h3>journalctl</h3>
+    <pre><code># Follow logs for a specific unit
+journalctl -u nginx.service -f
+
+# Logs since last boot
+journalctl -b
+
+# Logs from a time range
+journalctl --since "2024-01-01 00:00" --until "2024-01-02 00:00"
+
+# Kernel messages only
+journalctl -k
+
+# Show disk usage of journal
+journalctl --disk-usage</code></pre>
+
+    <div class="callout good">
+      <div class="callout-title">Practical Tip</div>
+      Use <code>systemctl list-dependencies multi-user.target</code> to visualize the full dependency tree. Add <code>--reverse</code> to see what depends on a specific unit.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Process Introspection</div>
+    <h2>Observing &amp; Debugging Processes</h2>
+    <p>Linux exposes rich process information through <code>/proc</code>, <code>/sys</code>, and a suite of command-line tools for real-time observation, tracing, and profiling.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">ps / top / htop</div>
+        <p>Snapshot and real-time views of processes. <code>ps auxf</code> for tree view, <code>htop</code> for interactive filtering and tree mode.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">strace</div>
+        <p>Traces system calls made by a process. Invaluable for debugging "why is this program hanging?" scenarios. <code>strace -p PID -e trace=open,read</code></p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">ltrace</div>
+        <p>Traces library calls (libc, etc.). Shows calls like <code>malloc()</code>, <code>printf()</code>, <code>fopen()</code> at the shared library boundary.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">perf</div>
+        <p>Hardware-level profiling using CPU performance counters. <code>perf top</code> for live profiling, <code>perf record</code> + <code>perf report</code> for offline analysis.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">lsof</div>
+        <p>Lists open files, sockets, and pipes for a process. <code>lsof -i :80</code> to find what is listening on port 80.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">dmesg</div>
+        <p>Kernel ring buffer messages. Shows hardware detection, driver errors, OOM kills. Use <code>dmesg -T</code> for human-readable timestamps.</p>
+      </div>
+    </div>
+
+    <h3>The /proc Filesystem</h3>
+    <p><code>/proc</code> is a virtual filesystem that exposes kernel and per-process data. Every running process has a directory at <code>/proc/[pid]/</code>.</p>
+    <pre><code># Key /proc entries
+/proc/[pid]/status   # Process state, memory, UIDs
+/proc/[pid]/fd/      # Open file descriptors (symlinks)
+/proc/[pid]/maps     # Memory mappings
+/proc/[pid]/cmdline  # Full command line
+/proc/cpuinfo        # CPU details
+/proc/meminfo        # Memory statistics
+/proc/loadavg        # 1/5/15 min load averages</code></pre>
+
+    <h3>The /sys Filesystem</h3>
+    <p><code>/sys</code> (sysfs) exposes the kernel's device model. Unlike <code>/proc</code>, it is structured hierarchically by bus, device, and driver. It is the primary interface for device configuration and hardware info.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Caution</div>
+      Writing to <code>/proc/sys/</code> or <code>/sys/</code> files takes effect immediately with no confirmation. A typo in <code>/proc/sys/vm/overcommit_memory</code> can cause OOM kills system-wide. Always validate values before writing.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Networking</div>
+    <h2>Network Configuration &amp; Debugging</h2>
+    <p>Modern Linux networking uses the <code>ip</code> command (replacing <code>ifconfig</code>), <code>ss</code> (replacing <code>netstat</code>), and <code>nftables</code> (replacing <code>iptables</code>).</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Tool</th><th>Purpose</th><th>Common Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>ip</code></td><td>Interface, address, route management</td><td><code>ip addr show</code>, <code>ip route</code></td></tr>
+        <tr><td><code>ss</code></td><td>Socket statistics</td><td><code>ss -tulnp</code> (listening TCP/UDP with PIDs)</td></tr>
+        <tr><td><code>iptables</code></td><td>Legacy packet filter (netfilter)</td><td><code>iptables -L -n -v</code></td></tr>
+        <tr><td><code>nftables</code></td><td>Modern packet filter (replaces iptables)</td><td><code>nft list ruleset</code></td></tr>
+        <tr><td><code>tc</code></td><td>Traffic control / QoS</td><td><code>tc qdisc show</code></td></tr>
+        <tr><td><code>tcpdump</code></td><td>Packet capture</td><td><code>tcpdump -i eth0 port 443 -w capture.pcap</code></td></tr>
+        <tr><td><code>dig</code></td><td>DNS lookup</td><td><code>dig +short example.com A</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>iptables vs nftables</h3>
+    <p><code>iptables</code> uses separate binaries for IPv4, IPv6, ARP, and bridging (<code>iptables</code>, <code>ip6tables</code>, <code>arptables</code>, <code>ebtables</code>). <code>nftables</code> unifies all of these behind a single <code>nft</code> command with a cleaner rule syntax and better performance through set-based matching.</p>
+
+    <pre><code># iptables: block incoming traffic on port 8080
+iptables -A INPUT -p tcp --dport 8080 -j DROP
+
+# nftables equivalent
+nft add rule inet filter input tcp dport 8080 drop
+
+# Traffic shaping: add 100ms latency (testing)
+tc qdisc add dev eth0 root netem delay 100ms
+
+# DNS trace
+dig +trace example.com</code></pre>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      <code>ss -tulnp</code> is the single most useful networking command. It shows all listening sockets with the PID and program name. Learn it by heart: <strong>t</strong>cp, <strong>u</strong>dp, <strong>l</strong>istening, <strong>n</strong>umeric, <strong>p</strong>rocess.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Permissions &amp; Security</div>
+    <h2>File Permissions, ACLs &amp; Security Frameworks</h2>
+
+    <h3>Traditional Unix Permissions</h3>
+    <p>Every file has three permission sets: <strong>user</strong> (owner), <strong>group</strong>, and <strong>other</strong>. Each set can have <strong>r</strong>ead (4), <strong>w</strong>rite (2), and e<strong>x</strong>ecute (1). The octal notation <code>755</code> means rwxr-xr-x.</p>
+
+    <h3>Special Bits</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Bit</th><th>Octal</th><th>Effect on Files</th><th>Effect on Directories</th></tr></thead>
+      <tbody>
+        <tr><td><code>setuid</code></td><td>4000</td><td>Execute as file owner (e.g., <code>passwd</code>)</td><td>No effect</td></tr>
+        <tr><td><code>setgid</code></td><td>2000</td><td>Execute as file group</td><td>New files inherit directory group</td></tr>
+        <tr><td><code>sticky</code></td><td>1000</td><td>No effect</td><td>Only owner can delete files (e.g., <code>/tmp</code>)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>POSIX ACLs</h3>
+    <p>ACLs extend the basic user/group/other model with per-user and per-group entries. The filesystem must be mounted with ACL support.</p>
+    <pre><code># Grant user "deploy" read+write on a file
+setfacl -m u:deploy:rw /var/www/config.yml
+
+# View ACLs
+getfacl /var/www/config.yml
+
+# Set default ACL on directory (inherited by new files)
+setfacl -d -m g:devops:rwx /var/www/</code></pre>
+
+    <h3>SELinux &amp; AppArmor</h3>
+    <p><strong>SELinux</strong> (RHEL/Fedora) uses mandatory access control with type enforcement. Every process and file has a security context label. Policies define which types can interact. <strong>AppArmor</strong> (Ubuntu/SUSE) uses path-based profiles that are simpler to write but less granular.</p>
+    <pre><code># SELinux: check current mode
+getenforce
+
+# SELinux: view file contexts
+ls -Z /var/www/html/
+
+# SELinux: restore default context
+restorecon -Rv /var/www/html/
+
+# AppArmor: check profile status
+aa-status</code></pre>
+
+    <h3>seccomp &amp; Capabilities</h3>
+    <p><strong>seccomp</strong> restricts which system calls a process can make. Docker and systemd both use seccomp profiles to sandbox processes. <strong>Capabilities</strong> split the monolithic root privilege into fine-grained tokens (e.g., <code>CAP_NET_BIND_SERVICE</code> lets a process bind to ports below 1024 without full root).</p>
+    <pre><code># View capabilities of a binary
+getcap /usr/bin/ping
+# /usr/bin/ping cap_net_raw=ep
+
+# Grant a capability
+setcap cap_net_bind_service=+ep /usr/local/bin/myserver</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">Security Warning</div>
+      <code>setuid</code> binaries are a classic attack surface. Any vulnerability in a setuid-root program grants the attacker root. Prefer capabilities over setuid whenever possible. Audit setuid binaries with <code>find / -perm -4000 -type f</code>.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Performance Tuning</div>
+    <h2>Resource Control &amp; Kernel Tuning</h2>
+    <p>Linux provides multiple layers of knobs for controlling process priority, CPU affinity, memory limits, and kernel-level behavior.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">nice / renice</div>
+        <p>Set process scheduling priority (-20 to 19). Lower value = higher priority. <code>nice -n 10 make -j8</code> runs a build at reduced priority.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">taskset</div>
+        <p>Pin a process to specific CPU cores (CPU affinity). <code>taskset -c 0,1 ./app</code> restricts to cores 0 and 1. Prevents cache-thrashing from migration.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">numactl</div>
+        <p>Control NUMA memory allocation policy. <code>numactl --cpunodebind=0 --membind=0 ./app</code> keeps processes on a single NUMA node for faster memory access.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">ulimit</div>
+        <p>Per-process resource limits: open files, stack size, core dumps. <code>ulimit -n 65536</code> raises the file descriptor limit. Persistent via <code>/etc/security/limits.conf</code>.</p>
+      </div>
+    </div>
+
+    <h3>sysctl Tuning</h3>
+    <p><code>sysctl</code> reads and writes kernel parameters at runtime via <code>/proc/sys/</code>. Persistent changes go in <code>/etc/sysctl.d/*.conf</code>.</p>
+
+    <pre><code># Common performance-related sysctls
+sysctl -w vm.swappiness=10                    # Reduce swap aggressiveness
+sysctl -w net.core.somaxconn=65535            # Max listen backlog
+sysctl -w net.ipv4.tcp_tw_reuse=1             # Reuse TIME_WAIT sockets
+sysctl -w fs.file-max=2097152                 # System-wide file descriptor limit
+sysctl -w kernel.pid_max=4194304              # Max PID value
+
+# Apply from config file
+sysctl --system</code></pre>
+
+    <div class="callout good">
+      <div class="callout-title">Production Checklist</div>
+      For high-connection servers: raise <code>somaxconn</code>, <code>file-max</code>, and per-process <code>ulimit -n</code>. Set <code>vm.swappiness=10</code> (or 0 for databases). Enable <code>tcp_tw_reuse</code> for services making many outbound connections. Always benchmark before and after changes.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">What is the primary purpose of initramfs during the Linux boot process?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> To provide the GRUB bootloader menu</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> To verify Secure Boot signatures</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> To provide drivers needed to find and mount the real root filesystem</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> To start systemd and all services</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">The kernel cannot include every possible storage driver. initramfs is a temporary root containing just enough drivers and scripts to locate, decrypt (if needed), and mount the actual root partition.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">What is the difference between <code>Wants=</code> and <code>Requires=</code> in a systemd unit file?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Wants= starts units in parallel, Requires= starts them sequentially</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Wants= is a soft dependency (failure is tolerated), Requires= is hard (failure propagates)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Wants= applies to services, Requires= applies to targets</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> They are identical, Wants= is just deprecated</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">Wants= is a soft dependency: if the wanted unit fails, the depending unit still starts. Requires= is a hard dependency: if the required unit fails, the depending unit is also stopped or not started.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">Which tool traces system calls made by a running process?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> strace</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> ltrace</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> lsof</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> perf</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">strace intercepts and records system calls (read, write, open, etc.) made by a process. ltrace traces library calls instead. lsof lists open files. perf does hardware-level profiling.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What does <code>ss -tulnp</code> show?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> All established TCP connections with transfer statistics</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> System-wide socket buffer usage</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Unix domain sockets only</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Listening TCP and UDP sockets with numeric addresses and process names</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">The flags decode as: <strong>t</strong>cp, <strong>u</strong>dp, <strong>l</strong>istening, <strong>n</strong>umeric (no DNS resolution), <strong>p</strong>rocess (show PID/program). This is the go-to command for seeing what is listening on which ports.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What is the sticky bit's effect on a directory?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Files inherit the directory's group ownership</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Only root can create files in the directory</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Only the file owner (or root) can delete or rename files in the directory</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Files in the directory cannot be modified</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">The sticky bit (octal 1000) on a directory means that only the file's owner, the directory's owner, or root can delete or rename files within it. /tmp is the classic example: anyone can write, but you can only delete your own files.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">How does SELinux differ from traditional Unix permissions?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> SELinux replaces file permissions entirely</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> SELinux adds mandatory access control with type labels on processes and files</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> SELinux only applies to network traffic, not filesystem access</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> SELinux is identical to AppArmor but uses different configuration files</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">SELinux implements Mandatory Access Control (MAC) by labeling every process and file with a security context. Even if Unix permissions allow access, SELinux policy can deny it. This defense-in-depth approach limits damage from compromised services.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="a" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">What does <code>nice -n 19 ./script.sh</code> do?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Runs the script at the lowest scheduling priority</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Runs the script at the highest scheduling priority</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Pins the script to CPU core 19</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Limits the script to 19% CPU usage</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">Nice values range from -20 (highest priority) to 19 (lowest priority). A nice value of 19 means the process will only get CPU time when no other process needs it. Only root can set negative nice values.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="d" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What advantage does socket activation provide in systemd?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It encrypts all socket communication automatically</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It allows services to run without root privileges</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It replaces TCP sockets with Unix domain sockets</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It delays starting a service until a connection arrives, speeding up boot</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">With socket activation, systemd opens the listening socket immediately but only spawns the actual service process when the first connection arrives. This lets the system boot faster since many services are started on-demand rather than eagerly.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">Which capability allows a non-root process to bind to ports below 1024?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> CAP_SYS_ADMIN</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> CAP_NET_RAW</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> CAP_NET_BIND_SERVICE</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> CAP_DAC_OVERRIDE</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">CAP_NET_BIND_SERVICE specifically grants the ability to bind to privileged ports (below 1024) without full root. This is the preferred approach over setuid or running as root for web servers that need port 80/443.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">What does <code>sysctl -w vm.swappiness=10</code> do?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Limits swap partition size to 10 GB</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Reduces the kernel's tendency to swap out memory pages, preferring to keep them in RAM</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Sets swap I/O priority to 10</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Allocates 10% of RAM as swap space</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">vm.swappiness controls how aggressively the kernel moves pages from physical memory to swap. The default is 60. A value of 10 tells the kernel to strongly prefer keeping pages in RAM and only swap when memory pressure is high. Databases and latency-sensitive workloads benefit from lower swappiness.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

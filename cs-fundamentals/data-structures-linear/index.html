@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Arrays, Lists, Stacks &amp; Queues — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">Data Structures</a>
+    <span>/</span>
+    <span style="color:var(--text);">Arrays, Lists, Stacks &amp; Queues</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Data Structures</div>
+  <h1>Arrays, Lists, <span class="thin">Stacks &amp; Queues</span></h1>
+  <p class="header-sub">The foundational linear data structures that underpin nearly every program. Understanding their memory layout, time complexities, and trade-offs is essential for writing efficient code.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Arrays &amp; Dynamic Arrays</div>
+    <h2>Contiguous Memory &amp; Random Access</h2>
+    <p>An array stores elements in a contiguous block of memory. Given the base address and element size, any element can be located in <code>O(1)</code> time using simple arithmetic: <code>addr = base + index * size</code>. This makes arrays the fastest structure for random access.</p>
+    <p>However, inserting or deleting in the middle requires shifting elements, costing <code>O(n)</code>. Arrays are also cache-friendly because sequential elements sit next to each other in memory, exploiting spatial locality for fast iteration.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Array Memory Layout</div>
+      <div class="flow-row">
+        <div class="flow-box">arr[0]</div>
+        <div class="flow-box">arr[1]</div>
+        <div class="flow-box">arr[2]</div>
+        <div class="flow-box">arr[3]</div>
+        <div class="flow-box">arr[4]</div>
+      </div>
+      <div style="font-size:0.65rem;color:var(--dim);margin-top:0.6rem;">Contiguous in memory &mdash; O(1) access by index</div>
+    </div>
+
+    <h3>Dynamic Arrays</h3>
+    <p>A dynamic array (Java <code>ArrayList</code>, C++ <code>vector</code>, Python <code>list</code>) wraps a fixed-size array and resizes when capacity is exceeded. The typical strategy is to double the capacity, yielding <strong>amortized O(1)</strong> appends. Individual resize operations copy all elements (<code>O(n)</code>), but they happen infrequently enough that the average cost per append stays constant.</p>
+
+    <div class="callout">
+      <div class="callout-title">Doubling Strategy</div>
+      When the array is full, allocate a new array of 2x the size and copy all elements over. Over n appends, total copy work is roughly 1 + 2 + 4 + ... + n = 2n, so amortized cost per append is O(1). Growth factors of 1.5x (used by some implementations) trade slightly more frequent resizes for less wasted space.
+    </div>
+
+    <table class="cmp-table">
+      <thead><tr><th>Operation</th><th>Static Array</th><th>Dynamic Array</th></tr></thead>
+      <tbody>
+        <tr><td>Access by index</td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td>Append (end)</td><td>N/A (fixed)</td><td>O(1) amortized</td></tr>
+        <tr><td>Insert (middle)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Delete (middle)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Search (unsorted)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Space overhead</td><td>None</td><td>Up to 2x</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Linked Lists</div>
+    <h2>Pointer-Based Sequences</h2>
+    <p>A linked list stores each element in a separate node, connected by pointers. Unlike arrays, nodes can be scattered across memory. This makes insertion and deletion at a known position <code>O(1)</code> (just re-wire pointers), but searching for a node is <code>O(n)</code> since you must traverse from the head.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Singly Linked List</div>
+      <div class="flow-row">
+        <div class="flow-box">head</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">node</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">node</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">tail</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div style="color:var(--dim);font-size:0.72rem;">null</div>
+      </div>
+    </div>
+
+    <h3>Variants</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Singly Linked</div>
+        <p>Each node has a <code>next</code> pointer. Traversal is one-way. Simplest form, least memory overhead per node.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Doubly Linked</div>
+        <p>Each node has <code>next</code> and <code>prev</code> pointers. Enables O(1) deletion of a given node and backward traversal.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Circular</div>
+        <p>The tail's <code>next</code> points back to the head. Useful for round-robin scheduling and ring-based algorithms.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">Cache Unfriendly</div>
+      Because nodes are heap-allocated at arbitrary addresses, linked list traversal causes frequent cache misses. For sequential access patterns, arrays will significantly outperform linked lists even when the Big-O complexity is the same.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Stacks &amp; Queues</div>
+    <h2>Restricted-Access Structures</h2>
+    <p>Stacks and queues limit how you interact with the data, enforcing a specific order of access. This restriction is their strength: it makes them simple, efficient, and exactly right for a large class of problems.</p>
+
+    <h3>Stack (LIFO)</h3>
+    <p>Last In, First Out. Three operations, all <code>O(1)</code>: <code>push</code> (add to top), <code>pop</code> (remove from top), and <code>peek</code> (view top without removing). Typically implemented with a dynamic array or a singly linked list.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Stack Operations</div>
+      <div class="flow-row">
+        <div style="display:flex;flex-direction:column;gap:0.3rem;align-items:center;">
+          <div style="font-size:0.6rem;color:var(--dim);">push/pop &darr;&uarr;</div>
+          <div class="flow-box" style="border-color:var(--green);color:var(--green);">top</div>
+          <div class="flow-box">mid</div>
+          <div class="flow-box">bottom</div>
+        </div>
+      </div>
+    </div>
+
+    <p><strong>Use cases:</strong> function call stack, expression evaluation (infix to postfix), DFS traversal, undo/redo functionality, matching parentheses, backtracking algorithms.</p>
+
+    <h3>Queue (FIFO)</h3>
+    <p>First In, First Out. <code>enqueue</code> adds to the back, <code>dequeue</code> removes from the front, both <code>O(1)</code>. Best implemented with a linked list or a circular buffer to avoid O(n) shifts that a naive array approach would require.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Queue Operations</div>
+      <div class="flow-row">
+        <div style="font-size:0.65rem;color:var(--dim);">dequeue &larr;</div>
+        <div class="flow-box" style="border-color:var(--green);color:var(--green);">front</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">mid</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box" style="border-color:var(--orange);color:var(--orange);">back</div>
+        <div style="font-size:0.65rem;color:var(--dim);">&larr; enqueue</div>
+      </div>
+    </div>
+
+    <p><strong>Use cases:</strong> BFS traversal, task scheduling, print queues, message buffers, rate limiting (sliding window).</p>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Deques, Priority Queues &amp; Ring Buffers</div>
+    <h2>Specialized Variants</h2>
+
+    <h3>Deque (Double-Ended Queue)</h3>
+    <p>Supports insertion and removal at both ends in <code>O(1)</code>. Can serve as both a stack and a queue. Python's <code>collections.deque</code> and Java's <code>ArrayDeque</code> use a circular buffer internally. Useful for sliding window problems and work-stealing schedulers.</p>
+
+    <h3>Priority Queue</h3>
+    <p>Elements are dequeued by priority, not insertion order. The standard implementation is a binary heap, giving <code>O(log n)</code> insert and <code>O(log n)</code> extract-min/max. Used in Dijkstra's algorithm, Huffman coding, event-driven simulations, and OS task schedulers.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Operation</th><th>Queue</th><th>Deque</th><th>Priority Queue (Heap)</th></tr></thead>
+      <tbody>
+        <tr><td>Insert</td><td>O(1) back</td><td>O(1) both ends</td><td>O(log n)</td></tr>
+        <tr><td>Remove</td><td>O(1) front</td><td>O(1) both ends</td><td>O(log n) min/max</td></tr>
+        <tr><td>Peek</td><td>O(1) front</td><td>O(1) both ends</td><td>O(1) min/max</td></tr>
+        <tr><td>Search</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Ring Buffer (Circular Buffer)</h3>
+    <p>A fixed-size array where the write position wraps around using modular arithmetic: <code>pos = (pos + 1) % capacity</code>. When the buffer is full, the oldest data is overwritten. No memory allocation after initialization.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Ring Buffer &mdash; Wrap-Around</div>
+      <div class="flow-row">
+        <div class="flow-box" style="border-color:var(--green);color:var(--green);">R</div>
+        <div class="flow-box">D</div>
+        <div class="flow-box">D</div>
+        <div class="flow-box" style="border-color:var(--orange);color:var(--orange);">W</div>
+        <div class="flow-box" style="opacity:0.4;">_</div>
+        <div class="flow-box" style="opacity:0.4;">_</div>
+      </div>
+      <div style="font-size:0.6rem;color:var(--dim);margin-top:0.5rem;">R = read head &nbsp; W = write head &nbsp; D = data &nbsp; _ = empty</div>
+    </div>
+
+    <p><strong>Use cases:</strong> I/O buffers, audio/video streaming, logging systems, producer-consumer patterns. Ring buffers are favored in real-time systems because they have zero allocation overhead and predictable memory usage.</p>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Advanced Linear Structures</div>
+    <h2>Bloom Filters, Skip Lists &amp; More</h2>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Bloom Filter</div>
+        <p>A probabilistic structure that tests set membership. Uses multiple hash functions mapping to a bit array. Can report false positives but never false negatives. Used in databases, caches, and spell checkers to avoid expensive lookups.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Skip List</div>
+        <p>A layered linked list with express lanes. Each level skips over nodes, giving O(log n) search, insert, and delete on average. A randomized alternative to balanced BSTs, used in Redis sorted sets and LevelDB.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">LRU Cache</div>
+        <p>Combines a doubly linked list with a hash map. The list maintains access order; the map gives O(1) lookups. On access, move the node to the front. On eviction, remove from the tail. O(1) for all operations.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Disjoint Set (Union-Find)</div>
+        <p>Tracks elements partitioned into disjoint sets. Supports <code>find</code> (which set?) and <code>union</code> (merge two sets). With path compression and union by rank, both operations run in near-O(1) amortized time. Key to Kruskal's MST algorithm.</p>
+      </div>
+    </div>
+
+    <div class="callout good">
+      <div class="callout-title">LRU Cache Pattern</div>
+      The doubly-linked-list + hash-map LRU cache is one of the most frequently asked interview questions. The key insight: the hash map stores pointers directly into the linked list, so you can locate and move any node in O(1) without traversal.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Choosing the Right Structure</div>
+    <h2>Trade-offs &amp; Decision Guide</h2>
+    <p>There is no universally best data structure. The right choice depends on your access pattern, frequency of operations, memory constraints, and whether you need ordering.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Need</th><th>Best Choice</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Fast random access</td><td>Array / Dynamic array</td><td>O(1) index, cache-friendly</td></tr>
+        <tr><td>Frequent insert/delete at ends</td><td>Deque / Linked list</td><td>O(1) at both ends</td></tr>
+        <tr><td>Frequent insert/delete in middle</td><td>Linked list</td><td>O(1) at known position</td></tr>
+        <tr><td>LIFO ordering</td><td>Stack</td><td>O(1) push/pop</td></tr>
+        <tr><td>FIFO ordering</td><td>Queue / Ring buffer</td><td>O(1) enqueue/dequeue</td></tr>
+        <tr><td>Priority-based ordering</td><td>Priority queue (heap)</td><td>O(log n) insert/extract</td></tr>
+        <tr><td>Fixed-size streaming buffer</td><td>Ring buffer</td><td>Zero alloc, wrap-around</td></tr>
+        <tr><td>Set membership (probabilistic)</td><td>Bloom filter</td><td>Space-efficient, no false negatives</td></tr>
+        <tr><td>Recently-used cache</td><td>LRU cache</td><td>O(1) access + eviction</td></tr>
+        <tr><td>Dynamic connectivity</td><td>Union-Find</td><td>Near O(1) union/find</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Practical Reality</div>
+      In practice, arrays and dynamic arrays dominate. Their cache-friendliness often makes them faster than linked lists even for operations where linked lists have better Big-O complexity. Always benchmark with real data before choosing a pointer-heavy structure over a contiguous one.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="b" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">What is the time complexity of accessing an element by index in an array?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> O(n)</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> O(1)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> O(log n)</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> O(n log n)</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">Arrays use contiguous memory, so the address of any element can be computed directly as base + index * element_size, giving constant-time access.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="c" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">Why does a dynamic array achieve amortized O(1) appends despite occasional O(n) resizes?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It never actually resizes</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Each resize copies only one element</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Doubling capacity means resizes happen exponentially less often, spreading the cost</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The OS handles resizing in O(1)</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">By doubling, each resize copies all n elements, but the next resize won't happen until n more appends. The total copy cost over n appends sums to about 2n, so the amortized cost per operation is O(1).</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">Which linked list variant allows O(1) deletion of a given node (when you have a pointer to it)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Doubly linked list</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Singly linked list</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Circular singly linked list</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Static array</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">A doubly linked list stores both prev and next pointers, so you can re-wire both neighbors in O(1) without needing to traverse from the head to find the predecessor.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">Which data structure is best suited for implementing DFS on a graph?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Queue</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Priority queue</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Deque</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Stack</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">DFS explores as deep as possible before backtracking, which matches the LIFO behavior of a stack. BFS, in contrast, uses a queue (FIFO).</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="b" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What is the time complexity of extracting the minimum element from a binary min-heap?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> O(1)</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> O(log n)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> O(n)</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> O(n log n)</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">The minimum is at the root (O(1) to find), but after removing it you must restore the heap property by sifting down, which takes O(log n) in the worst case.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="c" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">A ring buffer is full. What happens when a new element is written?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It throws an error</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It resizes to 2x capacity</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The oldest element is overwritten</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The newest element is discarded</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">A ring buffer has a fixed size and uses modular arithmetic to wrap around. When full, writing advances the write pointer, overwriting the oldest data at the read position.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="b" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">A Bloom filter reports that an element is NOT in the set. What can you conclude?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> The element is probably not in the set</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The element is definitely not in the set</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The element might still be in the set</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Nothing &mdash; Bloom filters are unreliable</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">Bloom filters can produce false positives (says "maybe in set" when it isn't) but never false negatives. If it says "not in set," that is guaranteed to be correct.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What two data structures are combined to build an O(1) LRU cache?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Doubly linked list + hash map</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Array + stack</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Binary heap + hash map</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Skip list + queue</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">The hash map provides O(1) key lookup, returning a pointer directly into the doubly linked list. The list maintains recency order, and nodes can be moved to the front or removed from the tail in O(1).</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="d" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">Why do arrays often outperform linked lists in practice, even for operations where linked lists have better Big-O?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Arrays use less total memory</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Linked lists require garbage collection</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Arrays have simpler code</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Arrays are cache-friendly due to contiguous memory layout</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">CPU caches exploit spatial locality: when one array element is accessed, nearby elements are loaded into cache automatically. Linked list nodes are scattered in memory, causing frequent cache misses that dominate actual runtime.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="c" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">What is the amortized time complexity of find and union in a Disjoint Set with path compression and union by rank?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> O(log n)</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> O(1)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> O(&alpha;(n)) &mdash; nearly constant</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> O(n)</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">With both path compression and union by rank, the amortized cost per operation is O(&alpha;(n)), where &alpha; is the inverse Ackermann function. For all practical input sizes, &alpha;(n) &le; 4, making it effectively constant.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

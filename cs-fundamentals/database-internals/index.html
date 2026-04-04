@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Database Internals — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">Databases</a>
+    <span>/</span>
+    <span style="color:var(--text);">Database Internals</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Databases</div>
+  <h1>Database Internals</h1>
+  <p class="header-sub">How databases actually work under the hood &mdash; from storage engines and crash recovery to query optimization and connection pooling.</p>
+</header>
+
+<div class="content">
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-num">01 / Storage Engines</div>
+    <h2>B-Tree vs LSM-Tree Storage</h2>
+    <p>Every database stores data on disk through a <strong>storage engine</strong>. The two dominant paradigms are B-Tree based engines and LSM-Tree based engines. They make fundamentally different trade-offs between read performance, write performance, and space usage.</p>
+
+    <h3>B-Tree Engines</h3>
+    <p>B-Trees are balanced, self-adjusting tree structures where data is organized in fixed-size <strong>pages</strong> (typically 4&ndash;16 KB). Each page holds sorted keys and pointers to child pages. When a page overflows, it <strong>splits</strong> into two; when it becomes too sparse, it <strong>merges</strong> with a sibling. This keeps the tree balanced and lookups at O(log n).</p>
+    <p>Used by: <code>InnoDB</code> (MySQL), <code>PostgreSQL</code>, SQL Server, Oracle. B-Trees excel at <strong>point reads</strong> and <strong>range scans</strong> because data is already sorted on disk.</p>
+
+    <h3>LSM-Tree Engines</h3>
+    <p>LSM-Trees (Log-Structured Merge Trees) buffer writes in an in-memory <strong>memtable</strong>. When the memtable reaches a threshold, it is flushed to disk as an immutable, sorted <strong>SSTable</strong> (Sorted String Table). Background <strong>compaction</strong> periodically merges SSTables to reclaim space and keep read performance manageable.</p>
+    <p>Used by: <code>RocksDB</code>, <code>Cassandra</code>, LevelDB, ScyllaDB. LSM-Trees excel at <strong>write-heavy workloads</strong> because writes are always sequential appends.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">B-Tree Write Path</div>
+      <div class="flow-row">
+        <div class="flow-box">Find leaf page</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Update in-place</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Split if full</div>
+      </div>
+    </div>
+
+    <div class="diagram">
+      <div class="diagram-label">LSM-Tree Write Path</div>
+      <div class="flow-row">
+        <div class="flow-box">Write to memtable</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Flush to SSTable</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Background compaction</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Compaction Strategies</div>
+      <strong>Leveled compaction</strong> (LevelDB, RocksDB default): SSTables are organized into levels of exponentially increasing size. Each level has no overlapping key ranges, giving better read performance but higher write amplification.<br>
+      <strong>Size-tiered compaction</strong> (Cassandra default): SSTables of similar size are merged together. Simpler and faster for writes, but can have more space amplification and slower reads due to overlapping key ranges.
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-num">02 / Amplification Trade-offs</div>
+    <h2>Read, Write &amp; Space Amplification</h2>
+    <p>No storage engine can minimize all three amplification factors simultaneously. Understanding these trade-offs is key to choosing the right engine for your workload.</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Amplification</th><th>B-Tree</th><th>LSM-Tree</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Read</strong></td>
+          <td>Low &mdash; single traversal from root to leaf</td>
+          <td>Higher &mdash; may check memtable + multiple SSTables (mitigated by bloom filters)</td>
+        </tr>
+        <tr>
+          <td><strong>Write</strong></td>
+          <td>Moderate &mdash; random I/O, write page + WAL</td>
+          <td>Higher &mdash; data written multiple times during compaction</td>
+        </tr>
+        <tr>
+          <td><strong>Space</strong></td>
+          <td>Lower &mdash; in-place updates, but page fragmentation</td>
+          <td>Higher &mdash; multiple copies exist until compaction</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <div class="callout-title">Rule of Thumb</div>
+      B-Trees favor <strong>read-heavy, transactional</strong> workloads (OLTP). LSM-Trees favor <strong>write-heavy, append-mostly</strong> workloads (time-series, logging, messaging). Hybrid approaches like TiDB use both.
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-num">03 / Durability &amp; Recovery</div>
+    <h2>WAL &amp; Buffer Pool</h2>
+
+    <h3>Write-Ahead Log (WAL)</h3>
+    <p>Before any change hits the actual data pages, it is first recorded in a sequential, append-only <strong>Write-Ahead Log</strong>. If the database crashes, it replays the WAL to recover committed transactions that hadn't been flushed to data files yet.</p>
+    <p>WAL provides the <strong>D</strong> (Durability) in ACID. Both B-Tree and LSM-Tree engines use WAL &mdash; PostgreSQL calls it WAL, MySQL/InnoDB calls it the <strong>redo log</strong>.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Crash Recovery Flow</div>
+      <div class="flow-row">
+        <div class="flow-box">Crash</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Read WAL from last checkpoint</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Redo committed txns</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Undo uncommitted txns</div>
+      </div>
+    </div>
+
+    <h3>Buffer Pool</h3>
+    <p>The buffer pool is a region of memory that caches frequently accessed <strong>disk pages</strong>. When a query needs data, the engine first checks the buffer pool. On a miss, it loads the page from disk into the pool (evicting a less-used page if needed).</p>
+    <p>Pages modified in memory but not yet written to disk are called <strong>dirty pages</strong>. A background process called <strong>checkpoint</strong> periodically flushes dirty pages to disk, which also advances the WAL recovery point &mdash; reducing crash recovery time.</p>
+
+    <div class="callout good">
+      <div class="callout-title">Practical Tip</div>
+      In InnoDB, set <code>innodb_buffer_pool_size</code> to 70&ndash;80% of available RAM. In PostgreSQL, <code>shared_buffers</code> is typically set to 25% of RAM (the OS page cache handles the rest).
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-num">04 / Query Processing</div>
+    <h2>From SQL to Execution</h2>
+    <p>A SQL query goes through several transformation stages before any data is touched. Understanding this pipeline helps explain why the same logical query can have wildly different performance characteristics.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Query Processing Pipeline</div>
+      <div class="flow-row">
+        <div class="flow-box">SQL Text</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Parse &amp; Validate</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Logical Plan</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Optimize</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Physical Plan</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Execute</div>
+      </div>
+    </div>
+
+    <h3>Cost-Based Optimization</h3>
+    <p>The optimizer generates multiple candidate physical plans and estimates the <strong>cost</strong> of each using table statistics: row counts, index cardinality, histogram distributions, and page counts. It picks the plan with the lowest estimated cost.</p>
+    <p><strong>Cardinality estimation</strong> is the hardest part &mdash; getting it wrong by even 10x can cause the optimizer to choose a terrible join order or skip an index entirely. This is why <code>ANALYZE</code> / <code>UPDATE STATISTICS</code> matters.</p>
+
+    <h3>Join Algorithms</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Nested Loop Join</div>
+        <p>For each row in the outer table, scan the inner table. Works well when the inner side has an index. O(n * m) worst case.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Hash Join</div>
+        <p>Build a hash table from the smaller table, then probe it with the larger table. O(n + m). Great for large, unsorted, equi-joins.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Merge Join</div>
+        <p>Both inputs must be sorted on the join key. Walks both sides in lockstep. O(n + m). Ideal when data is already sorted or indexes exist.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      The optimizer is only as good as its statistics. Stale stats lead to bad plans. Run <code>ANALYZE</code> (PostgreSQL) or <code>ANALYZE TABLE</code> (MySQL) after large data changes.
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-num">05 / Concurrency Control</div>
+    <h2>MVCC &mdash; Multi-Version Concurrency Control</h2>
+    <p>MVCC allows readers and writers to operate concurrently without blocking each other. Instead of locking rows, the database keeps <strong>multiple versions</strong> of each row. Each transaction sees a consistent <strong>snapshot</strong> of the data as of its start time.</p>
+
+    <h3>How It Works</h3>
+    <p>When a row is updated, the database doesn't overwrite the old version. It creates a new version tagged with the writing transaction's ID. Readers see only versions committed before their snapshot, providing <strong>snapshot isolation</strong>.</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Aspect</th><th>PostgreSQL</th><th>MySQL (InnoDB)</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Old versions stored in</td>
+          <td>Main heap (same table)</td>
+          <td>Separate undo log (rollback segment)</td>
+        </tr>
+        <tr>
+          <td>Cleanup mechanism</td>
+          <td><code>VACUUM</code> removes dead tuples</td>
+          <td>Purge thread cleans undo log</td>
+        </tr>
+        <tr>
+          <td>Versioning approach</td>
+          <td>Tuple has <code>xmin</code>/<code>xmax</code> transaction IDs</td>
+          <td>Row has a hidden rollback pointer to undo log</td>
+        </tr>
+        <tr>
+          <td>Bloat risk</td>
+          <td>Table bloat if VACUUM falls behind</td>
+          <td>Undo log growth if long-running transactions</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <div class="callout-title">Watch Out</div>
+      Long-running transactions are the enemy of MVCC. In PostgreSQL, they prevent VACUUM from reclaiming dead tuples, causing table bloat. In MySQL, they prevent undo log purging, growing the undo tablespace. Always keep transactions short.
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-num">06 / Connection Management</div>
+    <h2>Connection Pooling</h2>
+    <p>Every database connection consumes memory (typically 5&ndash;10 MB per connection in PostgreSQL). Creating a new connection involves TCP handshake, TLS negotiation, and authentication &mdash; taking 20&ndash;50ms. Connection poolers sit between the application and the database, maintaining a pool of reusable connections.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">PgBouncer</div>
+        <p>Lightweight, single-threaded pooler for PostgreSQL. Supports transaction-level and statement-level pooling. Minimal overhead.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">ProxySQL</div>
+        <p>Feature-rich MySQL proxy with connection pooling, query routing, read/write splitting, and query caching built in.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">HikariCP</div>
+        <p>JVM-side connection pool known for low latency and high throughput. Default pool in Spring Boot. Manages connections at the application layer.</p>
+      </div>
+    </div>
+
+    <h3>Pooling Modes (PgBouncer)</h3>
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Mode</th><th>Connection Assigned</th><th>Trade-off</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Session</strong></td>
+          <td>For the entire client session</td>
+          <td>Safest, but least efficient &mdash; same as no pooling in many cases</td>
+        </tr>
+        <tr>
+          <td><strong>Transaction</strong></td>
+          <td>For one transaction at a time</td>
+          <td>Best balance &mdash; most common mode. Cannot use session-level features (PREPARE, LISTEN/NOTIFY)</td>
+        </tr>
+        <tr>
+          <td><strong>Statement</strong></td>
+          <td>For a single statement</td>
+          <td>Most aggressive reuse, but no multi-statement transactions allowed</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">Sizing Rule</div>
+      A good starting formula for pool size: <code>connections = (core_count * 2) + effective_spindle_count</code>. For SSDs, start with <code>core_count * 2</code> to <code>core_count * 4</code>. More connections does not mean more throughput &mdash; context switching kills performance beyond the sweet spot.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="b" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">Which storage engine design is optimized for write-heavy workloads?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> B-Tree &mdash; because in-place updates are fast</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> LSM-Tree &mdash; because writes are sequential appends to a memtable</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Hash index &mdash; because O(1) lookups</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> B-Tree &mdash; because pages are cached in the buffer pool</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">LSM-Trees buffer all writes in memory (memtable) and flush sequentially to disk. This converts random writes into sequential I/O, which is much faster on both HDDs and SSDs.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="c" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">In an LSM-Tree, what is the correct order of the write path?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> SSTable &rarr; Memtable &rarr; Compaction</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Compaction &rarr; Memtable &rarr; SSTable</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Memtable &rarr; Flush to SSTable &rarr; Background Compaction</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> WAL &rarr; SSTable &rarr; Memtable</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">Writes go to the in-memory memtable first. When it reaches a size threshold, it's flushed as an immutable SSTable on disk. Background compaction then merges SSTables to reduce read amplification and reclaim space.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">What is the primary purpose of the Write-Ahead Log (WAL)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Ensure durability and enable crash recovery</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Speed up read queries by caching data</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Provide MVCC snapshot isolation</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Optimize join ordering in query plans</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">The WAL records all changes before they are applied to data pages. If the database crashes, it replays the WAL to recover committed transactions, providing the Durability guarantee in ACID.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What are "dirty pages" in the context of a buffer pool?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Pages that have been corrupted by a crash</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Pages that have been evicted from the cache</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Pages containing deleted rows that need vacuuming</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Pages modified in memory but not yet flushed to disk</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">Dirty pages are in-memory pages that have been modified but not yet written back to disk. The checkpoint process periodically flushes dirty pages to persistent storage.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="b" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">Which join algorithm builds a hash table from the smaller input and probes it with the larger?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Nested Loop Join</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Hash Join</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Merge Join</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Index Join</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">Hash Join builds a hash table from the smaller (build) side and then scans the larger (probe) side, looking up each row in the hash table. It's O(n + m) and ideal for large equi-joins without sorted input.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="c" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">In PostgreSQL's MVCC implementation, where are old row versions stored?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> In a separate undo log</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> In the WAL only</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> In the main heap table alongside current versions</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> In a dedicated version cache in shared memory</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">PostgreSQL stores old tuple versions directly in the main heap. Dead tuples are removed by the VACUUM process. This differs from InnoDB, which stores old versions in a separate undo/rollback segment.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="a" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">Why is cardinality estimation important in cost-based optimization?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Wrong estimates lead the optimizer to pick suboptimal join orders and access methods</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It determines the maximum number of connections allowed</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It controls how many versions of a row MVCC keeps</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It sets the size of the buffer pool</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">The optimizer uses cardinality estimates to predict how many rows each operation will produce. If these estimates are off by orders of magnitude, the optimizer may choose the wrong join algorithm, skip a useful index, or pick a terrible join order.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="b" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">Which PgBouncer pooling mode offers the best balance of safety and efficiency for most applications?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Session mode</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Transaction mode</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Statement mode</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Prepared statement mode</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">Transaction mode assigns a server connection for the duration of a single transaction, then returns it to the pool. This gives good multiplexing while still supporting multi-statement transactions. Session mode is too conservative; statement mode is too restrictive.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="d" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">What problem do long-running transactions cause in PostgreSQL's MVCC?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> They crash the WAL writer</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> They prevent new connections from being created</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> They invalidate all query plan caches</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> They prevent VACUUM from reclaiming dead tuples, causing table bloat</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">VACUUM can only remove tuple versions that are no longer visible to any active transaction. A long-running transaction holds an old snapshot, preventing cleanup of dead tuples created after it started, leading to table bloat.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="c" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">Which compaction strategy organizes SSTables into levels with non-overlapping key ranges?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Size-tiered compaction</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> FIFO compaction</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Leveled compaction</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Universal compaction</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">Leveled compaction (used by LevelDB and RocksDB by default) arranges SSTables into levels where each level has non-overlapping key ranges. This ensures at most one SSTable per level needs to be checked for a given key, improving read performance at the cost of higher write amplification from more frequent compaction.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

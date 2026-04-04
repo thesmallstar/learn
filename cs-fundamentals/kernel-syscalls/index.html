@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kernel & System Calls — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── STACKED DIAGRAM ── */
+.stack-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin: 0.5rem 0;
+}
+.stack-row {
+  width: 80%;
+  padding: 0.6rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid;
+}
+.stack-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0.3rem 0;
+}
+.ring-user {
+  background: var(--green-bg);
+  border-color: var(--green);
+  color: var(--green);
+  border-radius: 4px 4px 0 0;
+}
+.ring-kernel {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+  border-radius: 0 0 4px 4px;
+}
+.ring-divider {
+  width: 80%;
+  border: none;
+  border-top: 2px dashed var(--orange);
+  margin: 0;
+}
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+  .stack-row{width:95%}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">Operating Systems</a>
+    <span>/</span>
+    <span style="color:var(--text);">Kernel &amp; System Calls</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Operating Systems</div>
+  <h1>Kernel <span class="thin">&amp;</span> System Calls</h1>
+  <p class="header-sub">How user programs talk to hardware through the kernel, the architectures that shape modern operating systems, and the machinery that makes containers possible.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / The Kernel</div>
+    <h2>Kernel Space vs User Space</h2>
+    <p>The kernel is the core of an operating system. It has direct access to hardware, memory, and CPU privileged instructions. To protect the system from buggy or malicious programs, modern CPUs enforce <strong>protection rings</strong>.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">CPU Protection Rings</div>
+      <div class="stack-diagram">
+        <div class="stack-row ring-user">Ring 3 &mdash; User Space (applications, libraries, shells)</div>
+        <div class="stack-label">mode switch boundary (trap / syscall instruction)</div>
+        <div class="ring-divider"></div>
+        <div class="stack-row ring-kernel">Ring 0 &mdash; Kernel Space (scheduler, drivers, memory manager)</div>
+      </div>
+    </div>
+
+    <p><strong>User space (Ring 3)</strong> is where your applications run. Code here cannot directly access hardware, execute privileged CPU instructions, or touch another process's memory. When it needs to do any of those things, it must ask the kernel.</p>
+    <p><strong>Kernel space (Ring 0)</strong> has unrestricted access. The kernel manages processes, memory, file systems, networking, and device drivers. A bug in kernel code can crash the entire machine.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Why the Split Matters</div>
+      A null-pointer dereference in user space kills one process. The same bug in kernel space triggers a kernel panic and takes down the entire system. The ring boundary is the OS's primary safety net.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / System Calls</div>
+    <h2>Crossing the Boundary</h2>
+    <p>A <strong>system call (syscall)</strong> is the programmatic interface between user space and kernel space. When your program calls <code>read()</code>, it's not calling a regular function -- it triggers a controlled mode switch into Ring 0.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Syscall Flow</div>
+      <div class="flow-row">
+        <div class="flow-box">User calls read()</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">libc wrapper</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">SYSCALL instruction (trap)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Mode switch to Ring 0</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box">Kernel handler runs</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Result placed in register</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">SYSRET (back to Ring 3)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">libc returns to caller</div>
+      </div>
+    </div>
+
+    <h3>The Cost of Syscalls</h3>
+    <p>Each syscall costs roughly <strong>100-1000 nanoseconds</strong> depending on the operation. The overhead comes from saving/restoring registers, TLB flushes, cache pollution, and Spectre mitigations (KPTI). Minimizing syscalls is a key optimization -- this is why <code>read()</code> uses buffering and <code>epoll</code> batches notifications.</p>
+
+    <h3>vDSO: Skipping the Switch</h3>
+    <p>Some syscalls don't actually need kernel privileges. <code>gettimeofday()</code> and <code>clock_gettime()</code> just read a clock value. Linux maps a small shared library called the <strong>vDSO</strong> (virtual Dynamic Shared Object) into every process's address space. These "syscalls" execute entirely in user space -- no trap, no mode switch, ~nanosecond cost.</p>
+
+    <div class="callout good">
+      <div class="callout-title">Key Syscalls to Know</div>
+      <code>fork()</code> -- create a child process. <code>exec()</code> -- replace process image. <code>open()</code> / <code>read()</code> / <code>write()</code> -- file I/O. <code>mmap()</code> -- map files/memory. <code>socket()</code> -- create network endpoint. <code>epoll_ctl()</code> -- register interest in I/O events.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Kernel Architectures</div>
+    <h2>Monolithic, Micro, and Hybrid</h2>
+    <p>How much code runs in Ring 0 is a fundamental design decision. The three major approaches trade off performance, reliability, and complexity.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Kernel Architecture Comparison</div>
+      <div class="flow-row" style="gap:1.5rem;">
+        <div style="text-align:center;">
+          <div class="flow-box" style="min-width:140px;">Monolithic</div>
+          <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;">Everything in Ring 0</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="flow-box" style="min-width:140px;background:var(--green-bg);border-color:var(--green);color:var(--green);">Microkernel</div>
+          <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;">Minimal Ring 0</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="flow-box" style="min-width:140px;background:var(--purple-bg);border-color:var(--purple);color:var(--purple);">Hybrid</div>
+          <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;">Pragmatic middle ground</div>
+        </div>
+      </div>
+    </div>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Property</th><th>Monolithic</th><th>Microkernel</th><th>Hybrid</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>In Ring 0</td><td>Drivers, FS, networking, IPC -- everything</td><td>Only IPC, scheduling, basic memory</td><td>Core services in Ring 0, some drivers in user space</td></tr>
+        <tr><td>Performance</td><td>Fast (no IPC overhead)</td><td>Slower (many context switches)</td><td>Good (selective optimization)</td></tr>
+        <tr><td>Reliability</td><td>One driver bug can crash system</td><td>Faulty services restart independently</td><td>Better than monolithic, less than micro</td></tr>
+        <tr><td>Examples</td><td>Linux, FreeBSD</td><td>Mach, QNX, seL4</td><td>Windows NT, macOS XNU</td></tr>
+        <tr><td>Use cases</td><td>Servers, desktops, phones</td><td>Safety-critical (avionics, medical)</td><td>Consumer OS, gaming consoles</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Linux is Monolithic -- But Modular</div>
+      Linux puts everything in Ring 0 for speed, but supports <strong>loadable kernel modules</strong> (LKMs) that can be inserted and removed at runtime. You get monolithic performance with some of the flexibility of a microkernel. Run <code>lsmod</code> to see currently loaded modules.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Linux Subsystems</div>
+    <h2>Inside the Linux Kernel</h2>
+    <p>Linux's monolithic kernel contains several major subsystems, each responsible for a critical OS function.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">CFS (Scheduler)</div>
+        <p>Completely Fair Scheduler uses a red-black tree to pick the task with the smallest virtual runtime. O(log n) insertion, O(1) pick-next. Replaced by EEVDF in kernel 6.6+.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Memory Manager</div>
+        <p><strong>Buddy allocator</strong> for page-sized blocks, <strong>slab allocator</strong> (SLUB) for small kernel objects. When memory runs low, the <strong>OOM killer</strong> picks a process to sacrifice.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">VFS</div>
+        <p>Virtual File System provides a uniform interface (<code>open</code>, <code>read</code>, <code>write</code>) regardless of the underlying filesystem -- ext4, XFS, btrfs, NFS, or /proc.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Network Stack</div>
+        <p>Implements TCP/IP from L2 (ethernet) up. Socket buffers (sk_buff), Netfilter (iptables/nftables), and traffic control (tc). Supports XDP for kernel-bypass fast paths.</p>
+      </div>
+    </div>
+
+    <h3>The OOM Killer</h3>
+    <p>When the system is out of memory and swap, Linux's OOM killer selects a process to terminate. It calculates an <code>oom_score</code> for each process based on memory usage, process age, and whether it's privileged. You can influence it via <code>/proc/&lt;pid&gt;/oom_score_adj</code> (-1000 to +1000).</p>
+
+    <pre><code># Check a process's OOM score
+cat /proc/$(pidof nginx)/oom_score
+
+# Make a process immune to OOM killer
+echo -1000 > /proc/$(pidof critical-app)/oom_score_adj</code></pre>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Interrupts</div>
+    <h2>Top-Half and Bottom-Half Processing</h2>
+    <p>When hardware needs attention (a network packet arrives, a key is pressed), it sends an <strong>interrupt</strong> to the CPU. The CPU stops what it's doing and jumps to the kernel's interrupt handler. But interrupt handlers must be <em>fast</em> -- they run with interrupts disabled, so they block everything else.</p>
+
+    <p>Linux solves this with a two-phase approach:</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Interrupt Processing</div>
+      <div class="flow-row">
+        <div class="flow-box">Hardware IRQ</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange);">Top Half (fast, IRQs off)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box" style="background:var(--green-bg);border-color:var(--green);color:var(--green);">Bottom Half (deferred, IRQs on)</div>
+      </div>
+    </div>
+
+    <p><strong>Top half</strong>: Runs immediately with interrupts disabled. Does the minimum: acknowledge the hardware, copy critical data, schedule bottom-half work. Must finish in microseconds.</p>
+    <p><strong>Bottom half</strong>: Runs later with interrupts enabled. Three mechanisms exist:</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Mechanism</th><th>Context</th><th>Can Sleep?</th><th>Use Case</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Softirq</strong></td><td>Interrupt (atomic)</td><td>No</td><td>Networking, block I/O -- high-frequency, per-CPU</td></tr>
+        <tr><td><strong>Tasklet</strong></td><td>Interrupt (atomic)</td><td>No</td><td>Simpler deferred work, built on softirqs</td></tr>
+        <tr><td><strong>Workqueue</strong></td><td>Process (kernel thread)</td><td>Yes</td><td>Any work that needs to sleep (e.g., allocate memory)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Why This Matters</div>
+      If you've ever seen <code>ksoftirqd</code> consuming CPU in <code>top</code>, that's the kernel processing accumulated bottom-half work. Heavy network traffic generates many softirqs. Tools like <code>mpstat -I SCPU</code> show softirq CPU time per core.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Namespaces, Cgroups &amp; Containers</div>
+    <h2>The Building Blocks of Containers</h2>
+    <p>Containers are not a kernel primitive. They're a combination of three kernel features working together: <strong>namespaces</strong> for isolation, <strong>cgroups</strong> for resource limits, and <strong>overlayFS</strong> for layered filesystems.</p>
+
+    <h3>Linux Namespaces</h3>
+    <p>Each namespace type isolates a specific system resource, giving a process the illusion of having its own instance:</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Namespace Isolation</div>
+      <div class="flow-row" style="gap:0.6rem;">
+        <div class="flow-box">PID</div>
+        <div class="flow-box">NET</div>
+        <div class="flow-box">MNT</div>
+        <div class="flow-box">UTS</div>
+        <div class="flow-box">IPC</div>
+        <div class="flow-box">USER</div>
+      </div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:0.8rem;">Each namespace creates an isolated view. A container typically uses all six.</div>
+    </div>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Namespace</th><th>Isolates</th><th>Effect</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>PID</strong></td><td>Process IDs</td><td>Container sees its init as PID 1</td></tr>
+        <tr><td><strong>NET</strong></td><td>Network stack</td><td>Own interfaces, IP addresses, routing tables</td></tr>
+        <tr><td><strong>MNT</strong></td><td>Mount points</td><td>Own filesystem tree, isolated from host mounts</td></tr>
+        <tr><td><strong>UTS</strong></td><td>Hostname</td><td>Container can set its own hostname</td></tr>
+        <tr><td><strong>IPC</strong></td><td>System V IPC, POSIX queues</td><td>Isolated shared memory and semaphores</td></tr>
+        <tr><td><strong>USER</strong></td><td>User/group IDs</td><td>Root inside container maps to unprivileged user on host</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Cgroups v2</h3>
+    <p>While namespaces handle <em>what a process can see</em>, <strong>cgroups</strong> (control groups) handle <em>how much it can use</em>. Cgroups v2 provides a unified hierarchy for limiting CPU, memory, I/O, and PIDs.</p>
+
+    <pre><code># Limit a cgroup to 50% of one CPU and 256MB memory
+echo "50000 100000" > /sys/fs/cgroup/myapp/cpu.max
+echo "268435456" > /sys/fs/cgroup/myapp/memory.max
+
+# See current memory usage
+cat /sys/fs/cgroup/myapp/memory.current</code></pre>
+
+    <div class="callout good">
+      <div class="callout-title">Container = Namespaces + Cgroups + OverlayFS</div>
+      Docker, Podman, and containerd all work the same way at the kernel level: <code>clone()</code> with namespace flags, assign to a cgroup, mount an overlayFS root. That's it. There's no "container" syscall -- it's just clever use of existing primitives.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">8</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="b" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">Which CPU ring does user application code execute in?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Ring 0</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Ring 3</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Ring 1</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Ring -1 (hypervisor)</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">Ring 3 is the least privileged ring where user applications run. Ring 0 is reserved for the kernel. Most modern OSes only use Ring 0 and Ring 3, skipping Rings 1 and 2 entirely.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="c" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">What does the vDSO optimize?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> File I/O by caching disk blocks in user space</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Network calls by bypassing the TCP stack</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Certain syscalls (like gettimeofday) by executing them without a mode switch</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Process creation by skipping fork()</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">The vDSO (virtual Dynamic Shared Object) maps a small kernel-provided library into every process. Calls like gettimeofday() execute entirely in user space, avoiding the ~100ns+ cost of a real mode switch.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">Which kernel architecture does Linux use?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Monolithic (with loadable modules)</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Microkernel</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Hybrid kernel</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Exokernel</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">Linux is a monolithic kernel -- all core services (drivers, filesystem, networking) run in Ring 0. However, it supports loadable kernel modules (LKMs) that can be inserted at runtime, giving it some modularity without the IPC overhead of a microkernel.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What is the primary advantage of a microkernel over a monolithic kernel?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Faster syscalls due to less code in Ring 0</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Better hardware driver support</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Lower memory usage</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Faulty services can be restarted without crashing the system</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">In a microkernel, drivers and services run in user space. If a driver crashes, only that service is affected -- it can be restarted without rebooting. This comes at the cost of IPC overhead between services, which is why microkernels are typically slower than monolithic kernels.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="b" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">Which Linux bottom-half mechanism can sleep (block)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Softirq</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Workqueue</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Tasklet</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Top-half handler</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">Workqueues run in kernel thread context (process context), which means they can sleep, allocate memory with GFP_KERNEL, and do other blocking operations. Softirqs and tasklets run in interrupt context and must not sleep.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="c" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">A container's init process appears as PID 1 inside the container. Which namespace creates this illusion?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> USER namespace</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> MNT namespace</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> PID namespace</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> UTS namespace</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">The PID namespace gives each container its own set of process IDs. The first process in a new PID namespace becomes PID 1 from the container's perspective, even though it has a different PID on the host.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="a" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">What does Linux's OOM killer use to select which process to terminate?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> An oom_score based on memory usage, age, and privilege level</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Random selection among all running processes</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The process with the most open file descriptors</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The process with the highest PID number</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">The OOM killer calculates an oom_score for each process. Processes using more memory get higher scores and are more likely to be killed. The score can be influenced via /proc/&lt;pid&gt;/oom_score_adj, with -1000 making a process immune.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="d" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What are the three kernel features that make up a Linux container?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> VFS, slab allocator, and CFS</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> seccomp, AppArmor, and SELinux</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> KVM, virtio, and QEMU</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Namespaces, cgroups, and overlayFS</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">A container is not a single kernel feature but a combination: namespaces provide isolation (PID, network, mounts, etc.), cgroups enforce resource limits (CPU, memory, I/O), and overlayFS provides the layered filesystem. There is no "container" syscall.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

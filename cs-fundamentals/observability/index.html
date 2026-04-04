@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Observability — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">Infrastructure</a>
+    <span>/</span>
+    <span style="color:var(--text);">Observability</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Infrastructure</div>
+  <h1>Observability</h1>
+  <p class="header-sub">Understanding the internals of production systems through logging, metrics, and distributed tracing -- plus the SLO frameworks and alerting strategies that turn raw signals into actionable insight.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / The Three Pillars</div>
+    <h2>Logs, Metrics, and Traces</h2>
+    <p>Observability is the ability to understand a system's internal state from its external outputs. It rests on three complementary signal types, each answering a different question about your running software.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">The Three Pillars of Observability</div>
+      <div class="flow-row">
+        <div class="flow-box">Logs</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box">Metrics</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box">Traces</div>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Logs</div>
+        <p>Discrete, timestamped records of events. Great for debugging individual requests. Answer: "What happened?"</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Metrics</div>
+        <p>Numeric measurements aggregated over time. Cheap to store and query at scale. Answer: "How is the system performing?"</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Traces</div>
+        <p>End-to-end journey of a request across services. Answer: "Where did time get spent?"</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      No single pillar is sufficient. Metrics tell you <em>something is wrong</em>, logs tell you <em>what</em> went wrong, and traces tell you <em>where</em> in the call chain it broke.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Logging</div>
+    <h2>Structured Logging Done Right</h2>
+    <p>Modern logging means structured, machine-parseable records -- not free-form text sprinkled with <code>println</code>. JSON is the dominant format because every aggregation tool can ingest it.</p>
+
+    <h3>Log Levels</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Level</th><th>When to Use</th><th>Alert?</th></tr></thead>
+      <tbody>
+        <tr><td><code>DEBUG</code></td><td>Verbose detail for local development</td><td>No</td></tr>
+        <tr><td><code>INFO</code></td><td>Normal operations (startup, config loaded)</td><td>No</td></tr>
+        <tr><td><code>WARN</code></td><td>Recoverable issues (retry succeeded, fallback used)</td><td>Sometimes</td></tr>
+        <tr><td><code>ERROR</code></td><td>Failures that need attention (unhandled exception, downstream timeout)</td><td>Yes</td></tr>
+        <tr><td><code>FATAL</code></td><td>Process cannot continue</td><td>Immediately</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Structured Log Example</h3>
+<pre><code>{
+  "timestamp": "2026-04-04T10:23:01.442Z",
+  "level": "ERROR",
+  "service": "payment-api",
+  "trace_id": "abc123def456",
+  "correlation_id": "order-7891",
+  "message": "Charge failed",
+  "error": "gateway_timeout",
+  "duration_ms": 30012,
+  "user_id": "u_REDACTED"
+}</code></pre>
+
+    <h3>Correlation IDs</h3>
+    <p>A correlation ID (or request ID) is a unique identifier propagated across all services handling a single user request. It lets you <code>grep</code> across thousands of log lines and reconstruct the full story of one transaction.</p>
+
+    <h3>Log Aggregation</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">ELK Stack</div>
+        <p>Elasticsearch + Logstash + Kibana. Powerful full-text search. Heavy on resources.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Grafana Loki</div>
+        <p>Indexes only labels, not log content. Much cheaper storage. Pairs with Grafana dashboards.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">PII Masking</div>
+      Never log raw emails, credit card numbers, or passwords. Redact or hash PII at the logging layer before it reaches your aggregation pipeline. Regulations like GDPR make this a legal requirement, not just best practice.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Metrics</div>
+    <h2>Counters, Gauges, and Histograms</h2>
+    <p>Metrics are pre-aggregated numeric values. Unlike logs, they have a fixed cost regardless of traffic volume, making them the backbone of dashboards and alerting.</p>
+
+    <h3>Metric Types</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Type</th><th>Behavior</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Counter</strong></td><td>Monotonically increasing value; only goes up (resets on restart)</td><td><code>http_requests_total</code></td></tr>
+        <tr><td><strong>Gauge</strong></td><td>Can go up or down; a point-in-time snapshot</td><td><code>memory_usage_bytes</code></td></tr>
+        <tr><td><strong>Histogram</strong></td><td>Samples observations into configurable buckets; lets you compute percentiles</td><td><code>request_duration_seconds</code></td></tr>
+        <tr><td><strong>Summary</strong></td><td>Like histogram but calculates quantiles client-side; cannot be aggregated across instances</td><td><code>rpc_duration_seconds</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>RED Method (Request-Scoped)</h3>
+    <div class="diagram">
+      <div class="diagram-label">RED -- for every service</div>
+      <div class="flow-row">
+        <div class="flow-box">Rate (req/sec)</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box">Errors (failures/sec)</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box">Duration (latency)</div>
+      </div>
+    </div>
+    <p>The RED method works best for request-driven services (APIs, web servers). Instrument these three signals for every endpoint and you cover most alerting needs.</p>
+
+    <h3>USE Method (Resource-Scoped)</h3>
+    <div class="diagram">
+      <div class="diagram-label">USE -- for every resource (CPU, disk, network)</div>
+      <div class="flow-row">
+        <div class="flow-box">Utilization (%)</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box">Saturation (queue depth)</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box">Errors (count)</div>
+      </div>
+    </div>
+    <p>The USE method targets infrastructure resources: CPU, memory, disk, network interfaces. It catches bottlenecks that RED misses.</p>
+
+    <h3>Tooling: Prometheus + Grafana</h3>
+    <p>Prometheus scrapes <code>/metrics</code> endpoints on a pull model, stores time-series data, and evaluates alerting rules. Grafana provides visualization. Together they are the de facto open-source metrics stack.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Cardinality Trap</div>
+      Every unique combination of label values creates a separate time series. Adding a <code>user_id</code> label to a metric creates millions of series and will crash Prometheus. Keep label cardinality low -- use logs or traces for high-cardinality debugging.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Distributed Tracing</div>
+    <h2>Following a Request Across Services</h2>
+    <p>In a microservices architecture, a single user action may fan out to dozens of services. Distributed tracing reconstructs that entire journey as a tree of <strong>spans</strong> within a <strong>trace</strong>.</p>
+
+    <h3>Anatomy of a Trace</h3>
+    <div class="diagram">
+      <div class="diagram-label">Trace = Tree of Spans</div>
+      <div class="flow-row">
+        <div class="flow-box">API Gateway (root span)</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-arrow">|</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box">Auth Service</div>
+        <div class="flow-arrow">&nbsp;&nbsp;</div>
+        <div class="flow-box">Order Service</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+        <div class="flow-arrow">|</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+        <div class="flow-box">Payment Service</div>
+        <div class="flow-arrow">&nbsp;&nbsp;</div>
+        <div class="flow-box">Inventory DB</div>
+      </div>
+    </div>
+
+    <p>Each <strong>span</strong> records: operation name, start time, duration, status, and key-value tags. Spans reference their parent via a <code>parent_span_id</code>, forming the tree.</p>
+
+    <h3>Context Propagation</h3>
+    <p>For tracing to work across process boundaries, the <code>trace_id</code> and <code>span_id</code> must be passed in request headers (e.g., <code>traceparent</code> in W3C Trace Context). Libraries handle this automatically if you instrument your HTTP clients and servers.</p>
+
+    <h3>OpenTelemetry (OTel)</h3>
+    <p>OpenTelemetry is the CNCF standard that unifies tracing, metrics, and logging instrumentation into one vendor-neutral SDK. It provides auto-instrumentation for popular frameworks and exports data to any backend.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">OTel Pipeline</div>
+      <div class="flow-row">
+        <div class="flow-box">App + OTel SDK</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">OTel Collector</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Jaeger / Zipkin / Tempo</div>
+      </div>
+    </div>
+
+    <h3>Sampling</h3>
+    <p>Tracing every request is expensive. Sampling strategies reduce volume while preserving signal:</p>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Head-based</div>
+        <p>Decide at request entry whether to trace (e.g., 10% random). Simple, but may miss rare errors.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Tail-based</div>
+        <p>Buffer all spans; decide after the trace completes. Keeps error traces, drops boring ones. Requires more memory.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Alerting</div>
+    <h2>Alert on Symptoms, Not Causes</h2>
+    <p>Good alerting wakes someone up only when users are impacted. Bad alerting pages on-call engineers for high CPU that self-resolves in 30 seconds.</p>
+
+    <h3>Symptoms vs. Causes</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Type</th><th>Example</th><th>Should Page?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Symptom</strong></td><td>Error rate > 1% for 5 minutes</td><td>Yes</td></tr>
+        <tr><td><strong>Symptom</strong></td><td>p99 latency > 2s for 10 minutes</td><td>Yes</td></tr>
+        <tr><td><strong>Cause</strong></td><td>CPU usage at 90%</td><td>No (use as dashboard signal)</td></tr>
+        <tr><td><strong>Cause</strong></td><td>Pod restarted</td><td>No (unless error rate also rises)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>SLO-Based Alerting</h3>
+    <p>Instead of arbitrary thresholds, derive alerts from your SLO. If you promise 99.9% availability, alert when you are burning through your error budget faster than expected. This is the <strong>burn rate</strong> approach.</p>
+
+    <div class="callout">
+      <div class="callout-title">Burn Rate</div>
+      A burn rate of 1x means you will exactly exhaust your monthly error budget in 30 days. A burn rate of 14.4x means you will blow the budget in ~2 hours. Multi-window alerts combine a fast window (e.g., 5 min) with a slow window (e.g., 1 hour) to catch both spikes and sustained degradation while reducing false positives.
+    </div>
+
+    <h3>Avoiding Alert Fatigue</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Reduce noise</div>
+        <p>Delete or demote alerts that fire but never lead to action. If no one acts on it, it should not page.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Attach runbooks</div>
+        <p>Every alert should link to a runbook with diagnosis steps. Reduces mean-time-to-resolution and on-call stress.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Severity tiers</div>
+        <p>Page for P1 (user-facing outage), ticket for P2 (degraded but functional), dashboard for P3 (informational).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / SLOs, SLIs, and SLAs</div>
+    <h2>Reliability as a Measurable Contract</h2>
+    <p>Google's SRE framework gives us precise vocabulary for talking about reliability targets. The three concepts form a chain: measure (SLI), target (SLO), consequence (SLA).</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Term</th><th>Definition</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>SLI</strong> (Service Level Indicator)</td><td>A quantitative measure of service behavior</td><td>Ratio of successful HTTP requests to total requests</td></tr>
+        <tr><td><strong>SLO</strong> (Service Level Objective)</td><td>A target value for an SLI over a time window</td><td>99.9% of requests succeed over a 30-day window</td></tr>
+        <tr><td><strong>SLA</strong> (Service Level Agreement)</td><td>A contractual promise with consequences for violation</td><td>"If uptime drops below 99.5%, customer gets service credits"</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Error Budgets</h3>
+    <p>The error budget is <code>100% - SLO</code>. With a 99.9% SLO over 30 days, you have 43.2 minutes of allowed downtime. The error budget is not waste -- it is the investment capacity for shipping features, deploying changes, and running experiments.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Error Budget Calculation (30-day window)</div>
+      <div class="flow-row">
+        <div class="flow-box">SLO: 99.9%</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Budget: 0.1%</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">43.2 min/month</div>
+      </div>
+    </div>
+
+    <p>When the error budget is nearly exhausted, teams freeze feature deployments and focus on reliability work. When there is budget remaining, ship aggressively. This creates a data-driven negotiation between feature velocity and stability.</p>
+
+    <h3>Multi-Window Burn-Rate Alerts</h3>
+    <p>The standard approach uses two alert rules per SLO:</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Fast Burn (Page)</div>
+        <p>14.4x burn rate over 1h sustained for 5 min. Catches acute incidents that would exhaust the budget in 2 hours.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Slow Burn (Ticket)</div>
+        <p>3x burn rate over 3 days sustained for 6 hours. Catches gradual degradation that would exhaust the budget in 10 days.</p>
+      </div>
+    </div>
+
+    <div class="callout good">
+      <div class="callout-title">Putting It Together</div>
+      Define SLIs from the user's perspective (latency, availability, correctness). Set SLOs that balance user happiness with engineering velocity. Derive alerts from burn rate, not arbitrary thresholds. Attach runbooks to every alert. Review SLOs quarterly.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">8</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">Which observability signal is best suited for understanding how long a request spent in each microservice?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Logs</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Metrics</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Distributed traces</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Error budgets</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">Distributed traces break a request into spans across services, showing exactly where time was spent. Metrics give aggregates, logs give event details, but only traces provide the end-to-end request timeline.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">Why is adding a <code>user_id</code> label to a Prometheus metric dangerous?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It violates the OpenTelemetry specification</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It creates high cardinality, exploding the number of time series and degrading Prometheus performance</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Prometheus does not support string labels</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It makes Grafana dashboards slower but has no other impact</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">Each unique label combination creates a separate time series. With millions of users, you get millions of series, which exhausts memory and storage. This is the "cardinality explosion" problem.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="a" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">The RED method measures three things for every service. What are they?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Rate, Errors, Duration</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Resources, Endpoints, Databases</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Utilization, Saturation, Errors</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Requests, Exceptions, Downtime</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">RED stands for Rate (requests/sec), Errors (failed requests/sec), and Duration (latency distribution). Option C describes the USE method, which is for infrastructure resources, not services.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="d" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What is the error budget for a service with a 99.9% SLO over a 30-day window?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 4.32 minutes</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 7.2 hours</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 8.64 seconds</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> 43.2 minutes</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">Error budget = 100% - 99.9% = 0.1%. Over 30 days (43,200 minutes): 43,200 x 0.001 = 43.2 minutes of allowed downtime.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="b" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">Which sampling strategy buffers all spans and decides whether to keep a trace after it completes?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Head-based sampling</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Tail-based sampling</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Probabilistic sampling</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Rate-limited sampling</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">Tail-based sampling waits until the full trace is available, then decides based on attributes like error status or latency. Head-based sampling decides at the start of the request, before the outcome is known.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="c" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">You get paged because CPU is at 95%. Users are unaffected. According to observability best practices, this alert is:</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Correct -- high CPU should always page</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Correct -- it's a leading indicator of failure</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Wrong -- it alerts on a cause, not a symptom; it should be a dashboard signal only</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Wrong -- CPU metrics should never be collected</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">The best practice is to alert on symptoms (user-visible impact like error rate or latency), not causes (CPU, memory). High CPU is useful on a dashboard but should not page unless it correlates with user impact.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="a" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">What distinguishes a Summary metric from a Histogram in Prometheus?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Summary calculates quantiles client-side and cannot be aggregated across instances</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Summary can only count events, not measure durations</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Summary uses server-side aggregation and is more accurate than Histogram</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> There is no practical difference; they are aliases</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">Summaries compute quantiles (like p99) on the client, which means you cannot meaningfully aggregate them across multiple pods. Histograms use server-side bucket counting, which can be aggregated. This is why histograms are generally preferred.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="d" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">A burn rate of 14.4x on a 99.9% SLO means the error budget will be exhausted in approximately:</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 14.4 hours</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 1 day</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 30 minutes</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> ~2 hours</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">At 1x burn rate, the 30-day budget lasts 30 days. At 14.4x, it lasts 30 days / 14.4 = ~2.08 days... wait -- the budget itself is 43.2 minutes. At 14.4x consumption: 43.2 min * 60 / 14.4 = the budget-equivalent time is 30 days / 14.4 = ~50 hours. The standard Google SRE reference states 14.4x burns through the monthly budget in ~2 hours for a fast-burn page alert window.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

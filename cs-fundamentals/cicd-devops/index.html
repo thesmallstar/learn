@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CI/CD & DevOps — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">DevOps</a>
+    <span>/</span>
+    <span style="color:var(--text);">CI/CD & DevOps</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">DevOps</div>
+  <h1>CI/CD <span class="thin">&</span> DevOps</h1>
+  <p class="header-sub">From Git internals and continuous integration pipelines to deployment strategies, infrastructure as code, and immutable infrastructure -- the full lifecycle of modern software delivery.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1: Git Internals ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Git Internals</div>
+    <h2>Git's Object Model & Workflows</h2>
+    <p>Git is a content-addressable filesystem. Every piece of data is stored as an object identified by its SHA-1 hash. Understanding the four object types and how they compose is the key to mastering Git.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Blob</div>
+        <p>Stores file contents. No filename, no metadata -- just raw bytes identified by SHA-1. Two files with identical content share one blob.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Tree</div>
+        <p>A directory listing. Maps filenames to blob hashes (and sub-trees). Represents a snapshot of the project's directory structure.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Commit</div>
+        <p>Points to a tree (project snapshot), parent commit(s), author, committer, and message. Forms the nodes in Git's DAG.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Tag</div>
+        <p>An annotated pointer to a commit (or any object). Includes tagger identity, date, and a message. Lightweight tags are just refs.</p>
+      </div>
+    </div>
+
+    <h3>The DAG, Refs & Index</h3>
+    <p>Commits form a <strong>Directed Acyclic Graph</strong> (DAG) -- each commit points to its parent(s), never creating cycles. Branches and tags are simply <em>refs</em>: mutable pointers (files in <code>.git/refs/</code>) to commit hashes. <code>HEAD</code> is a symbolic ref pointing to the current branch.</p>
+    <p>The <strong>index</strong> (staging area) sits between your working directory and the repository. <code>git add</code> writes blobs and updates the index; <code>git commit</code> converts the index into a tree and creates a commit object.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Git object relationships</div>
+      <div class="flow-row">
+        <div class="flow-box">Working Dir</div>
+        <div class="flow-arrow">git add</div>
+        <div class="flow-box">Index (Stage)</div>
+        <div class="flow-arrow">git commit</div>
+        <div class="flow-box">Commit (DAG)</div>
+      </div>
+      <div class="flow-row" style="margin-top:0.8rem;">
+        <div class="flow-box">Commit</div>
+        <div class="flow-arrow">points to</div>
+        <div class="flow-box">Tree</div>
+        <div class="flow-arrow">contains</div>
+        <div class="flow-box">Blobs</div>
+      </div>
+    </div>
+
+    <h3>Merge vs Rebase</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Aspect</th><th>Merge</th><th>Rebase</th></tr></thead>
+      <tbody>
+        <tr><td>History</td><td>Preserves full branch topology (merge commit)</td><td>Produces a linear history</td></tr>
+        <tr><td>Conflict resolution</td><td>Once, in the merge commit</td><td>Per-commit during replay</td></tr>
+        <tr><td>Shared branches</td><td>Safe to use anytime</td><td>Never rebase published/shared commits</td></tr>
+        <tr><td>Use case</td><td>Feature integration, preserving context</td><td>Cleaning up local work before merging</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Git Bisect</div>
+      <code>git bisect</code> performs a binary search through commit history to find the exact commit that introduced a bug. You mark a known-good and known-bad commit, and Git checks out the midpoint for you to test. This reduces an N-commit search to O(log N) steps. It can be fully automated with <code>git bisect run &lt;test-script&gt;</code>.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2: Continuous Integration ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Continuous Integration</div>
+    <h2>CI: Fast Feedback on Every Commit</h2>
+    <p>Continuous Integration is the practice of merging developer work into a shared mainline frequently -- ideally multiple times per day. Each integration triggers an automated pipeline that builds, tests, and reports results within minutes.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">CI Pipeline Flow</div>
+      <div class="flow-row">
+        <div class="flow-box">Commit</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Build</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Unit Tests</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Static Analysis</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Report</div>
+      </div>
+    </div>
+
+    <h3>The Fast Feedback Loop</h3>
+    <p>The core principle: developers should know within <strong>10 minutes</strong> if their change broke something. This requires fast builds, parallelized test suites, and caching of dependencies and build artifacts. If CI is slow, developers batch changes and integration becomes painful.</p>
+
+    <h3>Static Analysis (SAST)</h3>
+    <p><strong>Static Application Security Testing</strong> analyzes source code without executing it. Tools like SonarQube, Semgrep, and CodeQL scan for security vulnerabilities (SQL injection, XSS, hardcoded secrets), code smells, and style violations. SAST runs early in the pipeline because it needs no running environment.</p>
+
+    <h3>Dependency Scanning (SCA)</h3>
+    <p><strong>Software Composition Analysis</strong> examines your dependency tree (package-lock.json, requirements.txt, go.sum) against known vulnerability databases (CVE/NVD). Tools like Dependabot, Snyk, and Trivy alert on vulnerable transitive dependencies and can auto-generate upgrade PRs.</p>
+
+    <div class="callout good">
+      <div class="callout-title">CI Best Practices</div>
+      Keep the mainline always green. If a build breaks, fixing it takes priority over new features. Use branch protection rules to require passing CI before merge. Run linting and formatting checks as the first pipeline step -- they're fast and catch the most common issues.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 3: Continuous Delivery / Deployment ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Continuous Delivery & Deployment</div>
+    <h2>CD: From Build to Production</h2>
+    <p>Continuous Delivery ensures that code is <em>always</em> in a deployable state and that releasing to production is a one-click decision. Continuous Deployment goes further: every change that passes the pipeline is automatically deployed with no human gate.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Aspect</th><th>Continuous Delivery</th><th>Continuous Deployment</th></tr></thead>
+      <tbody>
+        <tr><td>Production release</td><td>Manual approval / button click</td><td>Fully automated</td></tr>
+        <tr><td>Risk tolerance</td><td>Lower -- human reviews each release</td><td>Higher -- relies on automated quality gates</td></tr>
+        <tr><td>Feedback speed</td><td>Fast (hours)</td><td>Fastest (minutes)</td></tr>
+        <tr><td>Prerequisite</td><td>Solid CI + staging environment</td><td>Solid CI + canary/rollback automation</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Pipeline Stages</h3>
+    <div class="diagram">
+      <div class="diagram-label">Typical CD Pipeline</div>
+      <div class="flow-row">
+        <div class="flow-box">CI (build+test)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Artifact Store</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Staging</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Approval Gate</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Production</div>
+      </div>
+    </div>
+
+    <h3>Artifact Management</h3>
+    <p>Build artifacts (Docker images, JARs, binaries) are stored in a versioned registry (Docker Hub, ECR, Artifactory, Nexus). Each artifact is <strong>immutable</strong> and tagged with the commit SHA or semantic version. The same artifact that passes staging is the one deployed to production -- never rebuild for a different environment.</p>
+
+    <h3>Environment Promotion</h3>
+    <p>Code progresses through environments: <code>dev</code> &rarr; <code>staging</code> &rarr; <code>production</code>. Configuration differs per environment (via env vars or config files), but the <strong>artifact stays the same</strong>. This guarantees that what you tested is what you deploy. Promotion can be automated (continuous deployment) or gated by manual approval.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Common Pitfall</div>
+      Rebuilding artifacts for each environment introduces drift. A test that passes in staging may fail in production if the binary is different. Always promote the same artifact and inject environment-specific config externally.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4: Deployment Strategies ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Deployment Strategies</div>
+    <h2>Rolling, Blue-Green, Canary & More</h2>
+    <p>How you roll out changes to production determines your blast radius when things go wrong. Each strategy trades off between speed, safety, and infrastructure cost.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Rolling Update</div>
+        <p>Replace instances one-by-one (or batch-by-batch). Zero downtime, but old and new versions coexist briefly. Default in Kubernetes Deployments.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Blue-Green</div>
+        <p>Run two identical environments. Deploy to the idle one ("green"), test it, then switch the load balancer. Instant rollback by switching back. Requires 2x infrastructure.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Canary</div>
+        <p>Route a small percentage of traffic (1-5%) to the new version. Monitor error rates and latency. Gradually increase traffic if metrics look good. Rollback is trivial.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Feature Flags</div>
+        <p>Deploy code to all users but toggle features on/off at runtime. Decouples deployment from release. Enables A/B testing and gradual rollouts without redeploying.</p>
+      </div>
+    </div>
+
+    <h3>Database Migrations</h3>
+    <p>Schema changes are the hardest part of zero-downtime deployments. The key principle: <strong>make migrations backward-compatible</strong>. Use the expand-contract pattern:</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Expand-Contract Migration Pattern</div>
+      <div class="flow-row">
+        <div class="flow-box">1. Add new column</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">2. Deploy code (reads both)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">3. Backfill data</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">4. Drop old column</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">Never Do This</div>
+      Renaming a column or changing its type in a single migration will break running application instances that expect the old schema. Always expand first (add new), migrate data, update code, then contract (remove old).
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 5: Infrastructure as Code ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Infrastructure as Code</div>
+    <h2>IaC: Terraform, CloudFormation & GitOps</h2>
+    <p>Infrastructure as Code (IaC) means defining servers, networks, and services in version-controlled configuration files instead of clicking through consoles. This makes infrastructure reproducible, reviewable, and auditable.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Terraform</div>
+        <p>Declarative, provider-agnostic. Uses HCL. Maintains a <strong>state file</strong> that maps config to real resources. Plan before apply. Multi-cloud support.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">CloudFormation</div>
+        <p>AWS-native IaC. JSON/YAML templates. Manages stacks with automatic rollback on failure. Deep AWS integration but single-cloud only.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Pulumi</div>
+        <p>Define infrastructure in real programming languages (TypeScript, Python, Go). Full IDE support, loops, conditionals. Uses a state backend like Terraform.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">GitOps</div>
+        <p>Git as the single source of truth. ArgoCD/Flux watch a repo and reconcile cluster state to match. Pull-based model. Audit trail is the commit log.</p>
+      </div>
+    </div>
+
+    <h3>Terraform State</h3>
+    <p>Terraform's state file (<code>terraform.tfstate</code>) is a JSON mapping between your HCL resources and real-world infrastructure IDs. It enables <code>terraform plan</code> to diff desired vs. actual state. State must be stored remotely (S3, GCS, Terraform Cloud) with locking (DynamoDB) to prevent concurrent modifications.</p>
+
+    <pre><code># Terraform remote state backend
+terraform {
+  backend "s3" {
+    bucket         = "my-terraform-state"
+    key            = "prod/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
+  }
+}</code></pre>
+
+    <h3>GitOps: ArgoCD & Flux</h3>
+    <p>GitOps applies the Git workflow to infrastructure. The desired state of your Kubernetes cluster is declared in a Git repository. A controller (ArgoCD or Flux) continuously watches the repo and reconciles the cluster to match. Drift detection is automatic -- if someone manually changes the cluster, the controller reverts it.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">GitOps Reconciliation Loop</div>
+      <div class="flow-row">
+        <div class="flow-box">Git Push</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">ArgoCD detects diff</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Sync to cluster</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Healthy state</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      GitOps uses a <strong>pull model</strong>: the cluster pulls desired state from Git, rather than CI pushing deployments into the cluster. This means the cluster never needs inbound network access from CI, improving security.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6: Immutable Infrastructure & Config Management ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Immutable Infrastructure & Configuration Management</div>
+    <h2>Immutable Infra & Ansible</h2>
+    <p>Two contrasting philosophies for managing servers: treat them as <strong>cattle</strong> (immutable, replaceable) or <strong>pets</strong> (mutable, carefully maintained). Modern practice strongly favors the cattle approach.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Aspect</th><th>Mutable (Pets)</th><th>Immutable (Cattle)</th></tr></thead>
+      <tbody>
+        <tr><td>Updates</td><td>SSH in, run commands, patch in place</td><td>Build new image, replace old instances</td></tr>
+        <tr><td>Drift</td><td>High risk -- servers diverge over time</td><td>None -- every instance is from the same image</td></tr>
+        <tr><td>Rollback</td><td>Difficult (undo scripts, hope for the best)</td><td>Trivial (deploy previous image)</td></tr>
+        <tr><td>Debugging</td><td>Check each server individually</td><td>All instances identical, reproduce locally</td></tr>
+        <tr><td>Tools</td><td>Ansible, Chef, Puppet</td><td>Packer + Terraform, Docker, AMIs</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Immutable Infrastructure</h3>
+    <p>With immutable infrastructure, you never modify a running server. Instead, you bake a new machine image (AMI, Docker image) with every change, test it, then replace running instances. This eliminates configuration drift and makes rollback as simple as pointing to the previous image version.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Immutable Deployment Flow</div>
+      <div class="flow-row">
+        <div class="flow-box">Code Change</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Build Image (Packer/Docker)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Test Image</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box">Replace Instances</div>
+      </div>
+    </div>
+
+    <h3>Configuration Management with Ansible</h3>
+    <p>Ansible is an agentless configuration management tool that uses SSH to push configuration to servers. It uses YAML playbooks to declare desired state. While it's traditionally a "mutable infrastructure" tool, it's still widely used for provisioning base images and for environments where full immutability isn't practical.</p>
+
+    <pre><code># Ansible playbook example
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Copy config
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify: restart nginx
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted</code></pre>
+
+    <div class="callout good">
+      <div class="callout-title">Modern Best Practice</div>
+      Use Ansible (or similar) to build your base images, then use Terraform to deploy those images as immutable infrastructure. This combines the strengths of both: declarative provisioning for image creation, and immutable replacement for deployment.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">In Git's object model, which object type stores a directory listing that maps filenames to blob hashes?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Blob</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Commit</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Tree</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Tag</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">A tree object maps filenames (and permissions) to blob hashes and sub-tree hashes, representing a directory snapshot. Blobs store only file contents with no name metadata.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">Why should you never rebase commits that have been pushed to a shared branch?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Rebase is slower than merge</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It rewrites commit hashes, causing divergent histories for other collaborators</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Rebase cannot handle merge conflicts</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Rebase deletes the original branch</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">Rebase replays commits with new SHA-1 hashes. If others have based work on the original commits, their histories diverge, leading to duplicated commits and painful conflict resolution.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="d" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">What is the time complexity of finding a bug-introducing commit using git bisect across N commits?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> O(N)</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> O(N^2)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> O(1)</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> O(log N)</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">Git bisect performs a binary search through commit history. Each step halves the search space, so it requires at most log2(N) steps to find the offending commit.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="a" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What does SAST stand for, and when does it run in a CI pipeline?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Static Application Security Testing -- analyzes source code without executing it, early in the pipeline</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Server Application Security Testing -- tests running servers in staging</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Static API Scanning Tool -- validates API contracts at deploy time</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Source Audit Security Toolkit -- runs after deployment to audit logs</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">SAST (Static Application Security Testing) analyzes source code, bytecode, or binaries without executing the program. It runs early in CI because it needs no running environment, catching vulnerabilities like SQL injection and XSS at the code level.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What is the key difference between Continuous Delivery and Continuous Deployment?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Delivery uses containers; Deployment uses VMs</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Delivery requires manual testing; Deployment skips tests</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Delivery requires manual approval to deploy to production; Deployment is fully automated</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> They are identical concepts with different names</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">In Continuous Delivery, every change is proven deployable but a human decides when to release. In Continuous Deployment, every change that passes the automated pipeline goes to production automatically with no manual gate.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">In a blue-green deployment, how is rollback performed?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Redeploy the previous version from source</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Switch the load balancer back to the previous environment</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Run a database restore from backup</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Scale down the new instances gradually</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">Blue-green keeps the previous environment running. Rollback is instant: just point the load balancer back to the "blue" (old) environment. No rebuild or redeployment needed.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="d" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">Why should you avoid rebuilding artifacts for each environment (dev, staging, prod)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It makes builds slower</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It uses more disk space in the registry</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Environment variables cannot be injected into rebuilt artifacts</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Rebuilding introduces drift -- the binary that passed tests may differ from what gets deployed</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">Each build can produce subtly different output (different dependency resolution, timestamps, non-deterministic compilation). Promoting the exact same artifact guarantees that what you tested is what you deploy.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What is the purpose of Terraform's state file?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It maps declared resources to real-world infrastructure IDs so Terraform can compute diffs</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It stores the HCL source code as a compiled binary</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It caches provider plugins to speed up init</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It logs every terraform apply for audit purposes</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">The state file is a JSON document that records the mapping between your HCL resource declarations and the real infrastructure (e.g., AWS resource IDs). This allows <code>terraform plan</code> to diff desired state against actual state and determine what changes to make.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">What distinguishes GitOps from traditional CI/CD push-based deployments?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> GitOps only works with GitHub Actions</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> GitOps requires manual kubectl apply after each commit</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> The cluster pulls desired state from Git rather than CI pushing into the cluster</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> GitOps uses imperative scripts instead of declarative manifests</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">GitOps uses a pull model: a controller like ArgoCD or Flux runs inside the cluster, watches a Git repo, and reconciles cluster state to match. This eliminates the need for CI to have direct cluster access, improving security.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">What is the main advantage of immutable infrastructure over mutable (in-place patching)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> It uses less disk space</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> It eliminates configuration drift -- every instance is built from the same image</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> It allows SSH access for debugging</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> It makes servers boot faster</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">With mutable infrastructure, each server accumulates unique patches and changes over time, causing "configuration drift" where nominally identical servers behave differently. Immutable infrastructure eliminates this by replacing rather than modifying servers.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

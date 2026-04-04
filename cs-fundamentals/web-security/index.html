@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Web Security — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">Cryptography & Security</a>
+    <span>/</span>
+    <span style="color:var(--text);">Web Security</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Cryptography & Security</div>
+  <h1>Web Security</h1>
+  <p class="header-sub">How browsers enforce isolation, how attackers break it, and the headers, tokens, and policies that keep web applications safe.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / Foundations</div>
+    <h2>Same-Origin Policy & CORS</h2>
+
+    <h3>Same-Origin Policy (SOP)</h3>
+    <p>The browser's most fundamental security boundary. Two URLs share an origin only when all three parts match: <strong>protocol</strong>, <strong>host</strong>, and <strong>port</strong>.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>URL</th><th>Compared to https://app.io:443/page</th><th>Same Origin?</th></tr></thead>
+      <tbody>
+        <tr><td><code>https://app.io:443/other</code></td><td>Same protocol, host, port</td><td>Yes</td></tr>
+        <tr><td><code>http://app.io:443/page</code></td><td>Different protocol</td><td>No</td></tr>
+        <tr><td><code>https://api.app.io:443/page</code></td><td>Different host (subdomain)</td><td>No</td></tr>
+        <tr><td><code>https://app.io:8080/page</code></td><td>Different port</td><td>No</td></tr>
+      </tbody>
+    </table>
+
+    <p>SOP blocks cross-origin reads by default: scripts on origin A cannot read responses from origin B. Writes (form submissions, navigations) and embeds (images, scripts, iframes) are generally allowed.</p>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      SOP protects <em>reading</em> data, not <em>sending</em> requests. A cross-origin POST still fires; the browser just hides the response. This is why CSRF attacks are possible even with SOP in place.
+    </div>
+
+    <h3>Cross-Origin Resource Sharing (CORS)</h3>
+    <p>CORS is the opt-in mechanism that lets a server relax SOP for specific origins. The server declares who may read its responses via <code>Access-Control-*</code> headers.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">CORS Preflight Flow</div>
+      <div class="flow-row">
+        <div class="flow-box">Browser</div>
+        <div class="flow-arrow">OPTIONS /api</div>
+        <div class="flow-box">Server</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box">Server</div>
+        <div class="flow-arrow">Access-Control-Allow-*</div>
+        <div class="flow-box">Browser</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box">Browser</div>
+        <div class="flow-arrow">Actual GET/POST</div>
+        <div class="flow-box">Server</div>
+      </div>
+    </div>
+
+    <p><strong>Simple requests</strong> (GET/POST with standard headers and content types like <code>text/plain</code>) skip preflight. <strong>Preflighted requests</strong> (custom headers, methods like PUT/DELETE, or JSON content type) trigger an <code>OPTIONS</code> preflight first.</p>
+
+    <pre><code># Key CORS response headers
+Access-Control-Allow-Origin: https://app.io
+Access-Control-Allow-Methods: GET, POST, PUT
+Access-Control-Allow-Headers: Content-Type, Authorization
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 86400</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">Warning</div>
+      Setting <code>Access-Control-Allow-Origin: *</code> with <code>Access-Control-Allow-Credentials: true</code> is rejected by browsers. If you need credentials, you must specify the exact origin.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / Injection Attacks</div>
+    <h2>Cross-Site Scripting (XSS)</h2>
+
+    <p>XSS lets an attacker inject malicious scripts into pages viewed by other users. The browser executes the script in the context of the victim's session, giving access to cookies, DOM, and APIs.</p>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Reflected XSS</div>
+        <p>Malicious input is echoed back in the server response. Requires the victim to click a crafted link. Example: search query reflected in results page without escaping.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Stored XSS</div>
+        <p>Payload is persisted (database, comment, profile field) and served to every user who views the page. More dangerous because no user interaction beyond visiting the page is needed.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">DOM-Based XSS</div>
+        <p>The vulnerability is entirely in client-side JavaScript. The page reads from a source (e.g., <code>location.hash</code>) and writes to a sink (e.g., <code>innerHTML</code>) without sanitization.</p>
+      </div>
+    </div>
+
+    <h3>Prevention</h3>
+
+    <table class="cmp-table">
+      <thead><tr><th>Defense</th><th>What It Does</th><th>Limitation</th></tr></thead>
+      <tbody>
+        <tr><td>Output escaping</td><td>Encode <code>&lt; &gt; &amp; " '</code> before inserting into HTML</td><td>Must be context-aware (HTML vs. JS vs. URL)</td></tr>
+        <tr><td>Input sanitization</td><td>Strip or neutralize dangerous tags/attributes (e.g., DOMPurify)</td><td>Allow-lists are fragile; keep libraries updated</td></tr>
+        <tr><td>Content Security Policy</td><td>Browser-enforced allow-list of script sources</td><td>Complex to deploy; <code>unsafe-inline</code> weakens it</td></tr>
+        <tr><td><code>HttpOnly</code> cookies</td><td>Prevents <code>document.cookie</code> access from JS</td><td>Doesn't prevent XSS itself, only limits cookie theft</td></tr>
+      </tbody>
+    </table>
+
+    <pre><code>// BAD: DOM-based XSS
+document.getElementById('output').innerHTML = location.hash.slice(1);
+
+// GOOD: use textContent instead
+document.getElementById('output').textContent = location.hash.slice(1);</code></pre>
+  </div>
+
+  <!-- ═══════════ SECTION 3 ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / Forged Requests</div>
+    <h2>Cross-Site Request Forgery (CSRF)</h2>
+
+    <p>CSRF tricks a logged-in user's browser into making an unwanted request to a site where they're authenticated. The browser automatically attaches cookies, so the server sees a legitimate session.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">CSRF Attack Flow</div>
+      <div class="flow-row">
+        <div class="flow-box">User visits evil.com</div>
+        <div class="flow-arrow">-></div>
+        <div class="flow-box">evil.com serves hidden form</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box">Browser auto-submits form to bank.com</div>
+        <div class="flow-arrow">-></div>
+        <div class="flow-box">bank.com sees valid session cookie</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box">bank.com processes transfer</div>
+      </div>
+    </div>
+
+    <h3>Prevention</h3>
+
+    <table class="cmp-table">
+      <thead><tr><th>Defense</th><th>How It Works</th></tr></thead>
+      <tbody>
+        <tr><td>CSRF tokens</td><td>Server embeds a random token in forms; verifies it on submission. The attacker's page cannot read the token due to SOP.</td></tr>
+        <tr><td><code>SameSite</code> cookies</td><td><code>SameSite=Strict</code> blocks the cookie on all cross-site requests. <code>SameSite=Lax</code> allows top-level GET navigations but blocks cross-site POST.</td></tr>
+        <tr><td>Double-submit cookie</td><td>Token sent as both a cookie and a request parameter. Server checks they match. No server-side state needed.</td></tr>
+        <tr><td>Custom request headers</td><td>Require a custom header (e.g., <code>X-Requested-With</code>) that triggers CORS preflight, which the attacker's form cannot set.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">Modern Default</div>
+      Most browsers now default to <code>SameSite=Lax</code>, which blocks cross-site POST requests from automatically attaching cookies. This significantly reduces CSRF risk without any server-side changes.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4 ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Security Headers</div>
+    <h2>Content Security Policy & Cookies</h2>
+
+    <h3>Content Security Policy (CSP)</h3>
+    <p>CSP is a response header that tells the browser which sources of content are allowed. It is the strongest defense against XSS because it prevents inline scripts and restricts where scripts can load from.</p>
+
+    <pre><code>Content-Security-Policy:
+  default-src 'self';
+  script-src 'self' 'nonce-abc123' https://cdn.example.com;
+  style-src 'self' 'unsafe-inline';
+  img-src *;
+  connect-src 'self' https://api.example.com;
+  frame-ancestors 'none';</code></pre>
+
+    <table class="cmp-table">
+      <thead><tr><th>Directive</th><th>Controls</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><code>default-src</code></td><td>Fallback for all resource types</td><td><code>'self'</code></td></tr>
+        <tr><td><code>script-src</code></td><td>JavaScript sources</td><td><code>'nonce-xyz' https://cdn.io</code></td></tr>
+        <tr><td><code>style-src</code></td><td>CSS sources</td><td><code>'self' 'sha256-...'</code></td></tr>
+        <tr><td><code>img-src</code></td><td>Image sources</td><td><code>* data:</code></td></tr>
+        <tr><td><code>connect-src</code></td><td>Fetch, XHR, WebSocket targets</td><td><code>'self' https://api.io</code></td></tr>
+        <tr><td><code>frame-ancestors</code></td><td>Who can embed this page in an iframe</td><td><code>'none'</code> (prevents clickjacking)</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Nonces:</strong> Generate a random nonce per request and include it in both the CSP header and each <code>&lt;script nonce="..."&gt;</code> tag. Only scripts with the matching nonce execute. <strong>Hashes:</strong> Alternatively, specify the SHA-256 hash of the inline script content in the CSP header.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Warning</div>
+      <code>'unsafe-inline'</code> and <code>'unsafe-eval'</code> defeat the purpose of CSP. If you must use inline scripts, use nonces or hashes instead.
+    </div>
+
+    <h3>Cookie Security Attributes</h3>
+
+    <table class="cmp-table">
+      <thead><tr><th>Attribute</th><th>Purpose</th><th>Recommended Value</th></tr></thead>
+      <tbody>
+        <tr><td><code>Secure</code></td><td>Cookie only sent over HTTPS</td><td>Always set for session cookies</td></tr>
+        <tr><td><code>HttpOnly</code></td><td>Blocks JavaScript access via <code>document.cookie</code></td><td>Always set for session cookies</td></tr>
+        <tr><td><code>SameSite</code></td><td>Controls cross-site cookie sending</td><td><code>Lax</code> (default) or <code>Strict</code></td></tr>
+        <tr><td><code>Domain</code></td><td>Which domains receive the cookie</td><td>Omit to restrict to exact origin</td></tr>
+        <tr><td><code>Path</code></td><td>URL path prefix required for sending</td><td><code>/</code> unless scoping is needed</td></tr>
+      </tbody>
+    </table>
+
+    <pre><code>Set-Cookie: session=abc123;
+  Secure;
+  HttpOnly;
+  SameSite=Lax;
+  Path=/;
+  Max-Age=3600</code></pre>
+  </div>
+
+  <!-- ═══════════ SECTION 5 ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / Other Attacks</div>
+    <h2>Clickjacking, SSRF & More</h2>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Clickjacking</div>
+        <p>Attacker overlays an invisible iframe of the target site over a decoy page. User thinks they're clicking the decoy but actually interacts with the hidden site. Defend with <code>frame-ancestors 'none'</code> in CSP or <code>X-Frame-Options: DENY</code>.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">SSRF</div>
+        <p>Server-Side Request Forgery: attacker tricks the server into making requests to internal services (e.g., cloud metadata endpoints at <code>169.254.169.254</code>). Defend with allow-lists for outbound URLs and blocking private IP ranges.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Open Redirects</div>
+        <p>Application redirects to a user-supplied URL without validation. Attacker uses it for phishing: <code>app.com/redirect?url=evil.com</code>. Defend with allow-lists of permitted redirect domains.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">SQL Injection</div>
+        <p>Attacker injects SQL through user input that is concatenated into queries. Defend with parameterized queries / prepared statements, never string concatenation.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Command Injection</div>
+        <p>User input passed to shell commands (e.g., <code>os.system("ping " + ip)</code>). Defend by avoiding shell calls; use language-native libraries or strict input validation.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Path Traversal</div>
+        <p>Attacker uses <code>../</code> sequences to access files outside the intended directory. Defend by canonicalizing paths and validating they stay within the allowed root.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 6 ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / Framework</div>
+    <h2>OWASP Top 10 Overview</h2>
+
+    <p>The OWASP Top 10 is a widely-adopted awareness document for web application security. The 2021 edition reorganized categories based on data and community input.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>#</th><th>Category</th><th>Key Concern</th></tr></thead>
+      <tbody>
+        <tr><td>A01</td><td>Broken Access Control</td><td>Users acting beyond their permissions; IDOR, missing function-level access control</td></tr>
+        <tr><td>A02</td><td>Cryptographic Failures</td><td>Sensitive data exposure; weak encryption, plaintext storage, missing TLS</td></tr>
+        <tr><td>A03</td><td>Injection</td><td>SQL, NoSQL, OS, LDAP injection via untrusted input in queries/commands</td></tr>
+        <tr><td>A04</td><td>Insecure Design</td><td>Flawed architecture; missing threat modeling, no security by design</td></tr>
+        <tr><td>A05</td><td>Security Misconfiguration</td><td>Default credentials, open cloud storage, verbose error messages, missing headers</td></tr>
+        <tr><td>A06</td><td>Vulnerable Components</td><td>Outdated libraries, frameworks with known CVEs</td></tr>
+        <tr><td>A07</td><td>Auth & Identification Failures</td><td>Broken authentication, session fixation, weak passwords</td></tr>
+        <tr><td>A08</td><td>Software & Data Integrity Failures</td><td>Untrusted CI/CD pipelines, insecure deserialization, unsigned updates</td></tr>
+        <tr><td>A09</td><td>Security Logging & Monitoring Failures</td><td>No audit trail, alerts, or incident detection</td></tr>
+        <tr><td>A10</td><td>Server-Side Request Forgery</td><td>SSRF via unvalidated URLs fetched by the server</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      Broken Access Control moved to #1 in 2021, overtaking Injection. This reflects a shift: frameworks now prevent injection by default (parameterized queries, auto-escaping templates), but access control remains a manual, business-logic problem that developers must implement correctly.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">Which three components define a web origin under the Same-Origin Policy?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Protocol, domain, path</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Host, port, path</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Protocol, host, port</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Domain, subdomain, protocol</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">An origin is defined by the tuple (protocol, host, port). The path is not part of the origin comparison.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">When does a browser send a CORS preflight (OPTIONS) request?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> For every cross-origin request</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> When the request uses custom headers, non-simple methods, or a JSON content type</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Only for GET requests with credentials</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Only when the server explicitly requests it</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">Simple requests (GET/POST with standard headers and content types like text/plain) skip preflight. Any custom header, non-simple method (PUT, DELETE), or content type like application/json triggers a preflight OPTIONS request.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="d" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">Which type of XSS involves a payload that is persisted in the server's database?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Reflected XSS</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> DOM-based XSS</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Self-XSS</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Stored XSS</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">Stored (persistent) XSS saves the malicious payload in the database. Every user who views the affected page gets the script executed in their browser, making it the most dangerous variant.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="a" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">What does the <code>HttpOnly</code> cookie attribute prevent?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> JavaScript access to the cookie via document.cookie</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> The cookie being sent over HTTP (requires HTTPS)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Cross-site request forgery attacks</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> The cookie from being stored in the browser</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">HttpOnly makes the cookie invisible to client-side JavaScript. It doesn't prevent XSS itself, but it stops an XSS payload from stealing session cookies via document.cookie. The Secure flag (not HttpOnly) restricts cookies to HTTPS.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">Why does CSRF work even though the Same-Origin Policy is in place?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> SOP does not apply to POST requests</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> SOP only protects HTTPS origins</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> SOP blocks reading responses, but cross-origin requests with cookies are still sent</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> SOP is disabled when cookies are present</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">SOP prevents reading cross-origin responses, but the request itself (including cookies) is still sent to the server. CSRF exploits this: the attacker doesn't need to read the response, just trigger a state-changing request with the victim's session cookie.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">Which <code>SameSite</code> cookie value blocks the cookie on all cross-site requests, including top-level navigations?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> SameSite=Lax</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> SameSite=Strict</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> SameSite=None</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> SameSite=Secure</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">Strict blocks the cookie on all cross-site requests, even top-level GET navigations (e.g., clicking a link from another site). Lax allows top-level navigations but blocks cross-site sub-requests (forms, AJAX). None sends cookies everywhere but requires the Secure flag.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="d" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">What is the purpose of a CSP nonce?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> To encrypt inline scripts before execution</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> To hash the script content for caching</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> To allow all inline scripts globally</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> To allow specific inline scripts by matching a per-request random token</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">A nonce is a random value generated per request. The server includes it in the CSP header and on each allowed &lt;script&gt; tag. Only scripts with a matching nonce execute, preventing injected scripts from running.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">Which CSP directive prevents a page from being embedded in an iframe (clickjacking defense)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> frame-ancestors 'none'</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> script-src 'self'</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> default-src 'none'</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> connect-src 'self'</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">frame-ancestors controls which origins can embed the page in an iframe, object, or embed. Setting it to 'none' prevents all framing, which is the modern replacement for X-Frame-Options: DENY.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">In the OWASP Top 10 (2021), what is the #1 risk category?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Injection</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Cryptographic Failures</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Broken Access Control</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Security Misconfiguration</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">Broken Access Control rose to #1 in 2021, replacing Injection which dropped to #3. Modern frameworks handle injection well by default, but access control remains a manual, business-logic concern.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">An attacker tricks a server into fetching <code>http://169.254.169.254/latest/meta-data/</code>. What type of attack is this?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Open Redirect</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Server-Side Request Forgery (SSRF)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Cross-Site Scripting (XSS)</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> SQL Injection</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">SSRF occurs when an attacker makes the server issue requests to internal resources. The IP 169.254.169.254 is the cloud metadata endpoint (AWS, GCP, Azure), which can expose credentials and configuration if accessed.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>

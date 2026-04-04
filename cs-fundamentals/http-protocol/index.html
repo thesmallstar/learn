@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HTTP & Web Protocols — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEECE6;
+  --border: #D8D5CC;
+  --border2: #C4C0B6;
+  --accent: #2B5EA7;
+  --accent2: #1A3D6D;
+  --accent-light: rgba(43,94,167,0.08);
+  --accent-glow: rgba(43,94,167,0.15);
+  --green: #1B7D46;
+  --green-bg: rgba(27,125,70,0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192,57,43,0.08);
+  --orange: #D4730E;
+  --orange-bg: rgba(212,115,14,0.07);
+  --purple: #7C3AED;
+  --purple-bg: rgba(124,58,237,0.07);
+  --text: #1B1B1F;
+  --text2: #4A4A52;
+  --muted: #7A7A85;
+  --dim: #A0A0AA;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(246,245,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+nav a { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.06em; }
+nav a:hover { color: var(--accent); }
+.nav-crumb { display: flex; gap: 0.5rem; align-items: center; }
+.nav-crumb span { color: var(--dim); }
+
+/* ── HEADER ── */
+header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 3rem;
+}
+.header-cat {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h1 .thin { font-weight: 300; font-style: italic; color: var(--muted); }
+.header-sub {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.section {
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.6rem;
+}
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+p { margin-bottom: 0.8rem; color: var(--text2); font-size: 0.82rem; }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+.callout.warn { border-left-color: var(--orange); background: var(--orange-bg); }
+.callout.good { border-left-color: var(--green); background: var(--green-bg); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+/* ── CODE ── */
+code {
+  background: var(--surface2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--accent2);
+}
+pre {
+  background: #1B1B1F;
+  color: #E8E6DF;
+  padding: 1.2rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+pre code { background: none; color: inherit; padding: 0; }
+
+/* ── DIAGRAM / VISUAL BOXES ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.2rem 0;
+  text-align: center;
+}
+.diagram-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.flow-box {
+  background: var(--accent-light);
+  border: 1px solid rgba(43,94,167,0.2);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--dim); font-size: 0.9rem; }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.75rem;
+}
+.cmp-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--border);
+}
+.cmp-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.cmp-table tr:hover { background: var(--accent-light); }
+
+/* ── GRID CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.mini-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.mini-card p { font-size: 0.72rem; margin: 0; }
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid var(--border);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.quiz-header h2 { margin-bottom: 0; }
+.quiz-score {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.quiz-score .score-num { color: var(--accent); font-weight: 700; }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: var(--green); background: var(--green-bg); }
+.q-card.wrong { border-color: var(--red); background: var(--red-bg); }
+
+.q-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.q-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.q-options { display: flex; flex-direction: column; gap: 0.4rem; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text2);
+  transition: all 0.15s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.q-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+.q-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.q-opt.correct-answer { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.q-opt.wrong-answer { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.q-opt .opt-letter {
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  color: inherit;
+}
+.q-opt[disabled] { cursor: default; }
+.q-explanation {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 3px;
+  display: none;
+  line-height: 1.6;
+}
+.q-explanation.show { display: block; }
+
+/* ── CHECK ALL BUTTON ── */
+.quiz-actions { margin-top: 1.5rem; text-align: center; }
+.btn-check {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-check:hover { opacity: 0.88; }
+.btn-check:active { transform: scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  header{padding:3rem 1.2rem 2rem}
+  .content{padding:0 1.2rem 3rem}
+  nav{padding:0.6rem 1.2rem}
+  .card-grid{grid-template-columns:1fr}
+  .flow-row{flex-direction:column}
+  footer{padding:2rem 1.2rem}
+}
+
+/* ── PRINT ── */
+@media print {
+  nav { display: none; }
+  body { background: #fff; }
+  .quiz-section { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-crumb">
+    <a href="/">learn.surkar.in</a>
+    <span>/</span>
+    <a href="../">Web Fundamentals</a>
+    <span>/</span>
+    <span style="color:var(--text);">HTTP & Web Protocols</span>
+  </div>
+</nav>
+
+<header>
+  <div class="header-cat">Web Fundamentals</div>
+  <h1>HTTP <span class="thin">&</span> Web Protocols</h1>
+  <p class="header-sub">From HTTP/1.1's plain-text request-response model through HTTP/2's multiplexed streams to HTTP/3's QUIC-powered zero-RTT connections, plus WebSockets, SSE, and gRPC.</p>
+</header>
+
+<div class="content">
+
+  <!-- ═══════════ SECTION 1: HTTP/1.1 ═══════════ -->
+  <div class="section">
+    <div class="section-num">01 / HTTP/1.1</div>
+    <h2>HTTP/1.1 &mdash; The Foundation</h2>
+    <p>HTTP/1.1 (RFC 2616, later refined by RFC 7230-7235) is a text-based, request-response protocol. The client sends a plaintext request with a method, path, headers, and optional body. The server responds with a status code, headers, and a body.</p>
+
+    <h3>Methods</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">GET</div>
+        <p>Retrieve a resource. Safe, idempotent, cacheable. No request body by convention.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">POST</div>
+        <p>Submit data to create a resource or trigger processing. Not idempotent.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">PUT</div>
+        <p>Replace the entire resource at the target URI. Idempotent.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">PATCH</div>
+        <p>Partial update of a resource. Not necessarily idempotent.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">DELETE</div>
+        <p>Remove the resource. Idempotent.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">HEAD / OPTIONS</div>
+        <p>HEAD returns headers only. OPTIONS returns allowed methods (used in CORS preflight).</p>
+      </div>
+    </div>
+
+    <h3>Key Headers</h3>
+    <p><code>Host</code> (required in HTTP/1.1), <code>Content-Type</code>, <code>Content-Length</code>, <code>Authorization</code>, <code>Cache-Control</code>, <code>Accept-Encoding</code>, <code>Connection: keep-alive</code>, <code>Transfer-Encoding: chunked</code>.</p>
+
+    <h3>Status Codes</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Code</th><th>Meaning</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>200</code></td><td>OK</td><td>Standard success response</td></tr>
+        <tr><td><code>201</code></td><td>Created</td><td>Resource created (POST/PUT)</td></tr>
+        <tr><td><code>204</code></td><td>No Content</td><td>Success with no body (DELETE)</td></tr>
+        <tr><td><code>301</code></td><td>Moved Permanently</td><td>Permanent redirect, method may change to GET</td></tr>
+        <tr><td><code>302</code></td><td>Found</td><td>Temporary redirect, method may change</td></tr>
+        <tr><td><code>304</code></td><td>Not Modified</td><td>Cached version is still valid</td></tr>
+        <tr><td><code>400</code></td><td>Bad Request</td><td>Malformed request syntax</td></tr>
+        <tr><td><code>401</code></td><td>Unauthorized</td><td>Missing or invalid authentication</td></tr>
+        <tr><td><code>403</code></td><td>Forbidden</td><td>Authenticated but not authorized</td></tr>
+        <tr><td><code>404</code></td><td>Not Found</td><td>Resource does not exist</td></tr>
+        <tr><td><code>429</code></td><td>Too Many Requests</td><td>Rate limiting; check <code>Retry-After</code></td></tr>
+        <tr><td><code>500</code></td><td>Internal Server Error</td><td>Unhandled server-side failure</td></tr>
+        <tr><td><code>502</code></td><td>Bad Gateway</td><td>Upstream server returned invalid response</td></tr>
+        <tr><td><code>503</code></td><td>Service Unavailable</td><td>Server overloaded or in maintenance</td></tr>
+        <tr><td><code>504</code></td><td>Gateway Timeout</td><td>Upstream server did not respond in time</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Keep-Alive & Chunked Transfer</h3>
+    <p>HTTP/1.0 opened a new TCP connection for every request. HTTP/1.1 defaults to persistent connections via <code>Connection: keep-alive</code>, reusing the same TCP connection for multiple requests. <code>Transfer-Encoding: chunked</code> allows the server to stream a response in pieces without knowing the total <code>Content-Length</code> upfront.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">Head-of-Line (HOL) Blocking</div>
+      HTTP/1.1 processes requests sequentially on a single connection. If one response is slow, all subsequent responses on that connection are blocked. Browsers work around this by opening 6-8 parallel TCP connections per host, but this wastes resources.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 2: HTTP/2 ═══════════ -->
+  <div class="section">
+    <div class="section-num">02 / HTTP/2</div>
+    <h2>HTTP/2 &mdash; Binary & Multiplexed</h2>
+    <p>HTTP/2 (RFC 7540, 2015) keeps the same semantics (methods, status codes, headers) but fundamentally changes how data is framed and transported over the wire.</p>
+
+    <h3>Binary Framing Layer</h3>
+    <p>Instead of plaintext, HTTP/2 uses a binary framing layer. Each HTTP message is broken into small binary frames (HEADERS frame, DATA frame, etc.) that are interleaved on a single TCP connection.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">HTTP/2 Binary Framing</div>
+      <div class="flow-row">
+        <div class="flow-box">Request A (HEADERS)</div>
+        <div class="flow-box">Request B (HEADERS)</div>
+        <div class="flow-box">Response A (DATA)</div>
+        <div class="flow-box">Response B (DATA)</div>
+      </div>
+      <div style="font-size:0.7rem; color:var(--muted); margin-top:0.8rem;">All frames interleaved on a single TCP connection</div>
+    </div>
+
+    <h3>Multiplexing</h3>
+    <p>Multiple requests and responses are sent concurrently as interleaved frames over a single TCP connection. Each request-response pair lives on its own numbered "stream". This eliminates HTTP-level HOL blocking.</p>
+
+    <h3>HPACK Header Compression</h3>
+    <p>HTTP/2 uses HPACK, a purpose-built header compression algorithm. It maintains a dynamic table of previously seen headers on both client and server, sending only indices or diffs for repeated headers. This dramatically reduces overhead &mdash; headers like <code>Cookie</code>, <code>User-Agent</code>, and <code>Authorization</code> are often identical across requests.</p>
+
+    <h3>Server Push</h3>
+    <p>The server can proactively send resources it predicts the client will need (e.g., pushing CSS/JS after receiving an HTML request) using <code>PUSH_PROMISE</code> frames. In practice, this feature was rarely used well and is <strong>deprecated in most browsers</strong> as of 2022.</p>
+
+    <h3>Stream Priority</h3>
+    <p>Clients can assign priority weights and dependencies to streams, hinting to the server which resources to send first (e.g., CSS before images). HTTP/2's priority model was complex and inconsistently implemented, leading to a simpler model in HTTP/3.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">TCP-Level HOL Blocking Remains</div>
+      While HTTP/2 eliminates HTTP-level HOL blocking, TCP still treats all streams as a single byte stream. A single lost TCP packet blocks all streams until retransmission completes. This is the core motivation for HTTP/3.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 3: HTTP/3 & QUIC ═══════════ -->
+  <div class="section">
+    <div class="section-num">03 / HTTP/3 & QUIC</div>
+    <h2>HTTP/3 &mdash; QUIC & UDP</h2>
+    <p>HTTP/3 (RFC 9114, 2022) replaces TCP with QUIC (RFC 9000), a transport protocol built on UDP. QUIC was originally developed by Google and standardized by the IETF.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Protocol Stack Comparison</div>
+      <div class="flow-row">
+        <div class="flow-box">HTTP/1.1 & HTTP/2</div>
+        <div class="flow-arrow">:</div>
+        <div class="flow-box">TCP</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box">TLS 1.2/1.3</div>
+      </div>
+      <div class="flow-row" style="margin-top:0.8rem;">
+        <div class="flow-box">HTTP/3</div>
+        <div class="flow-arrow">:</div>
+        <div class="flow-box">QUIC (UDP + TLS 1.3 built-in)</div>
+      </div>
+    </div>
+
+    <h3>Key Advantages</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">No HOL Blocking</div>
+        <p>QUIC streams are independent. A lost packet on stream A does not block streams B or C &mdash; unlike TCP where all streams share one byte sequence.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">0-RTT Connection Setup</div>
+        <p>QUIC merges the transport and TLS handshakes. Returning clients can send data on the very first packet (0-RTT) using cached keys.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">TLS 1.3 Built-In</div>
+        <p>Encryption is mandatory and integrated into the transport. There is no unencrypted QUIC. Even packet headers are partially encrypted.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Connection Migration</div>
+        <p>Connections are identified by a Connection ID, not the IP:port 4-tuple. Switching from Wi-Fi to cellular keeps the same QUIC connection alive.</p>
+      </div>
+    </div>
+
+    <div class="callout good">
+      <div class="callout-title">Real-World Impact</div>
+      Google reported 2% improvement in Search latency and 3% reduction in YouTube rebuffering when switching from TCP to QUIC. The gains are most significant on lossy mobile networks.
+    </div>
+  </div>
+
+  <!-- ═══════════ SECTION 4: HTTP Version Comparison ═══════════ -->
+  <div class="section">
+    <div class="section-num">04 / Version Comparison</div>
+    <h2>HTTP/1.1 vs HTTP/2 vs HTTP/3</h2>
+    <p>A side-by-side comparison of the three major HTTP versions.</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Feature</th><th>HTTP/1.1</th><th>HTTP/2</th><th>HTTP/3</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Year</td><td>1997</td><td>2015</td><td>2022</td></tr>
+        <tr><td>Transport</td><td>TCP</td><td>TCP</td><td>QUIC (UDP)</td></tr>
+        <tr><td>Framing</td><td>Text-based</td><td>Binary frames</td><td>Binary frames</td></tr>
+        <tr><td>Multiplexing</td><td>No (pipelining, rarely used)</td><td>Yes, over single TCP conn</td><td>Yes, independent QUIC streams</td></tr>
+        <tr><td>HOL Blocking</td><td>HTTP + TCP level</td><td>TCP level only</td><td>None</td></tr>
+        <tr><td>Header Compression</td><td>None</td><td>HPACK</td><td>QPACK</td></tr>
+        <tr><td>Encryption</td><td>Optional (HTTPS)</td><td>Effectively required</td><td>Always (TLS 1.3 built-in)</td></tr>
+        <tr><td>Connection Setup</td><td>TCP + TLS (2-3 RTT)</td><td>TCP + TLS (2-3 RTT)</td><td>1 RTT (0-RTT for returning)</td></tr>
+        <tr><td>Server Push</td><td>No</td><td>Yes (deprecated in browsers)</td><td>Yes (rarely used)</td></tr>
+        <tr><td>Connection Migration</td><td>No</td><td>No</td><td>Yes (Connection ID)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ SECTION 5: WebSockets & SSE ═══════════ -->
+  <div class="section">
+    <div class="section-num">05 / WebSockets & SSE</div>
+    <h2>Real-Time: WebSockets & SSE</h2>
+
+    <h3>WebSockets</h3>
+    <p>WebSockets (RFC 6455) provide full-duplex, bidirectional communication over a single TCP connection. The connection starts as HTTP/1.1 and is upgraded via the <code>Upgrade: websocket</code> header.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">WebSocket Upgrade Handshake</div>
+      <div class="flow-row">
+        <div class="flow-box">Client: GET /chat HTTP/1.1<br>Upgrade: websocket</div>
+        <div class="flow-arrow">-></div>
+        <div class="flow-box">Server: HTTP/1.1 101<br>Switching Protocols</div>
+        <div class="flow-arrow">-></div>
+        <div class="flow-box">Full-duplex<br>frames</div>
+      </div>
+    </div>
+
+    <p>After the handshake, data flows as lightweight frames (2-14 bytes overhead per frame vs. HTTP headers for each message). WebSockets support text and binary frames, ping/pong for keepalive, and close frames for graceful shutdown.</p>
+
+    <div class="callout">
+      <div class="callout-title">Scaling WebSockets</div>
+      Each WebSocket holds a persistent TCP connection, consuming server memory. Common patterns: use a pub/sub broker (Redis, NATS) for fan-out, sticky sessions at the load balancer, and connection limits per server.
+    </div>
+
+    <h3>Server-Sent Events (SSE)</h3>
+    <p>SSE is a simpler, one-way streaming protocol. The server sends events over a long-lived HTTP connection with <code>Content-Type: text/event-stream</code>. The client uses the browser-native <code>EventSource</code> API.</p>
+
+    <pre><code>// Server response
+Content-Type: text/event-stream
+
+event: update
+data: {"price": 42.50}
+
+event: update
+data: {"price": 43.10}</code></pre>
+
+    <p>SSE supports auto-reconnection with <code>Last-Event-ID</code> and event types. It works over standard HTTP/2, benefiting from multiplexing (many SSE streams on one connection).</p>
+
+    <h3>SSE vs WebSocket vs Polling</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Feature</th><th>Polling</th><th>SSE</th><th>WebSocket</th></tr></thead>
+      <tbody>
+        <tr><td>Direction</td><td>Client -> Server</td><td>Server -> Client</td><td>Bidirectional</td></tr>
+        <tr><td>Protocol</td><td>HTTP request/response</td><td>HTTP with text/event-stream</td><td>Upgraded TCP (ws://)</td></tr>
+        <tr><td>Latency</td><td>High (poll interval)</td><td>Low (push)</td><td>Lowest (push, both ways)</td></tr>
+        <tr><td>Reconnection</td><td>Built-in (just poll again)</td><td>Auto (EventSource API)</td><td>Manual implementation</td></tr>
+        <tr><td>Binary Data</td><td>Yes (HTTP body)</td><td>No (text only, Base64 workaround)</td><td>Yes (binary frames)</td></tr>
+        <tr><td>HTTP/2 Compatible</td><td>Yes</td><td>Yes (multiplexed)</td><td>No (requires HTTP/1.1 upgrade)</td></tr>
+        <tr><td>Best For</td><td>Simple, low-frequency updates</td><td>Live feeds, notifications, LLM streaming</td><td>Chat, gaming, collaborative editing</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ SECTION 6: gRPC ═══════════ -->
+  <div class="section">
+    <div class="section-num">06 / gRPC</div>
+    <h2>gRPC &mdash; HTTP/2 RPC Framework</h2>
+    <p>gRPC is a high-performance RPC framework developed by Google. It uses HTTP/2 for transport and Protocol Buffers (protobuf) for serialization by default.</p>
+
+    <h3>How It Works</h3>
+    <div class="diagram">
+      <div class="diagram-label">gRPC Request Flow</div>
+      <div class="flow-row">
+        <div class="flow-box">.proto definition</div>
+        <div class="flow-arrow">-></div>
+        <div class="flow-box">Code generation<br>(client stub + server interface)</div>
+        <div class="flow-arrow">-></div>
+        <div class="flow-box">Binary protobuf<br>over HTTP/2</div>
+      </div>
+    </div>
+
+    <p>Services and messages are defined in <code>.proto</code> files. The <code>protoc</code> compiler generates client stubs and server interfaces in 10+ languages. Calls look like local function calls but execute remotely.</p>
+
+    <pre><code>// example.proto
+service UserService {
+  rpc GetUser (UserRequest) returns (UserResponse);
+  rpc ListUsers (ListRequest) returns (stream UserResponse);
+  rpc Chat (stream ChatMessage) returns (stream ChatMessage);
+}
+
+message UserRequest {
+  string id = 1;
+}</code></pre>
+
+    <h3>Four Streaming Types</h3>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Unary</div>
+        <p>Single request, single response. Like a normal function call.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Server Streaming</div>
+        <p>Client sends one request, server streams back multiple responses.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Client Streaming</div>
+        <p>Client streams multiple messages, server responds once when done.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Bidirectional Streaming</div>
+        <p>Both sides stream messages independently over the same connection.</p>
+      </div>
+    </div>
+
+    <h3>gRPC vs REST</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Aspect</th><th>REST</th><th>gRPC</th></tr></thead>
+      <tbody>
+        <tr><td>Protocol</td><td>HTTP/1.1 or HTTP/2</td><td>HTTP/2 (required)</td></tr>
+        <tr><td>Serialization</td><td>JSON (text)</td><td>Protobuf (binary)</td></tr>
+        <tr><td>Contract</td><td>OpenAPI / informal</td><td>Strict .proto schema</td></tr>
+        <tr><td>Streaming</td><td>Limited (SSE, chunked)</td><td>Native (4 types)</td></tr>
+        <tr><td>Browser Support</td><td>Native</td><td>Requires gRPC-Web proxy</td></tr>
+        <tr><td>Performance</td><td>Good</td><td>Better (smaller payloads, binary, multiplexed)</td></tr>
+        <tr><td>Tooling / Debug</td><td>Easy (curl, browser)</td><td>Harder (needs grpcurl, protobuf decode)</td></tr>
+        <tr><td>Best For</td><td>Public APIs, web clients</td><td>Internal microservices, high-throughput</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good">
+      <div class="callout-title">When to Use gRPC</div>
+      gRPC shines for internal service-to-service communication where performance matters and both sides are code-generated. REST remains better for public APIs consumed by browsers, third-party integrations, and cases where human readability matters.
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>Test Yourself</h2>
+      <div class="quiz-score">Score: <span class="score-num" id="score">0</span> / <span id="total">10</span></div>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="q-card" data-correct="c" id="q1">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">What is the primary problem that HTTP/2 multiplexing solves?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Removes the need for TLS encryption</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Enables binary data in request bodies</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Eliminates HTTP-level head-of-line blocking</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Allows servers to reject malformed requests</button>
+      </div>
+      <div class="q-explanation" id="q1-exp">HTTP/2 multiplexing allows multiple request-response pairs to be interleaved as frames on a single TCP connection, eliminating the HTTP-level HOL blocking that plagued HTTP/1.1. However, TCP-level HOL blocking still exists.</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card" data-correct="b" id="q2">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">Which transport protocol does HTTP/3 use?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> TCP with TLS 1.3</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> QUIC (built on UDP)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> SCTP</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Raw UDP with custom framing</button>
+      </div>
+      <div class="q-explanation" id="q2-exp">HTTP/3 uses QUIC, a transport protocol built on UDP that integrates TLS 1.3. QUIC is not raw UDP &mdash; it provides reliable, ordered, multiplexed streams with built-in encryption.</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card" data-correct="d" id="q3">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">What HTTP status code indicates the client is being rate-limited?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 403 Forbidden</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> 503 Service Unavailable</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> 408 Request Timeout</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> 429 Too Many Requests</button>
+      </div>
+      <div class="q-explanation" id="q3-exp">429 Too Many Requests is the standard status code for rate limiting. It should include a <code>Retry-After</code> header indicating when the client can try again.</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card" data-correct="a" id="q4">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">How does a WebSocket connection begin?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> An HTTP/1.1 GET request with an Upgrade: websocket header</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> A direct TCP connection to a special port</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> An HTTP/2 PUSH_PROMISE frame</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> A QUIC 0-RTT connection</button>
+      </div>
+      <div class="q-explanation" id="q4-exp">WebSocket connections start as a standard HTTP/1.1 request with <code>Upgrade: websocket</code> and <code>Connection: Upgrade</code> headers. The server responds with 101 Switching Protocols, and the connection transitions to the WebSocket framing protocol.</div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card" data-correct="c" id="q5">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">What header compression algorithm does HTTP/2 use?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> gzip</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> QPACK</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> HPACK</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Brotli</button>
+      </div>
+      <div class="q-explanation" id="q5-exp">HTTP/2 uses HPACK for header compression, which maintains a dynamic table of previously seen headers. QPACK is the header compression used by HTTP/3, adapted for QUIC's out-of-order delivery. gzip and Brotli are used for body compression, not headers.</div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card" data-correct="b" id="q6">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">Which real-time technology is best suited for unidirectional server-to-client updates like a live stock ticker?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> WebSocket</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Server-Sent Events (SSE)</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Long polling</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> gRPC unary calls</button>
+      </div>
+      <div class="q-explanation" id="q6-exp">SSE is ideal for one-way server-to-client streaming. It's simpler than WebSocket, has built-in auto-reconnection via the EventSource API, and works over standard HTTP/2. WebSocket would be overkill since no client-to-server messages are needed.</div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card" data-correct="d" id="q7">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">What key feature of QUIC enables seamless network transitions (e.g., Wi-Fi to cellular)?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> 0-RTT handshakes</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> UDP-based transport</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> Integrated TLS 1.3</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Connection IDs instead of IP:port tuples</button>
+      </div>
+      <div class="q-explanation" id="q7-exp">QUIC identifies connections by a Connection ID rather than the traditional IP:port 4-tuple. When the device's IP changes (e.g., switching networks), the Connection ID stays the same, allowing the QUIC connection to survive the transition.</div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card" data-correct="a" id="q8">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">What serialization format does gRPC use by default?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> Protocol Buffers (protobuf)</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> JSON</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> MessagePack</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Avro</button>
+      </div>
+      <div class="q-explanation" id="q8-exp">gRPC uses Protocol Buffers (protobuf) by default. Protobuf is a binary serialization format that is smaller and faster to parse than JSON. Services are defined in .proto files, and code is generated for client stubs and server interfaces.</div>
+    </div>
+
+    <!-- Question 9 -->
+    <div class="q-card" data-correct="c" id="q9">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">Why does HTTP/2 still suffer from head-of-line blocking despite supporting multiplexing?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> HPACK compression introduces ordering dependencies</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> Stream priorities force sequential processing</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> TCP treats all streams as a single byte sequence; one lost packet blocks everything</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> Browser implementations limit concurrent streams</button>
+      </div>
+      <div class="q-explanation" id="q9-exp">TCP sees all HTTP/2 streams as one ordered byte stream. If a single TCP packet is lost, the kernel cannot deliver any subsequent data (even for other streams) until that packet is retransmitted. This TCP-level HOL blocking is why HTTP/3 moved to QUIC, which has independent streams.</div>
+    </div>
+
+    <!-- Question 10 -->
+    <div class="q-card" data-correct="b" id="q10">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">Which HTTP method is both safe and idempotent?</div>
+      <div class="q-options">
+        <button class="q-opt" data-val="a" onclick="pick(this)"><span class="opt-letter">A</span> POST</button>
+        <button class="q-opt" data-val="b" onclick="pick(this)"><span class="opt-letter">B</span> GET</button>
+        <button class="q-opt" data-val="c" onclick="pick(this)"><span class="opt-letter">C</span> PUT</button>
+        <button class="q-opt" data-val="d" onclick="pick(this)"><span class="opt-letter">D</span> DELETE</button>
+      </div>
+      <div class="q-explanation" id="q10-exp">GET is both safe (does not modify server state) and idempotent (multiple identical requests have the same effect). PUT and DELETE are idempotent but not safe (they modify state). POST is neither safe nor idempotent.</div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn-check" onclick="checkAll()">Check Answers</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>learn.surkar.in</span>
+  <a href="../">&#8592; cs-fundamentals</a>
+</footer>
+
+<script>
+function pick(btn) {
+  const card = btn.closest('.q-card');
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function checkAll() {
+  let score = 0;
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const correct = card.dataset.correct;
+    const selected = card.querySelector('.q-opt.selected');
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+
+    if (selected) {
+      const val = selected.dataset.val;
+      if (val === correct) {
+        card.classList.add('correct');
+        selected.classList.add('correct-answer');
+        score++;
+      } else {
+        card.classList.add('wrong');
+        selected.classList.add('wrong-answer');
+        opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+      }
+    } else {
+      card.classList.add('wrong');
+      opts.forEach(o => { if (o.dataset.val === correct) o.classList.add('correct-answer'); });
+    }
+    const exp = card.querySelector('.q-explanation');
+    if (exp) exp.classList.add('show');
+  });
+  document.getElementById('score').textContent = score;
+  document.querySelector('.btn-check').textContent = `${score} / ${cards.length} correct`;
+  document.querySelector('.btn-check').disabled = true;
+  document.querySelector('.btn-check').style.opacity = '0.6';
+}
+</script>
+</body>
+</html>
