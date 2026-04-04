@@ -1,0 +1,186 @@
+{
+  "topic": "docker-containers",
+  "questions": [
+    {
+      "id": "docker-containers-001",
+      "tier": "A",
+      "q": "What is the difference between an image and a container?",
+      "a": "An image is a read-only template; a container is a running instance of that image.",
+      "tags": [
+        "docker",
+        "image",
+        "container"
+      ]
+    },
+    {
+      "id": "docker-containers-002",
+      "tier": "A",
+      "q": "What Linux feature isolates process IDs inside a container?",
+      "a": "PID namespaces.",
+      "tags": [
+        "docker",
+        "namespaces"
+      ]
+    },
+    {
+      "id": "docker-containers-003",
+      "tier": "A",
+      "q": "What Linux feature limits CPU and memory usage for a container?",
+      "a": "cgroups.",
+      "tags": [
+        "docker",
+        "cgroups"
+      ]
+    },
+    {
+      "id": "docker-containers-004",
+      "tier": "A",
+      "q": "What is a bind mount?",
+      "a": "A host path mounted into the container filesystem.",
+      "tags": [
+        "docker",
+        "storage"
+      ]
+    },
+    {
+      "id": "docker-containers-005",
+      "tier": "A",
+      "q": "What does PID 1 do in a container?",
+      "a": "It acts as the init process and must reap orphaned children.",
+      "tags": [
+        "docker",
+        "pid1"
+      ]
+    },
+    {
+      "id": "docker-containers-006",
+      "tier": "A",
+      "q": "What does multi-stage build let you do?",
+      "a": "Use one build stage for compilation and a smaller final image for runtime.",
+      "tags": [
+        "docker",
+        "build"
+      ]
+    },
+    {
+      "id": "docker-containers-007",
+      "tier": "B",
+      "q": "Why does PID 1 need special handling in a container?",
+      "a": "It must forward signals and reap zombies or processes can linger.",
+      "tags": [
+        "docker",
+        "signals"
+      ]
+    },
+    {
+      "id": "docker-containers-008",
+      "tier": "B",
+      "q": "Why do image layers matter?",
+      "a": "They let Docker reuse unchanged steps and speed up rebuilds.",
+      "tags": [
+        "docker",
+        "layers"
+      ]
+    },
+    {
+      "id": "docker-containers-009",
+      "tier": "B",
+      "q": "Why are distroless or slim images safer than full OS images?",
+      "a": "They reduce attack surface and remove unused tooling.",
+      "tags": [
+        "docker",
+        "security"
+      ]
+    },
+    {
+      "id": "docker-containers-010",
+      "tier": "B",
+      "q": "Why does rootless container mode help security?",
+      "a": "The daemon and containers run without full root privileges on the host.",
+      "tags": [
+        "docker",
+        "rootless"
+      ]
+    },
+    {
+      "id": "docker-containers-011",
+      "tier": "B",
+      "q": "Why can overlay filesystems make containers feel fast to start?",
+      "a": "Most layers are shared and only the writable layer is unique.",
+      "tags": [
+        "docker",
+        "overlayfs"
+      ]
+    },
+    {
+      "id": "docker-containers-012",
+      "tier": "B",
+      "q": "Why is `docker exec` not the same as starting a new container?",
+      "a": "It joins an existing container namespace and does not create new isolation.",
+      "tags": [
+        "docker",
+        "exec"
+      ]
+    },
+    {
+      "id": "docker-containers-013",
+      "tier": "C",
+      "q": "When should you choose containers over virtual machines?",
+      "a": "When you want lighter isolation, fast startup, and dense packaging of services.",
+      "tags": [
+        "docker",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "docker-containers-014",
+      "tier": "C",
+      "q": "When is a bind mount the wrong choice?",
+      "a": "When you need portability or do not want the container to depend on host paths.",
+      "tags": [
+        "docker",
+        "storage"
+      ]
+    },
+    {
+      "id": "docker-containers-015",
+      "tier": "C",
+      "q": "What tradeoff comes with small base images?",
+      "a": "You get a smaller attack surface, but debugging and tooling become harder.",
+      "tags": [
+        "docker",
+        "base-image"
+      ]
+    },
+    {
+      "id": "docker-containers-016",
+      "tier": "C",
+      "q": "When would you use an init process inside a container?",
+      "a": "When your app spawns children and needs correct signal forwarding and reaping.",
+      "tags": [
+        "docker",
+        "init"
+      ]
+    },
+    {
+      "id": "docker-containers-017",
+      "tier": "C",
+      "q": "Why might you avoid containers for a stateful, low-change legacy app?",
+      "a": "The operational complexity may outweigh the packaging benefits.",
+      "tags": [
+        "docker",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "docker-containers-018",
+      "tier": "C",
+      "q": "What is the tradeoff of setting hard resource limits?",
+      "a": "They improve isolation but can cause throttling or OOM kills under load.",
+      "tags": [
+        "docker",
+        "limits"
+      ]
+    }
+  ]
+}

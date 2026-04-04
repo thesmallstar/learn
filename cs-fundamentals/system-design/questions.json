@@ -1,0 +1,185 @@
+{
+  "topic": "system-design",
+  "questions": [
+    {
+      "id": "system-design-001",
+      "tier": "A",
+      "q": "What is the first step in a system design interview?",
+      "a": "Clarify requirements and constraints.",
+      "tags": [
+        "design",
+        "requirements"
+      ]
+    },
+    {
+      "id": "system-design-002",
+      "tier": "A",
+      "q": "What is a load balancer for?",
+      "a": "To spread traffic across multiple backends.",
+      "tags": [
+        "design",
+        "load-balancer"
+      ]
+    },
+    {
+      "id": "system-design-003",
+      "tier": "A",
+      "q": "What is sharding?",
+      "a": "Splitting data or traffic across multiple partitions.",
+      "tags": [
+        "design",
+        "sharding"
+      ]
+    },
+    {
+      "id": "system-design-004",
+      "tier": "A",
+      "q": "What is replication?",
+      "a": "Keeping copies of data on multiple nodes.",
+      "tags": [
+        "design",
+        "replication"
+      ]
+    },
+    {
+      "id": "system-design-005",
+      "tier": "A",
+      "q": "What is a cache used for in system design?",
+      "a": "To reduce latency and backend load.",
+      "tags": [
+        "design",
+        "cache"
+      ]
+    },
+    {
+      "id": "system-design-006",
+      "tier": "A",
+      "q": "What is a rate limiter?",
+      "a": "A control that caps request volume over time.",
+      "tags": [
+        "design",
+        "rate-limiting"
+      ]
+    },
+    {
+      "id": "system-design-007",
+      "tier": "B",
+      "q": "Why do you estimate traffic and storage early?",
+      "a": "Capacity numbers determine architecture, cost, and failure modes.",
+      "tags": [
+        "design",
+        "capacity"
+      ]
+    },
+    {
+      "id": "system-design-008",
+      "tier": "B",
+      "q": "Why is idempotency important in public APIs?",
+      "a": "Clients and networks retry, so repeated requests must be safe.",
+      "tags": [
+        "design",
+        "idempotency"
+      ]
+    },
+    {
+      "id": "system-design-009",
+      "tier": "B",
+      "q": "Why do pagination and cursors matter?",
+      "a": "They keep large result sets manageable and stable.",
+      "tags": [
+        "design",
+        "pagination"
+      ]
+    },
+    {
+      "id": "system-design-010",
+      "tier": "B",
+      "q": "Why are circuit breakers useful?",
+      "a": "They stop cascading failures by failing fast on unhealthy dependencies.",
+      "tags": [
+        "design",
+        "resilience"
+      ]
+    },
+    {
+      "id": "system-design-011",
+      "tier": "B",
+      "q": "Why do you separate read and write paths sometimes?",
+      "a": "Because their scaling, consistency, and latency needs can differ.",
+      "tags": [
+        "design",
+        "cqrs"
+      ]
+    },
+    {
+      "id": "system-design-012",
+      "tier": "B",
+      "q": "Why does a single hot partition hurt a sharded system?",
+      "a": "One shard becomes the bottleneck even if the rest are idle.",
+      "tags": [
+        "design",
+        "hot-partition"
+      ]
+    },
+    {
+      "id": "system-design-013",
+      "tier": "C",
+      "q": "When would you choose a monolith over distributed services?",
+      "a": "When simplicity, locality, and faster iteration matter more than independent scaling.",
+      "tags": [
+        "design",
+        "monolith"
+      ]
+    },
+    {
+      "id": "system-design-014",
+      "tier": "C",
+      "q": "When would you choose a microservice split?",
+      "a": "When a boundary has clear ownership and independent scaling or deployment value.",
+      "tags": [
+        "design",
+        "microservices"
+      ]
+    },
+    {
+      "id": "system-design-015",
+      "tier": "C",
+      "q": "What tradeoff comes with multi-region active-active systems?",
+      "a": "Better resilience and locality, but much harder consistency and conflict handling.",
+      "tags": [
+        "design",
+        "multi-region"
+      ]
+    },
+    {
+      "id": "system-design-016",
+      "tier": "C",
+      "q": "Why is back-of-the-envelope math useful?",
+      "a": "It keeps designs grounded in realistic throughput and storage constraints.",
+      "tags": [
+        "design",
+        "math"
+      ]
+    },
+    {
+      "id": "system-design-017",
+      "tier": "C",
+      "q": "What tradeoff comes with eventual consistency?",
+      "a": "Higher availability and lower latency, but temporary stale reads or conflicts.",
+      "tags": [
+        "design",
+        "consistency"
+      ]
+    },
+    {
+      "id": "system-design-018",
+      "tier": "C",
+      "q": "Why do you think about failure explicitly?",
+      "a": "Every real system fails, and the design must define the recovery path.",
+      "tags": [
+        "design",
+        "failures"
+      ]
+    }
+  ]
+}

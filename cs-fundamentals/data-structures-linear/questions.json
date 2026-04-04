@@ -1,0 +1,185 @@
+{
+  "topic": "data-structures-linear",
+  "questions": [
+    {
+      "id": "data-structures-linear-001a",
+      "tier": "A",
+      "q": "What is random access in an array?",
+      "a": "O(1) lookup by index.",
+      "tags": [
+        "arrays",
+        "cache-locality"
+      ]
+    },
+    {
+      "id": "data-structures-linear-001b",
+      "tier": "B",
+      "q": "Why are arrays cache-friendly?",
+      "a": "They are contiguous in memory, so sequential reads exploit spatial locality.",
+      "tags": [
+        "arrays",
+        "cache-locality"
+      ]
+    },
+    {
+      "id": "data-structures-linear-001c",
+      "tier": "C",
+      "q": "When would you choose an array over a linked list?",
+      "a": "When you need fast indexing, compact storage, and mostly read-heavy access.",
+      "tags": [
+        "arrays",
+        "cache-locality"
+      ]
+    },
+    {
+      "id": "data-structures-linear-002a",
+      "tier": "A",
+      "q": "What is the amortized cost of appending to a dynamic array?",
+      "a": "O(1) amortized.",
+      "tags": [
+        "dynamic-array",
+        "amortized"
+      ]
+    },
+    {
+      "id": "data-structures-linear-002b",
+      "tier": "B",
+      "q": "Why can a resize be O(n) but appends still stay amortized O(1)?",
+      "a": "A resize copies all elements, but it happens rarely enough that the copy cost is spread across many cheap appends.",
+      "tags": [
+        "dynamic-array",
+        "amortized"
+      ]
+    },
+    {
+      "id": "data-structures-linear-002c",
+      "tier": "C",
+      "q": "When is a dynamic array a bad fit?",
+      "a": "When frequent inserts or deletes in the middle dominate and shifting elements becomes expensive.",
+      "tags": [
+        "dynamic-array",
+        "amortized"
+      ]
+    },
+    {
+      "id": "data-structures-linear-003a",
+      "tier": "A",
+      "q": "What is the search complexity of a singly linked list?",
+      "a": "O(n).",
+      "tags": [
+        "linked-list",
+        "pointers"
+      ]
+    },
+    {
+      "id": "data-structures-linear-003b",
+      "tier": "B",
+      "q": "Why is insertion after a known node O(1)?",
+      "a": "Only the local next pointers change; no shifting of elements is needed.",
+      "tags": [
+        "linked-list",
+        "pointers"
+      ]
+    },
+    {
+      "id": "data-structures-linear-003c",
+      "tier": "C",
+      "q": "When is a singly linked list better than an array?",
+      "a": "When you already have the node and you expect frequent insertions or deletions near it.",
+      "tags": [
+        "linked-list",
+        "pointers"
+      ]
+    },
+    {
+      "id": "data-structures-linear-004a",
+      "tier": "A",
+      "q": "What extra pointer does a doubly linked list add?",
+      "a": "A prev pointer.",
+      "tags": [
+        "doubly-linked-list",
+        "deletion"
+      ]
+    },
+    {
+      "id": "data-structures-linear-004b",
+      "tier": "B",
+      "q": "Why does a doubly linked list make deletion easier?",
+      "a": "You can unlink a known node in O(1) without searching for its predecessor.",
+      "tags": [
+        "doubly-linked-list",
+        "deletion"
+      ]
+    },
+    {
+      "id": "data-structures-linear-004c",
+      "tier": "C",
+      "q": "When would you choose a doubly linked list over a singly linked list?",
+      "a": "When you need backward traversal or constant-time deletion from arbitrary positions.",
+      "tags": [
+        "doubly-linked-list",
+        "deletion"
+      ]
+    },
+    {
+      "id": "data-structures-linear-005a",
+      "tier": "A",
+      "q": "What access order does a stack enforce?",
+      "a": "LIFO, last in first out.",
+      "tags": [
+        "stack",
+        "lifo"
+      ]
+    },
+    {
+      "id": "data-structures-linear-005b",
+      "tier": "B",
+      "q": "Why does a stack map well to recursion and backtracking?",
+      "a": "The most recent call or state is the next one that must be undone or explored.",
+      "tags": [
+        "stack",
+        "lifo"
+      ]
+    },
+    {
+      "id": "data-structures-linear-005c",
+      "tier": "C",
+      "q": "When should you choose a stack over a queue?",
+      "a": "When the newest work item must be handled first, such as DFS or undo/redo flows.",
+      "tags": [
+        "stack",
+        "lifo"
+      ]
+    },
+    {
+      "id": "data-structures-linear-006a",
+      "tier": "A",
+      "q": "What access order does a queue enforce?",
+      "a": "FIFO, first in first out.",
+      "tags": [
+        "queue",
+        "circular-buffer"
+      ]
+    },
+    {
+      "id": "data-structures-linear-006b",
+      "tier": "B",
+      "q": "Why is a circular buffer a good queue implementation?",
+      "a": "It avoids O(n) shifts on dequeue while keeping enqueue and dequeue O(1).",
+      "tags": [
+        "queue",
+        "circular-buffer"
+      ]
+    },
+    {
+      "id": "data-structures-linear-006c",
+      "tier": "C",
+      "q": "When would you prefer a deque or circular buffer over a linked list queue?",
+      "a": "When you want O(1) ends with better cache behavior and predictable memory use.",
+      "tags": [
+        "queue",
+        "circular-buffer"
+      ]
+    }
+  ]
+}

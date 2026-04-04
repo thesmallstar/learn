@@ -1,0 +1,188 @@
+{
+  "topic": "trees-data-structures",
+  "questions": [
+    {
+      "id": "trees-data-structures-001a",
+      "tier": "A",
+      "q": "What is a root node in a tree?",
+      "a": "The top node with no parent.",
+      "tags": [
+        "trees",
+        "traversal"
+      ]
+    },
+    {
+      "id": "trees-data-structures-001b",
+      "tier": "B",
+      "q": "Why are tree traversals useful?",
+      "a": "They give a systematic way to visit every node in a controlled order.",
+      "tags": [
+        "trees",
+        "traversal"
+      ]
+    },
+    {
+      "id": "trees-data-structures-001c",
+      "tier": "C",
+      "q": "When should you use a tree instead of a flat list?",
+      "a": "When the data is hierarchical, ordered by key, or benefits from fast structured lookup.",
+      "tags": [
+        "trees",
+        "traversal"
+      ]
+    },
+    {
+      "id": "trees-data-structures-002a",
+      "tier": "A",
+      "q": "What invariant does a BST enforce?",
+      "a": "Left subtree keys are smaller, right subtree keys are larger.",
+      "tags": [
+        "bst",
+        "ordering"
+      ]
+    },
+    {
+      "id": "trees-data-structures-002b",
+      "tier": "B",
+      "q": "Why does in-order traversal of a BST produce sorted output?",
+      "a": "It visits left, node, then right, which respects the BST ordering invariant.",
+      "tags": [
+        "bst",
+        "ordering"
+      ]
+    },
+    {
+      "id": "trees-data-structures-002c",
+      "tier": "C",
+      "q": "When is a plain BST not enough?",
+      "a": "When you need worst-case guarantees instead of relying on the tree staying balanced.",
+      "tags": [
+        "bst",
+        "ordering"
+      ]
+    },
+    {
+      "id": "trees-data-structures-003a",
+      "tier": "A",
+      "q": "What balance condition does an AVL tree enforce?",
+      "a": "Each node has left/right subtree heights differing by at most 1.",
+      "tags": [
+        "avl",
+        "rotations"
+      ]
+    },
+    {
+      "id": "trees-data-structures-003b",
+      "tier": "B",
+      "q": "Why do AVL trees use rotations?",
+      "a": "Rotations restore balance after inserts or deletes without rebuilding the whole tree.",
+      "tags": [
+        "avl",
+        "rotations"
+      ]
+    },
+    {
+      "id": "trees-data-structures-003c",
+      "tier": "C",
+      "q": "When would you choose AVL over a plain BST?",
+      "a": "When you want tighter balance and faster lookups at the cost of more rebalancing work.",
+      "tags": [
+        "avl",
+        "rotations"
+      ]
+    },
+    {
+      "id": "trees-data-structures-004a",
+      "tier": "A",
+      "q": "What color-property idea does a red-black tree use?",
+      "a": "Nodes are colored red or black to keep the tree roughly balanced.",
+      "tags": [
+        "red-black-tree",
+        "balancing"
+      ]
+    },
+    {
+      "id": "trees-data-structures-004b",
+      "tier": "B",
+      "q": "Why do red-black trees often rotate less than AVL trees?",
+      "a": "They allow more relaxed balance, so fewer updates need rebalancing.",
+      "tags": [
+        "red-black-tree",
+        "balancing"
+      ]
+    },
+    {
+      "id": "trees-data-structures-004c",
+      "tier": "C",
+      "q": "When is a red-black tree a better fit than AVL?",
+      "a": "When write-heavy workloads benefit more from fewer rotations than from the tightest possible balance.",
+      "tags": [
+        "red-black-tree",
+        "balancing"
+      ]
+    },
+    {
+      "id": "trees-data-structures-005a",
+      "tier": "A",
+      "q": "What structure does a heap maintain?",
+      "a": "Each parent is ordered relative to its children so the min or max is at the root.",
+      "tags": [
+        "heap",
+        "priority-queue"
+      ]
+    },
+    {
+      "id": "trees-data-structures-005b",
+      "tier": "B",
+      "q": "Why is a heap good for a priority queue?",
+      "a": "Insert and extract-min or extract-max both stay logarithmic while preserving fast access to the top priority.",
+      "tags": [
+        "heap",
+        "priority-queue"
+      ]
+    },
+    {
+      "id": "trees-data-structures-005c",
+      "tier": "C",
+      "q": "When would you use a heap instead of a BST?",
+      "a": "When you care most about repeatedly pulling the smallest or largest item rather than sorted iteration.",
+      "tags": [
+        "heap",
+        "priority-queue"
+      ]
+    },
+    {
+      "id": "trees-data-structures-006a",
+      "tier": "A",
+      "q": "What makes a B-tree or B+ tree different from a binary tree?",
+      "a": "Each node stores multiple keys and has multiple children.",
+      "tags": [
+        "b-tree",
+        "b-plus-tree",
+        "storage"
+      ]
+    },
+    {
+      "id": "trees-data-structures-006b",
+      "tier": "B",
+      "q": "Why are B-trees good for databases and file systems?",
+      "a": "Wide nodes reduce tree height and match disk page sizes, so the structure minimizes I/O.",
+      "tags": [
+        "b-tree",
+        "b-plus-tree",
+        "storage"
+      ]
+    },
+    {
+      "id": "trees-data-structures-006c",
+      "tier": "C",
+      "q": "When would you choose a B-tree over a BST or trie?",
+      "a": "When you need sorted storage on disk, range scans, and predictable page-oriented access.",
+      "tags": [
+        "b-tree",
+        "b-plus-tree",
+        "storage"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "topic": "http-protocol",
+  "exercises": [
+    {
+      "id": "http-ex-01",
+      "size": "small",
+      "title": "Inspect response headers",
+      "description": "Use curl -I on a site and identify cache and connection headers.",
+      "command": "curl -I https://example.com",
+      "expected_outcome": "You see HTTP status, cache headers, and server metadata.",
+      "prereqs": [
+        "curl installed"
+      ],
+      "tags": [
+        "curl",
+        "headers"
+      ]
+    },
+    {
+      "id": "http-ex-02",
+      "size": "small",
+      "title": "Watch a redirect",
+      "description": "Request a URL that redirects and inspect the status code and Location header.",
+      "command": "curl -i https://httpbin.org/redirect/1",
+      "expected_outcome": "You observe a 3xx response and the redirect target.",
+      "prereqs": [
+        "curl installed"
+      ],
+      "tags": [
+        "redirects",
+        "http"
+      ]
+    },
+    {
+      "id": "http-ex-03",
+      "size": "medium",
+      "title": "Build a small HTTP client",
+      "description": "Write a script that issues a GET request and prints status, headers, and body length.",
+      "command": "python http_client.py https://example.com",
+      "expected_outcome": "The client parses the response and reports basic metadata.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "client",
+        "http"
+      ]
+    },
+    {
+      "id": "http-ex-04",
+      "size": "medium",
+      "title": "Compare HTTP versions",
+      "description": "Use curl to compare a request over HTTP/1.1 and HTTP/2.",
+      "command": "curl -I --http2 https://example.com",
+      "expected_outcome": "You can see protocol differences and header behavior.",
+      "prereqs": [
+        "curl with HTTP/2 support"
+      ],
+      "tags": [
+        "http2",
+        "comparison"
+      ]
+    },
+    {
+      "id": "http-ex-05",
+      "size": "large",
+      "title": "Implement a tiny REST server",
+      "description": "Create a basic JSON API with GET and POST endpoints and proper status codes.",
+      "command": "python mini_rest.py",
+      "expected_outcome": "Clients can create and fetch resources over HTTP.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "api",
+        "rest"
+      ]
+    },
+    {
+      "id": "http-ex-06",
+      "size": "large",
+      "title": "Build a streaming endpoint",
+      "description": "Add an SSE or chunked streaming endpoint to a local server and observe incremental delivery.",
+      "command": "python stream_server.py",
+      "expected_outcome": "The client receives events or chunks without waiting for completion.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "streaming",
+        "sse"
+      ]
+    }
+  ]
+}

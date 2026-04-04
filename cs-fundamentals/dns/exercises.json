@@ -1,0 +1,95 @@
+{
+  "topic": "dns",
+  "exercises": [
+    {
+      "id": "dns-ex-01",
+      "size": "small",
+      "title": "Trace DNS resolution",
+      "description": "Run a full recursive trace for a public domain and follow the delegation chain.",
+      "command": "dig +trace google.com",
+      "expected_outcome": "You can see root, TLD, and authoritative answers.",
+      "prereqs": [
+        "dig installed"
+      ],
+      "tags": [
+        "dig",
+        "trace"
+      ]
+    },
+    {
+      "id": "dns-ex-02",
+      "size": "small",
+      "title": "Inspect your records",
+      "description": "Query A, MX, NS, and TXT records for a domain you control.",
+      "command": "dig example.com any",
+      "expected_outcome": "You identify the different record types and their values.",
+      "prereqs": [
+        "dig installed"
+      ],
+      "tags": [
+        "records",
+        "dns"
+      ]
+    },
+    {
+      "id": "dns-ex-03",
+      "size": "medium",
+      "title": "Compare resolvers",
+      "description": "Write a script that queries several public resolvers for the same name and reports differences.",
+      "command": "python dns_compare.py example.com",
+      "expected_outcome": "The script shows which resolvers agree and where answers differ.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "resolvers",
+        "propagation"
+      ]
+    },
+    {
+      "id": "dns-ex-04",
+      "size": "medium",
+      "title": "Run a local resolver",
+      "description": "Configure a local dnsmasq instance and map a custom local name to 127.0.0.1.",
+      "command": "dig myapp.test @127.0.0.1",
+      "expected_outcome": "The custom name resolves locally through your resolver.",
+      "prereqs": [
+        "dnsmasq installed"
+      ],
+      "tags": [
+        "dnsmasq",
+        "local"
+      ]
+    },
+    {
+      "id": "dns-ex-05",
+      "size": "large",
+      "title": "Build a stub resolver",
+      "description": "Parse a DNS A-record response and print the IP addresses from a UDP packet.",
+      "command": "python dns_stub.py",
+      "expected_outcome": "The script decodes a response and prints answer records.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "packet-parsing",
+        "dns"
+      ]
+    },
+    {
+      "id": "dns-ex-06",
+      "size": "large",
+      "title": "Create a DNS health checker",
+      "description": "Poll a domain on a schedule, detect IP changes, and log when the answer changes.",
+      "command": "python dns_health.py",
+      "expected_outcome": "The checker reports answer changes and stable periods.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "monitoring",
+        "dns"
+      ]
+    }
+  ]
+}

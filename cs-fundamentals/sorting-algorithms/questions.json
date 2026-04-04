@@ -1,0 +1,185 @@
+{
+  "topic": "sorting-algorithms",
+  "questions": [
+    {
+      "id": "sorting-algorithms-001a",
+      "tier": "A",
+      "q": "What is the lower bound for comparison-based sorting?",
+      "a": "O(n log n).",
+      "tags": [
+        "sorting",
+        "complexity"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-001b",
+      "tier": "B",
+      "q": "Why can no comparison sort beat O(n log n) in the worst case?",
+      "a": "Comparison sorts must distinguish among n! possible orders, which requires logarithmically many decisions per item on average.",
+      "tags": [
+        "sorting",
+        "complexity"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-001c",
+      "tier": "C",
+      "q": "When should you reach for a non-comparison sort?",
+      "a": "When keys are bounded integers or the input distribution lets counting or radix sort exploit structure.",
+      "tags": [
+        "sorting",
+        "complexity"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-002a",
+      "tier": "A",
+      "q": "What does it mean for a sort to be stable?",
+      "a": "Equal keys keep their original relative order.",
+      "tags": [
+        "stability",
+        "ordering"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-002b",
+      "tier": "B",
+      "q": "Why does stability matter in practice?",
+      "a": "It lets you sort by one key and then refine by another without destroying the earlier ordering.",
+      "tags": [
+        "stability",
+        "ordering"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-002c",
+      "tier": "C",
+      "q": "When is stability more important than raw speed?",
+      "a": "When later processing depends on the original order of equal elements or on multi-key sorts.",
+      "tags": [
+        "stability",
+        "ordering"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-003a",
+      "tier": "A",
+      "q": "What is the average-case complexity of quicksort?",
+      "a": "O(n log n).",
+      "tags": [
+        "quicksort",
+        "partitioning"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-003b",
+      "tier": "B",
+      "q": "Why can quicksort degrade to O(n^2)?",
+      "a": "Bad pivot choices can keep splitting the array into very uneven parts.",
+      "tags": [
+        "quicksort",
+        "partitioning"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-003c",
+      "tier": "C",
+      "q": "When is quicksort a strong choice?",
+      "a": "When you want fast in-place sorting on average and can control pivot quality.",
+      "tags": [
+        "quicksort",
+        "partitioning"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-004a",
+      "tier": "A",
+      "q": "What is the extra space cost of mergesort?",
+      "a": "O(n).",
+      "tags": [
+        "mergesort",
+        "stable-sort"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-004b",
+      "tier": "B",
+      "q": "Why is mergesort stable?",
+      "a": "It merges two already ordered halves while preserving the order of equal elements.",
+      "tags": [
+        "mergesort",
+        "stable-sort"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-004c",
+      "tier": "C",
+      "q": "When is mergesort a better choice than quicksort?",
+      "a": "When you need stability or guaranteed O(n log n) worst-case behavior.",
+      "tags": [
+        "mergesort",
+        "stable-sort"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-005a",
+      "tier": "A",
+      "q": "What is the worst-case complexity of heapsort?",
+      "a": "O(n log n).",
+      "tags": [
+        "heapsort",
+        "in-place"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-005b",
+      "tier": "B",
+      "q": "Why is heapsort usually considered in-place?",
+      "a": "It uses the array itself as the heap and needs only constant extra memory.",
+      "tags": [
+        "heapsort",
+        "in-place"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-005c",
+      "tier": "C",
+      "q": "When would you choose heapsort over quicksort or mergesort?",
+      "a": "When you want worst-case guarantees with low extra memory and do not need stability.",
+      "tags": [
+        "heapsort",
+        "in-place"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-006a",
+      "tier": "A",
+      "q": "What kind of data do counting and radix sort need?",
+      "a": "Bounded or structured keys, usually integers or fixed-length digits.",
+      "tags": [
+        "counting-sort",
+        "radix-sort"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-006b",
+      "tier": "B",
+      "q": "Why can counting sort beat comparison sorts?",
+      "a": "It skips pairwise comparisons and counts key frequencies directly.",
+      "tags": [
+        "counting-sort",
+        "radix-sort"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-006c",
+      "tier": "C",
+      "q": "When does counting or radix sort stop being attractive?",
+      "a": "When the key range is too large, memory gets wasteful, or the keys are not structured enough.",
+      "tags": [
+        "counting-sort",
+        "radix-sort"
+      ]
+    }
+  ]
+}

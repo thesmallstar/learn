@@ -1,0 +1,188 @@
+{
+  "topic": "dynamic-programming",
+  "questions": [
+    {
+      "id": "dynamic-programming-001a",
+      "tier": "A",
+      "q": "What are overlapping subproblems?",
+      "a": "The same subproblems appear repeatedly in a recursive solution.",
+      "tags": [
+        "dp",
+        "overlap"
+      ]
+    },
+    {
+      "id": "dynamic-programming-001b",
+      "tier": "B",
+      "q": "Why do overlapping subproblems make DP effective?",
+      "a": "You can cache answers once and reuse them instead of recomputing the same work.",
+      "tags": [
+        "dp",
+        "overlap"
+      ]
+    },
+    {
+      "id": "dynamic-programming-001c",
+      "tier": "C",
+      "q": "When does a problem not benefit from DP?",
+      "a": "When each subproblem is solved once already, as in plain divide-and-conquer.",
+      "tags": [
+        "dp",
+        "overlap"
+      ]
+    },
+    {
+      "id": "dynamic-programming-002a",
+      "tier": "A",
+      "q": "What is optimal substructure?",
+      "a": "An optimal solution can be built from optimal solutions to smaller subproblems.",
+      "tags": [
+        "dp",
+        "optimal-substructure"
+      ]
+    },
+    {
+      "id": "dynamic-programming-002b",
+      "tier": "B",
+      "q": "Why is optimal substructure required for DP?",
+      "a": "If subproblem optima do not compose correctly, the table will not lead to a correct global optimum.",
+      "tags": [
+        "dp",
+        "optimal-substructure"
+      ]
+    },
+    {
+      "id": "dynamic-programming-002c",
+      "tier": "C",
+      "q": "Why is longest simple path in a general graph a bad DP candidate?",
+      "a": "Because a locally optimal subpath does not necessarily extend to a globally optimal simple path.",
+      "tags": [
+        "dp",
+        "optimal-substructure"
+      ]
+    },
+    {
+      "id": "dynamic-programming-003a",
+      "tier": "A",
+      "q": "What is memoization?",
+      "a": "Top-down DP with caching of recursive results.",
+      "tags": [
+        "memoization",
+        "top-down"
+      ]
+    },
+    {
+      "id": "dynamic-programming-003b",
+      "tier": "B",
+      "q": "Why do people like memoization for first-pass DP solutions?",
+      "a": "It is often closest to the problem statement and easy to add to an existing recursive solution.",
+      "tags": [
+        "memoization",
+        "top-down"
+      ]
+    },
+    {
+      "id": "dynamic-programming-003c",
+      "tier": "C",
+      "q": "When might memoization be less ideal than tabulation?",
+      "a": "When recursion depth is large or you want tighter control over iteration order and memory.",
+      "tags": [
+        "memoization",
+        "top-down"
+      ]
+    },
+    {
+      "id": "dynamic-programming-004a",
+      "tier": "A",
+      "q": "What is tabulation?",
+      "a": "Bottom-up DP that fills a table iteratively.",
+      "tags": [
+        "tabulation",
+        "bottom-up"
+      ]
+    },
+    {
+      "id": "dynamic-programming-004b",
+      "tier": "B",
+      "q": "Why can tabulation be faster than memoization?",
+      "a": "It avoids recursion overhead and often accesses memory in a more predictable order.",
+      "tags": [
+        "tabulation",
+        "bottom-up"
+      ]
+    },
+    {
+      "id": "dynamic-programming-004c",
+      "tier": "C",
+      "q": "When is tabulation the better implementation choice?",
+      "a": "When you know a safe fill order and want better performance or a bounded stack footprint.",
+      "tags": [
+        "tabulation",
+        "bottom-up"
+      ]
+    },
+    {
+      "id": "dynamic-programming-005a",
+      "tier": "A",
+      "q": "What kind of state does knapsack-style DP usually use?",
+      "a": "Item index plus remaining capacity or target amount.",
+      "tags": [
+        "knapsack",
+        "coin-change"
+      ]
+    },
+    {
+      "id": "dynamic-programming-005b",
+      "tier": "B",
+      "q": "Why does knapsack fit DP so well?",
+      "a": "Each choice splits into smaller versions of the same problem with reduced capacity.",
+      "tags": [
+        "knapsack",
+        "coin-change"
+      ]
+    },
+    {
+      "id": "dynamic-programming-005c",
+      "tier": "C",
+      "q": "When should you expect a 1D or 2D DP table for a problem?",
+      "a": "When the answer depends on a sequence position plus another constraint like weight, sum, or budget.",
+      "tags": [
+        "knapsack",
+        "coin-change"
+      ]
+    },
+    {
+      "id": "dynamic-programming-006a",
+      "tier": "A",
+      "q": "What do sequence DP problems like LCS or edit distance track?",
+      "a": "Prefixes or intervals of one or two sequences.",
+      "tags": [
+        "lcs",
+        "edit-distance",
+        "strings"
+      ]
+    },
+    {
+      "id": "dynamic-programming-006b",
+      "tier": "B",
+      "q": "Why are LCS and edit distance usually 2D DPs?",
+      "a": "Each state depends on the next smaller prefix of one or both strings.",
+      "tags": [
+        "lcs",
+        "edit-distance",
+        "strings"
+      ]
+    },
+    {
+      "id": "dynamic-programming-006c",
+      "tier": "C",
+      "q": "When can a sequence DP be space-optimized?",
+      "a": "When each row only depends on the previous row or a small sliding window of rows.",
+      "tags": [
+        "lcs",
+        "edit-distance",
+        "strings"
+      ]
+    }
+  ]
+}

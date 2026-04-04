@@ -1,0 +1,94 @@
+{
+  "topic": "distributed-systems",
+  "exercises": [
+    {
+      "id": "distributed-systems-ex-01",
+      "size": "small",
+      "title": "Simulate a Partition",
+      "description": "Block traffic between two local processes and observe how the system reacts.",
+      "command": "tc qdisc add dev lo root netem loss 100%",
+      "expected_outcome": "Requests fail and you can observe partition behavior.",
+      "prereqs": [
+        "Linux",
+        "tc"
+      ],
+      "tags": [
+        "partition",
+        "netem"
+      ]
+    },
+    {
+      "id": "distributed-systems-ex-02",
+      "size": "small",
+      "title": "Trace a Leader Election",
+      "description": "Run a tiny cluster and watch which node becomes leader after a restart.",
+      "command": "python leader_demo.py",
+      "expected_outcome": "One node is elected leader and another takes over on failure.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "leader-election"
+      ]
+    },
+    {
+      "id": "distributed-systems-ex-03",
+      "size": "medium",
+      "title": "Build a Consistent Hash Ring",
+      "description": "Map keys to nodes and show how few keys move when a node is added or removed.",
+      "command": "python consistent_hash.py",
+      "expected_outcome": "You can quantify key movement across membership changes.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "hashing"
+      ]
+    },
+    {
+      "id": "distributed-systems-ex-04",
+      "size": "medium",
+      "title": "Implement an Optimistic Counter",
+      "description": "Use WATCH/MULTI/EXEC or compare-and-swap semantics to increment safely under contention.",
+      "command": "python distributed_counter.py",
+      "expected_outcome": "Concurrent increments do not overwrite each other.",
+      "prereqs": [
+        "Python",
+        "Redis or similar"
+      ],
+      "tags": [
+        "optimistic-locking"
+      ]
+    },
+    {
+      "id": "distributed-systems-ex-05",
+      "size": "large",
+      "title": "Build a Leader Election Prototype",
+      "description": "Implement election timeouts, heartbeats, and failover for a small cluster.",
+      "command": "python election_cluster.py",
+      "expected_outcome": "A new leader appears after the old one is stopped.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "consensus",
+        "failover"
+      ]
+    },
+    {
+      "id": "distributed-systems-ex-06",
+      "size": "large",
+      "title": "Design a Fault-Tolerant Task Queue",
+      "description": "Create a queue that retries failures, dedupes work, and survives worker crashes.",
+      "command": "mkdir -p docs && $EDITOR docs/task-queue.md",
+      "expected_outcome": "You have an end-to-end design for retries, state, and failure handling.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "reliability",
+        "architecture"
+      ]
+    }
+  ]
+}

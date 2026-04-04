@@ -1,0 +1,185 @@
+{
+  "topic": "cloud-computing",
+  "questions": [
+    {
+      "id": "cloud-computing-001",
+      "tier": "A",
+      "q": "What is IaaS?",
+      "a": "Infrastructure as a Service: virtualized compute, storage, and networking.",
+      "tags": [
+        "cloud",
+        "iaas"
+      ]
+    },
+    {
+      "id": "cloud-computing-002",
+      "tier": "A",
+      "q": "What is PaaS?",
+      "a": "Platform as a Service: managed runtime and deployment environment.",
+      "tags": [
+        "cloud",
+        "paas"
+      ]
+    },
+    {
+      "id": "cloud-computing-003",
+      "tier": "A",
+      "q": "What is FaaS?",
+      "a": "Function as a Service: event-driven functions that run on demand.",
+      "tags": [
+        "cloud",
+        "faas"
+      ]
+    },
+    {
+      "id": "cloud-computing-004",
+      "tier": "A",
+      "q": "What is a region?",
+      "a": "A geographic cloud location containing multiple availability zones.",
+      "tags": [
+        "cloud",
+        "region"
+      ]
+    },
+    {
+      "id": "cloud-computing-005",
+      "tier": "A",
+      "q": "What is an availability zone?",
+      "a": "An isolated data center grouping inside a region.",
+      "tags": [
+        "cloud",
+        "az"
+      ]
+    },
+    {
+      "id": "cloud-computing-006",
+      "tier": "A",
+      "q": "What is a security group?",
+      "a": "A stateful network firewall attached to a cloud resource.",
+      "tags": [
+        "cloud",
+        "security-group"
+      ]
+    },
+    {
+      "id": "cloud-computing-007",
+      "tier": "B",
+      "q": "Why do private subnets exist?",
+      "a": "To keep internal resources off the public internet while still allowing outbound access through controlled paths.",
+      "tags": [
+        "cloud",
+        "subnet"
+      ]
+    },
+    {
+      "id": "cloud-computing-008",
+      "tier": "B",
+      "q": "Why are presigned URLs useful?",
+      "a": "They let clients access object storage without sharing permanent credentials.",
+      "tags": [
+        "cloud",
+        "s3"
+      ]
+    },
+    {
+      "id": "cloud-computing-009",
+      "tier": "B",
+      "q": "Why does least privilege matter in IAM?",
+      "a": "It limits blast radius if credentials or roles are compromised.",
+      "tags": [
+        "cloud",
+        "iam"
+      ]
+    },
+    {
+      "id": "cloud-computing-010",
+      "tier": "B",
+      "q": "Why is multi-AZ deployment common for production services?",
+      "a": "It survives the loss of one zone without full service outage.",
+      "tags": [
+        "cloud",
+        "ha"
+      ]
+    },
+    {
+      "id": "cloud-computing-011",
+      "tier": "B",
+      "q": "Why can egress cost surprise teams?",
+      "a": "Outbound data transfer is often billed and can dominate the bill.",
+      "tags": [
+        "cloud",
+        "cost"
+      ]
+    },
+    {
+      "id": "cloud-computing-012",
+      "tier": "B",
+      "q": "Why are serverless functions attractive for bursty workloads?",
+      "a": "They scale quickly and avoid paying for idle capacity.",
+      "tags": [
+        "cloud",
+        "serverless"
+      ]
+    },
+    {
+      "id": "cloud-computing-013",
+      "tier": "C",
+      "q": "When should you choose a multi-region architecture?",
+      "a": "When you need geo-resilience or low latency for users spread across continents.",
+      "tags": [
+        "cloud",
+        "multi-region"
+      ]
+    },
+    {
+      "id": "cloud-computing-014",
+      "tier": "C",
+      "q": "When is a public subnet appropriate?",
+      "a": "When the resource must accept inbound internet traffic, such as a load balancer.",
+      "tags": [
+        "cloud",
+        "networking"
+      ]
+    },
+    {
+      "id": "cloud-computing-015",
+      "tier": "C",
+      "q": "What tradeoff comes with serverless cold starts?",
+      "a": "Lower idle cost, but higher latency on the first request after inactivity.",
+      "tags": [
+        "cloud",
+        "cold-start"
+      ]
+    },
+    {
+      "id": "cloud-computing-016",
+      "tier": "C",
+      "q": "Why might you still use VMs instead of managed services?",
+      "a": "You may need more control, custom software, or simpler portability.",
+      "tags": [
+        "cloud",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "cloud-computing-017",
+      "tier": "C",
+      "q": "What tradeoff comes with heavily managed cloud services?",
+      "a": "You reduce ops burden but accept vendor lock-in and less low-level control.",
+      "tags": [
+        "cloud",
+        "managed-service"
+      ]
+    },
+    {
+      "id": "cloud-computing-018",
+      "tier": "C",
+      "q": "Why does IAM policy evaluation matter in troubleshooting?",
+      "a": "An action can fail because multiple policies, boundaries, or resource rules intersect.",
+      "tags": [
+        "cloud",
+        "iam"
+      ]
+    }
+  ]
+}

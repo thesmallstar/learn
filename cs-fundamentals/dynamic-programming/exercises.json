@@ -1,0 +1,96 @@
+{
+  "topic": "dynamic-programming",
+  "exercises": [
+    {
+      "id": "dynamic-programming-ex-01",
+      "size": "small",
+      "title": "Memoize Fibonacci",
+      "description": "Add caching to a recursive Fibonacci implementation and compare the call count before and after.",
+      "command": "python3 memoized_fibonacci.py",
+      "expected_outcome": "Repeated subproblems should disappear and runtime should drop sharply.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "memoization",
+        "fibonacci"
+      ]
+    },
+    {
+      "id": "dynamic-programming-ex-02",
+      "size": "small",
+      "title": "Inspect a coin-change table",
+      "description": "Print the DP table for minimum coin change on a small target and explain each transition.",
+      "command": "python3 coin_change_table.py",
+      "expected_outcome": "You should see the table fill from smaller amounts up to the target.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "coin-change",
+        "tabulation"
+      ]
+    },
+    {
+      "id": "dynamic-programming-ex-03",
+      "size": "medium",
+      "title": "Solve 0/1 knapsack",
+      "description": "Implement the classic 0/1 knapsack DP and test it with a small item set.",
+      "command": "python3 knapsack_01.py",
+      "expected_outcome": "The solver should maximize value without exceeding capacity.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "knapsack",
+        "dp-table"
+      ]
+    },
+    {
+      "id": "dynamic-programming-ex-04",
+      "size": "medium",
+      "title": "Compute edit distance",
+      "description": "Write a Levenshtein distance solver and verify the insert/delete/replace transitions.",
+      "command": "python3 edit_distance.py",
+      "expected_outcome": "The final distance should match the minimum number of edits needed.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "edit-distance",
+        "strings"
+      ]
+    },
+    {
+      "id": "dynamic-programming-ex-05",
+      "size": "large",
+      "title": "Build an interval DP",
+      "description": "Solve a weighted interval scheduling or palindrome interval problem with a DP table.",
+      "command": "python3 interval_dp.py",
+      "expected_outcome": "The solution should choose compatible intervals or subranges optimally.",
+      "prereqs": [
+        "Python 3.10+",
+        "recurrence design"
+      ],
+      "tags": [
+        "interval-dp",
+        "optimization"
+      ]
+    },
+    {
+      "id": "dynamic-programming-ex-06",
+      "size": "large",
+      "title": "Space-optimize a 2D DP",
+      "description": "Take a 2D DP and reduce it to a rolling-row or one-dimensional implementation.",
+      "command": "python3 dp_space_optimization.py",
+      "expected_outcome": "The optimized version should use less memory while returning the same answer.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "space-optimization",
+        "dynamic-programming"
+      ]
+    }
+  ]
+}

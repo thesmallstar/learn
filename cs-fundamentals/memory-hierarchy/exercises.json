@@ -1,0 +1,11 @@
+{
+  "topic": "memory-hierarchy",
+  "exercises": [
+    {"id":"mem-ex-01","size":"small","title":"Inspect Process Maps","description":"Open your own process memory map and identify text, heap, stack, and mmap regions.","command":"cat /proc/self/maps","expected_outcome":"You can point to the major virtual memory regions in the output.","prereqs":["Linux"],"tags":["proc","maps","virtual-memory"]},
+    {"id":"mem-ex-02","size":"small","title":"Read Memory Pressure","description":"Run free and vmstat to understand system memory usage and swap activity.","command":"free -h && vmstat 1 5","expected_outcome":"You can explain the major columns and whether the machine is under memory pressure.","prereqs":["Linux"],"tags":["memory","vmstat","free"]},
+    {"id":"mem-ex-03","size":"medium","title":"Sequential vs Random Access","description":"Write a small benchmark that walks an array sequentially and randomly, then compare timings.","command":"./access_pattern_bench","expected_outcome":"Sequential access should be measurably faster than random access on the same data size.","prereqs":["C, Rust, or Go"],"tags":["locality","benchmark","cache"]},
+    {"id":"mem-ex-04","size":"medium","title":"Detect a Memory Leak","description":"Create a small leak in a toy program and detect it with valgrind or heaptrack.","command":"valgrind --leak-check=full ./leaky_program","expected_outcome":"The tool should report leaked allocations or still-reachable blocks.","prereqs":["valgrind or heaptrack","C or C++"],"tags":["leak","debugging","heap"]},
+    {"id":"mem-ex-05","size":"large","title":"Pointer-Chasing Latency Test","description":"Build a pointer-chasing benchmark that explores cache and RAM latency at different working-set sizes.","command":"perf stat ./pointer_chase_bench","expected_outcome":"Latency should jump as the working set moves beyond cache sizes and into RAM.","prereqs":["perf","C compiler"],"tags":["latency","cache","ram"]},
+    {"id":"mem-ex-06","size":"large","title":"Simple Allocator","description":"Implement a basic malloc/free wrapper with mmap, splitting, and coalescing.","command":"./allocator_demo","expected_outcome":"You can allocate and free blocks while observing reuse of freed memory.","prereqs":["C","mmap knowledge"],"tags":["allocator","mmap","fragmentation"]}
+  ]
+}

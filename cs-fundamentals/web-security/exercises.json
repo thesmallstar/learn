@@ -1,0 +1,95 @@
+{
+  "topic": "web-security",
+  "exercises": [
+    {
+      "id": "ws-ex-01",
+      "size": "small",
+      "title": "Inspect security headers",
+      "description": "Use curl to inspect CSP, X-Frame-Options, and cookie headers on a site.",
+      "command": "curl -I https://example.com",
+      "expected_outcome": "You can identify which security headers are present or missing.",
+      "prereqs": [
+        "curl installed"
+      ],
+      "tags": [
+        "headers",
+        "security"
+      ]
+    },
+    {
+      "id": "ws-ex-02",
+      "size": "small",
+      "title": "Check SameSite and HttpOnly",
+      "description": "Open DevTools and inspect the cookies set by a local app or demo site.",
+      "command": "open DevTools Application tab",
+      "expected_outcome": "You can see HttpOnly, Secure, and SameSite attributes on cookies.",
+      "prereqs": [
+        "browser"
+      ],
+      "tags": [
+        "cookies",
+        "devtools"
+      ]
+    },
+    {
+      "id": "ws-ex-03",
+      "size": "medium",
+      "title": "Demonstrate CORS behavior",
+      "description": "Create a tiny server and a cross-origin page that tries to fetch it, then adjust the response headers.",
+      "command": "python cors_demo.py",
+      "expected_outcome": "You can show a blocked fetch and then a successful CORS-enabled fetch.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "cors",
+        "fetch"
+      ]
+    },
+    {
+      "id": "ws-ex-04",
+      "size": "medium",
+      "title": "Build an XSS-safe renderer",
+      "description": "Write a small HTML renderer that escapes user input before inserting it into the page.",
+      "command": "python safe_render.py",
+      "expected_outcome": "Injected HTML is displayed as text instead of executing.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "xss",
+        "encoding"
+      ]
+    },
+    {
+      "id": "ws-ex-05",
+      "size": "large",
+      "title": "Add CSRF protection",
+      "description": "Implement a token-based CSRF defense in a tiny form submission app and verify cross-site requests fail.",
+      "command": "python csrf_app.py",
+      "expected_outcome": "Legitimate submissions succeed while forged cross-site posts are rejected.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "csrf",
+        "forms"
+      ]
+    },
+    {
+      "id": "ws-ex-06",
+      "size": "large",
+      "title": "Harden a mini app with CSP",
+      "description": "Add a strict CSP, nonce-based scripts, and frame blocking to a demo app.",
+      "command": "python csp_demo.py",
+      "expected_outcome": "The app only runs approved scripts and refuses framing.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "csp",
+        "clickjacking"
+      ]
+    }
+  ]
+}

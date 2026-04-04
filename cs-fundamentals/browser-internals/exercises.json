@@ -1,0 +1,97 @@
+{
+  "topic": "browser-internals",
+  "exercises": [
+    {
+      "id": "br-ex-01",
+      "size": "small",
+      "title": "Inspect the critical path",
+      "description": "Open DevTools and identify which requests block first render on a page.",
+      "command": "open DevTools Network tab",
+      "expected_outcome": "You can point to parser-blocking scripts and render-blocking CSS.",
+      "prereqs": [
+        "Chrome or Chromium"
+      ],
+      "tags": [
+        "devtools",
+        "rendering"
+      ]
+    },
+    {
+      "id": "br-ex-02",
+      "size": "small",
+      "title": "Observe storage usage",
+      "description": "Inspect cookies, localStorage, and cache storage for a site.",
+      "command": "open DevTools Application tab",
+      "expected_outcome": "You can see what the browser stored and where it lives.",
+      "prereqs": [
+        "Chrome or Chromium"
+      ],
+      "tags": [
+        "storage",
+        "devtools"
+      ]
+    },
+    {
+      "id": "br-ex-03",
+      "size": "medium",
+      "title": "Measure layout cost",
+      "description": "Change a layout-heavy property versus a transform and compare repaint behavior.",
+      "command": "edit a local demo page",
+      "expected_outcome": "Transform changes are cheaper than repeated layout invalidations.",
+      "prereqs": [
+        "browser"
+      ],
+      "tags": [
+        "layout",
+        "paint"
+      ]
+    },
+    {
+      "id": "br-ex-04",
+      "size": "medium",
+      "title": "Build a service worker cache",
+      "description": "Add a service worker that caches static assets and serves them offline.",
+      "command": "python -m http.server",
+      "expected_outcome": "The app continues to load after the network is disabled.",
+      "prereqs": [
+        "browser",
+        "local web server"
+      ],
+      "tags": [
+        "service-worker",
+        "offline"
+      ]
+    },
+    {
+      "id": "br-ex-05",
+      "size": "large",
+      "title": "Profile a slow page",
+      "description": "Instrument a page and identify the main bottleneck on the performance timeline.",
+      "command": "use Lighthouse and DevTools performance",
+      "expected_outcome": "You can explain the dominant render or script bottleneck.",
+      "prereqs": [
+        "Chrome or Chromium"
+      ],
+      "tags": [
+        "profiling",
+        "vitals"
+      ]
+    },
+    {
+      "id": "br-ex-06",
+      "size": "large",
+      "title": "Implement a tiny SPA cache",
+      "description": "Write a small app that preloads assets, caches them, and serves stale content while revalidating.",
+      "command": "build a local static app",
+      "expected_outcome": "The app loads quickly on repeat visits and updates in the background.",
+      "prereqs": [
+        "browser",
+        "local web server"
+      ],
+      "tags": [
+        "cache",
+        "spa"
+      ]
+    }
+  ]
+}

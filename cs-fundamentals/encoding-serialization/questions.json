@@ -1,0 +1,23 @@
+{
+  "topic": "encoding-serialization",
+  "questions": [
+    {"id":"enc-001","tier":"A","q":"What is UTF-8?","a":"A variable-length encoding for Unicode text.","tags":["utf-8","unicode"]},
+    {"id":"enc-002","tier":"A","q":"What is Base64 used for?","a":"Encoding binary data as text-safe characters.","tags":["base64","encoding"]},
+    {"id":"enc-003","tier":"A","q":"What is serialization?","a":"Converting in-memory data into a storable or transmissible format.","tags":["serialization","data-format"]},
+    {"id":"enc-004","tier":"A","q":"What is JSON?","a":"A text-based data interchange format using key-value structures and arrays.","tags":["json","serialization"]},
+    {"id":"enc-005","tier":"A","q":"What is gzip?","a":"A compression format and algorithm commonly used for reducing text payloads.","tags":["gzip","compression"]},
+    {"id":"enc-006","tier":"A","q":"Why can 0.1 + 0.2 be surprising in floating point?","a":"Binary floating point cannot represent many decimal fractions exactly.","tags":["floating-point","ieee-754"]},
+    {"id":"enc-007","tier":"B","q":"Why is UTF-8 popular on the web?","a":"It is backward-compatible with ASCII and efficient for common text.","tags":["utf-8","web"]},
+    {"id":"enc-008","tier":"B","q":"Why are binary formats often smaller than JSON?","a":"They omit field names and store values in compact encoded forms.","tags":["binary-format","json"]},
+    {"id":"enc-009","tier":"B","q":"What problem does schema evolution solve?","a":"It lets producers and consumers change over time without breaking old data.","tags":["schema-evolution","compatibility"]},
+    {"id":"enc-010","tier":"B","q":"Why is compression helpful for network payloads?","a":"It reduces bytes on the wire and can lower transfer time when CPU cost is acceptable.","tags":["compression","network"]},
+    {"id":"enc-011","tier":"B","q":"What is the difference between encoding and compression?","a":"Encoding changes representation; compression reduces size.","tags":["encoding","compression"]},
+    {"id":"enc-012","tier":"B","q":"Why do some systems choose protobuf over JSON?","a":"They want smaller payloads, faster parsing, and explicit schemas.","tags":["protobuf","json"]},
+    {"id":"enc-013","tier":"C","q":"When would you choose a text format over a binary format?","a":"When human readability, debugging, and ease of integration matter more than compactness.","tags":["text-format","binary-format","tradeoff"]},
+    {"id":"enc-014","tier":"C","q":"What tradeoff does compression add to a request pipeline?","a":"It saves bandwidth but adds CPU work and sometimes latency.","tags":["compression","tradeoff"]},
+    {"id":"enc-015","tier":"C","q":"Why can careless schema changes break consumers?","a":"Readers may depend on field names, types, or required fields that are no longer present.","tags":["schema","compatibility"]},
+    {"id":"enc-016","tier":"C","q":"When is Base64 the wrong solution?","a":"When you can send raw binary and avoid the 33 percent size overhead.","tags":["base64","tradeoff"]},
+    {"id":"enc-017","tier":"C","q":"What tradeoff do self-describing formats like JSON introduce?","a":"They are easy to inspect, but they cost more bytes and parse time than compact binary encodings.","tags":["json","tradeoff"]},
+    {"id":"enc-018","tier":"C","q":"Why does exact decimal money handling often avoid binary floating point?","a":"Because rounding error can accumulate, so fixed-point or decimal types are safer.","tags":["floating-point","money","tradeoff"]}
+  ]
+}

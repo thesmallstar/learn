@@ -1,0 +1,185 @@
+{
+  "topic": "symmetric-encryption",
+  "questions": [
+    {
+      "id": "symmetric-encryption-001",
+      "tier": "A",
+      "q": "What is symmetric encryption?",
+      "a": "Encryption where the same secret key is used to encrypt and decrypt.",
+      "tags": [
+        "crypto",
+        "symmetric"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-002",
+      "tier": "A",
+      "q": "What is AES?",
+      "a": "A widely used symmetric block cipher.",
+      "tags": [
+        "crypto",
+        "aes"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-003",
+      "tier": "A",
+      "q": "What is a nonce?",
+      "a": "A value used once to make encryption unique even with the same key.",
+      "tags": [
+        "crypto",
+        "nonce"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-004",
+      "tier": "A",
+      "q": "What is an IV?",
+      "a": "An initialization vector used to randomize some encryption modes.",
+      "tags": [
+        "crypto",
+        "iv"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-005",
+      "tier": "A",
+      "q": "What is AEAD?",
+      "a": "Authenticated encryption with associated data.",
+      "tags": [
+        "crypto",
+        "aead"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-006",
+      "tier": "A",
+      "q": "What is HMAC for?",
+      "a": "Integrity and authenticity for messages using a shared secret.",
+      "tags": [
+        "crypto",
+        "hmac"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-007",
+      "tier": "B",
+      "q": "Why is ECB mode dangerous?",
+      "a": "It leaks patterns because identical plaintext blocks encrypt to identical ciphertext blocks.",
+      "tags": [
+        "crypto",
+        "ecb"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-008",
+      "tier": "B",
+      "q": "Why must nonces be unique in GCM?",
+      "a": "Nonce reuse can destroy confidentiality and integrity guarantees.",
+      "tags": [
+        "crypto",
+        "gcm"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-009",
+      "tier": "B",
+      "q": "Why do padding schemes exist in block ciphers?",
+      "a": "Because block ciphers operate on fixed-size blocks, but plaintext lengths vary.",
+      "tags": [
+        "crypto",
+        "padding"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-010",
+      "tier": "B",
+      "q": "Why is ChaCha20-Poly1305 popular?",
+      "a": "It is fast in software and provides authenticated encryption.",
+      "tags": [
+        "crypto",
+        "chacha20"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-011",
+      "tier": "B",
+      "q": "Why do you use a KDF for passwords?",
+      "a": "To slow down guessing and derive a suitable key from a low-entropy secret.",
+      "tags": [
+        "crypto",
+        "kdf"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-012",
+      "tier": "B",
+      "q": "Why is bcrypt stronger for password storage than raw SHA-256?",
+      "a": "It is intentionally slow and tunable, which raises brute-force cost.",
+      "tags": [
+        "crypto",
+        "passwords"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-013",
+      "tier": "C",
+      "q": "When should you choose AES-GCM over CBC?",
+      "a": "When you want authenticated encryption with modern safety guarantees.",
+      "tags": [
+        "crypto",
+        "gcm"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-014",
+      "tier": "C",
+      "q": "When is ChaCha20-Poly1305 a better choice?",
+      "a": "When software performance or mobile/embedded environments matter.",
+      "tags": [
+        "crypto",
+        "chacha20"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-015",
+      "tier": "C",
+      "q": "What tradeoff comes with encrypting data at rest only?",
+      "a": "It protects stored data, but data can still leak in memory or in transit.",
+      "tags": [
+        "crypto",
+        "at-rest"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-016",
+      "tier": "C",
+      "q": "Why does key rotation matter?",
+      "a": "It limits exposure if a key is leaked or long-lived cryptography becomes risky.",
+      "tags": [
+        "crypto",
+        "rotation"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-017",
+      "tier": "C",
+      "q": "What tradeoff comes with stronger password hashing settings?",
+      "a": "Better brute-force resistance, but higher login latency and CPU cost.",
+      "tags": [
+        "crypto",
+        "passwords"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-018",
+      "tier": "C",
+      "q": "Why is nonce management often the hardest part of symmetric crypto systems?",
+      "a": "Because the algorithm can be sound while reuse or state bugs break security.",
+      "tags": [
+        "crypto",
+        "nonce"
+      ]
+    }
+  ]
+}

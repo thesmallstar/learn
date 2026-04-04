@@ -1,0 +1,173 @@
+{
+  "topic": "performance-engineering",
+  "questions": [
+    {
+      "id": "performance-engineering-001",
+      "tier": "A",
+      "q": "What does P99 latency mean?",
+      "a": "99 percent of requests finish at or below that latency.",
+      "tags": [
+        "latency",
+        "p99"
+      ]
+    },
+    {
+      "id": "performance-engineering-002",
+      "tier": "A",
+      "q": "What is throughput?",
+      "a": "The amount of work completed per unit time.",
+      "tags": [
+        "throughput"
+      ]
+    },
+    {
+      "id": "performance-engineering-003",
+      "tier": "A",
+      "q": "What does CPU-bound mean?",
+      "a": "The CPU is the bottleneck.",
+      "tags": [
+        "cpu"
+      ]
+    },
+    {
+      "id": "performance-engineering-004",
+      "tier": "A",
+      "q": "What does I/O-bound mean?",
+      "a": "Waiting on disk, network, or another external resource is the bottleneck.",
+      "tags": [
+        "io"
+      ]
+    },
+    {
+      "id": "performance-engineering-005",
+      "tier": "A",
+      "q": "What is a flame graph used for?",
+      "a": "Visualizing where CPU time is spent in a program.",
+      "tags": [
+        "profiling"
+      ]
+    },
+    {
+      "id": "performance-engineering-006",
+      "tier": "A",
+      "q": "What is batching?",
+      "a": "Combining multiple units of work into one operation.",
+      "tags": [
+        "batching"
+      ]
+    },
+    {
+      "id": "performance-engineering-007",
+      "tier": "B",
+      "q": "Why do averages hide performance problems?",
+      "a": "They smooth out slow tail requests that users actually feel.",
+      "tags": [
+        "latency",
+        "tail"
+      ]
+    },
+    {
+      "id": "performance-engineering-008",
+      "tier": "B",
+      "q": "Why is Little's Law useful?",
+      "a": "It relates concurrency, throughput, and latency, so you can estimate system behavior.",
+      "tags": [
+        "queueing",
+        "littles-law"
+      ]
+    },
+    {
+      "id": "performance-engineering-009",
+      "tier": "B",
+      "q": "Why does Amdahl's Law matter?",
+      "a": "It shows the limited speedup from optimizing only one part of a workload.",
+      "tags": [
+        "amdahl"
+      ]
+    },
+    {
+      "id": "performance-engineering-010",
+      "tier": "B",
+      "q": "Why do connection pools improve latency?",
+      "a": "They avoid repeated setup cost and reuse warmed connections.",
+      "tags": [
+        "pooling"
+      ]
+    },
+    {
+      "id": "performance-engineering-011",
+      "tier": "B",
+      "q": "Why is an N+1 query pattern slow?",
+      "a": "It turns one logical request into many repeated round trips.",
+      "tags": [
+        "database",
+        "n+1"
+      ]
+    },
+    {
+      "id": "performance-engineering-012",
+      "tier": "B",
+      "q": "Why does load testing need a steady methodology?",
+      "a": "Without controlled inputs, benchmark results are noisy and misleading.",
+      "tags": [
+        "load-testing"
+      ]
+    },
+    {
+      "id": "performance-engineering-013",
+      "tier": "C",
+      "q": "When should you optimize for tail latency instead of average latency?",
+      "a": "When user experience or SLAs are dominated by slow outliers.",
+      "tags": [
+        "latency",
+        "slo"
+      ]
+    },
+    {
+      "id": "performance-engineering-014",
+      "tier": "C",
+      "q": "What tradeoff comes with aggressive caching?",
+      "a": "It reduces latency, but freshness and invalidation complexity increase.",
+      "tags": [
+        "caching",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "performance-engineering-015",
+      "tier": "C",
+      "q": "When is throughput more important than latency?",
+      "a": "When you need to process bulk work and individual request time matters less.",
+      "tags": [
+        "throughput"
+      ]
+    },
+    {
+      "id": "performance-engineering-016",
+      "tier": "C",
+      "q": "Why do performance regressions often come from contention?",
+      "a": "Threads or requests start waiting on the same shared resource.",
+      "tags": [
+        "contention"
+      ]
+    },
+    {
+      "id": "performance-engineering-017",
+      "tier": "C",
+      "q": "What should you measure before optimizing?",
+      "a": "The actual bottleneck, the workload shape, and a baseline you trust.",
+      "tags": [
+        "profiling"
+      ]
+    },
+    {
+      "id": "performance-engineering-018",
+      "tier": "C",
+      "q": "What tradeoff comes with parallelism?",
+      "a": "More parallel work can improve throughput, but synchronization overhead may rise.",
+      "tags": [
+        "parallelism"
+      ]
+    }
+  ]
+}

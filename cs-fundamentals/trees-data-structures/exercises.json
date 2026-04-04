@@ -1,0 +1,97 @@
+{
+  "topic": "trees-data-structures",
+  "exercises": [
+    {
+      "id": "trees-data-structures-ex-01",
+      "size": "small",
+      "title": "Walk a sample tree",
+      "description": "Print preorder, inorder, and postorder traversals for a small tree and compare the outputs.",
+      "command": "python3 tree_traversal_demo.py",
+      "expected_outcome": "Inorder traversal of a BST should come out sorted.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "trees",
+        "traversal"
+      ]
+    },
+    {
+      "id": "trees-data-structures-ex-02",
+      "size": "small",
+      "title": "Inspect a heap",
+      "description": "Insert several values into a binary heap and observe how the smallest or largest value stays at the root.",
+      "command": "python3 heap_property_demo.py",
+      "expected_outcome": "The root should always hold the current min or max depending on heap type.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "heap",
+        "priority-queue"
+      ]
+    },
+    {
+      "id": "trees-data-structures-ex-03",
+      "size": "medium",
+      "title": "Implement a BST",
+      "description": "Write search, insert, and delete for a binary search tree and test the ordering invariant.",
+      "command": "python3 bst_impl.py",
+      "expected_outcome": "Lookups should respect the BST ordering rule and deletes should preserve it.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "bst",
+        "search"
+      ]
+    },
+    {
+      "id": "trees-data-structures-ex-04",
+      "size": "medium",
+      "title": "Build a trie autocomplete",
+      "description": "Store a word list in a trie and return completions for a typed prefix.",
+      "command": "python3 trie_autocomplete.py",
+      "expected_outcome": "Prefix queries should return only words that start with the prefix.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "trie",
+        "prefix-search"
+      ]
+    },
+    {
+      "id": "trees-data-structures-ex-05",
+      "size": "large",
+      "title": "Implement AVL rotations",
+      "description": "Add AVL insertion with single and double rotations, then verify the balance factor stays bounded.",
+      "command": "python3 avl_tree.py",
+      "expected_outcome": "The tree should remain height-balanced after each insert.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "avl",
+        "rotations"
+      ]
+    },
+    {
+      "id": "trees-data-structures-ex-06",
+      "size": "large",
+      "title": "Simulate B-tree splits",
+      "description": "Model page splits and range scans for a small B-tree or B+ tree and compare behavior to a BST.",
+      "command": "python3 btree_split_demo.py",
+      "expected_outcome": "Node splits should keep the tree shallow and preserve sorted range access.",
+      "prereqs": [
+        "Python 3.10+",
+        "tree basics"
+      ],
+      "tags": [
+        "b-tree",
+        "storage",
+        "range-scan"
+      ]
+    }
+  ]
+}

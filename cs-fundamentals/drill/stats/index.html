@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CS Drill Stats — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/drill.css">
+</head>
+<body>
+<nav>
+  <a href="/">learn.surkar.in</a>
+  <a href="../">drill</a>
+</nav>
+
+<main class="wrap">
+  <section class="hero-card">
+    <div class="hero-kicker">Progress</div>
+    <h1>Drill Stats</h1>
+    <p class="hero-copy">Local progress only. No backend, no account, and no sync layer hiding the real review state.</p>
+  </section>
+
+  <section class="stats-grid" style="margin-top:1rem;">
+    <div class="stat-card"><span class="stat-label">Cards</span><span class="stat-value" id="stat-total">0</span></div>
+    <div class="stat-card"><span class="stat-label">Reviewed This Week</span><span class="stat-value" id="stat-reviewed">0</span></div>
+    <div class="stat-card"><span class="stat-label">Retention</span><span class="stat-value" id="stat-retention">0%</span></div>
+    <div class="stat-card"><span class="stat-label">Streak</span><span class="stat-value" id="stat-streak">0</span></div>
+    <div class="stat-card"><span class="stat-label">Study Time</span><span class="stat-value" id="stat-time">0m</span></div>
+  </section>
+
+  <section class="panel" style="margin-top:1rem;">
+    <h2>Topic Breakdown</h2>
+    <p class="panel-copy">New, learning, review, mastered, and due counts are computed from local review history plus each topic's JSON bank.</p>
+    <table class="stats-page-table">
+      <thead>
+        <tr>
+          <th>Topic</th>
+          <th>Cards</th>
+          <th>New</th>
+          <th>Learning</th>
+          <th>Review</th>
+          <th>Mastered</th>
+          <th>Due</th>
+        </tr>
+      </thead>
+      <tbody id="stats-body"></tbody>
+    </table>
+  </section>
+</main>
+
+<script src="../../assets/catalog.js"></script>
+<script src="../../assets/study-utils.js"></script>
+<script src="../../assets/drill-stats.js"></script>
+</body>
+</html>

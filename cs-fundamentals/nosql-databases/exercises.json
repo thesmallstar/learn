@@ -1,0 +1,96 @@
+{
+  "topic": "nosql-databases",
+  "exercises": [
+    {
+      "id": "nosql-databases-ex-01",
+      "size": "small",
+      "title": "Use Redis as a key-value store",
+      "description": "Store a key with a TTL, read it back, and watch it expire.",
+      "command": "redis-cli set demo:key value EX 10",
+      "expected_outcome": "The value should be retrievable until the TTL expires.",
+      "prereqs": [
+        "Redis"
+      ],
+      "tags": [
+        "redis",
+        "ttl"
+      ]
+    },
+    {
+      "id": "nosql-databases-ex-02",
+      "size": "small",
+      "title": "Compare document shapes",
+      "description": "Represent the same data as nested JSON and as flattened relational rows and compare the shape.",
+      "command": "python3 compare_document_shapes.py",
+      "expected_outcome": "The document version should keep related fields together in one object.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "document-db",
+        "schema"
+      ]
+    },
+    {
+      "id": "nosql-databases-ex-03",
+      "size": "medium",
+      "title": "Build an in-memory document store",
+      "description": "Support insert and nested-field lookup for a tiny document collection.",
+      "command": "python3 document_store.py",
+      "expected_outcome": "Nested fields should be queryable without flattening the whole object.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "document-db",
+        "query"
+      ]
+    },
+    {
+      "id": "nosql-databases-ex-04",
+      "size": "medium",
+      "title": "Simulate hash sharding",
+      "description": "Route records across shards by key and inspect how evenly the keys distribute.",
+      "command": "python3 shard_distribution.py",
+      "expected_outcome": "A good partition key should spread records across shards fairly evenly.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "sharding",
+        "partition-key"
+      ]
+    },
+    {
+      "id": "nosql-databases-ex-05",
+      "size": "large",
+      "title": "Build a replicated key-value store",
+      "description": "Create a primary-replica KV store and observe how writes propagate to followers.",
+      "command": "python3 replicated_kv_store.py",
+      "expected_outcome": "Reads from replicas should eventually converge with the primary.",
+      "prereqs": [
+        "Python 3.10+",
+        "network basics"
+      ],
+      "tags": [
+        "replication",
+        "kv-store"
+      ]
+    },
+    {
+      "id": "nosql-databases-ex-06",
+      "size": "large",
+      "title": "Benchmark query patterns",
+      "description": "Compare a graph traversal, a document lookup, and a key-value read for the same data set.",
+      "command": "python3 nosql_query_benchmark.py",
+      "expected_outcome": "Each model should win on the access pattern it was built for.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "benchmark",
+        "nosql-models"
+      ]
+    }
+  ]
+}

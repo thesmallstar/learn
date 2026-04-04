@@ -1,0 +1,188 @@
+{
+  "topic": "database-internals",
+  "questions": [
+    {
+      "id": "database-internals-001a",
+      "tier": "A",
+      "q": "What is a B-tree page?",
+      "a": "A fixed-size block that stores sorted keys and pointers.",
+      "tags": [
+        "b-tree",
+        "storage-engine"
+      ]
+    },
+    {
+      "id": "database-internals-001b",
+      "tier": "B",
+      "q": "Why are B-trees strong for reads and range scans?",
+      "a": "Their balanced shape and sorted pages let the engine find nearby keys with few I/Os.",
+      "tags": [
+        "b-tree",
+        "storage-engine"
+      ]
+    },
+    {
+      "id": "database-internals-001c",
+      "tier": "C",
+      "q": "When would you choose a B-tree engine over an LSM-tree engine?",
+      "a": "When point lookups and range queries matter more than write throughput.",
+      "tags": [
+        "b-tree",
+        "storage-engine"
+      ]
+    },
+    {
+      "id": "database-internals-002a",
+      "tier": "A",
+      "q": "What is an LSM-tree memtable?",
+      "a": "An in-memory write buffer flushed later as immutable sorted files.",
+      "tags": [
+        "lsm-tree",
+        "write-path"
+      ]
+    },
+    {
+      "id": "database-internals-002b",
+      "tier": "B",
+      "q": "Why are LSM-trees good for write-heavy workloads?",
+      "a": "Writes become sequential appends, which are much cheaper than random page updates.",
+      "tags": [
+        "lsm-tree",
+        "write-path"
+      ]
+    },
+    {
+      "id": "database-internals-002c",
+      "tier": "C",
+      "q": "When would you choose an LSM-tree over a B-tree?",
+      "a": "When ingest rate is high and you can tolerate compaction work for faster writes.",
+      "tags": [
+        "lsm-tree",
+        "write-path"
+      ]
+    },
+    {
+      "id": "database-internals-003a",
+      "tier": "A",
+      "q": "What does the WAL provide?",
+      "a": "Crash recovery and durability for committed changes.",
+      "tags": [
+        "wal",
+        "checkpoint"
+      ]
+    },
+    {
+      "id": "database-internals-003b",
+      "tier": "B",
+      "q": "Why must a change hit the WAL before data pages?",
+      "a": "If the database crashes, it can replay the log and recover committed work.",
+      "tags": [
+        "wal",
+        "checkpoint"
+      ]
+    },
+    {
+      "id": "database-internals-003c",
+      "tier": "C",
+      "q": "What happens if checkpoints are too infrequent?",
+      "a": "Recovery gets slower and the log grows larger because more changes remain to replay.",
+      "tags": [
+        "wal",
+        "checkpoint"
+      ]
+    },
+    {
+      "id": "database-internals-004a",
+      "tier": "A",
+      "q": "What is the buffer pool?",
+      "a": "A memory cache for database pages.",
+      "tags": [
+        "buffer-pool",
+        "pages"
+      ]
+    },
+    {
+      "id": "database-internals-004b",
+      "tier": "B",
+      "q": "Why do dirty pages matter?",
+      "a": "They have changed in memory but have not yet been flushed to disk.",
+      "tags": [
+        "buffer-pool",
+        "pages"
+      ]
+    },
+    {
+      "id": "database-internals-004c",
+      "tier": "C",
+      "q": "When do buffer pool misses become a major problem?",
+      "a": "When the working set is larger than memory and the engine keeps reading cold pages from disk.",
+      "tags": [
+        "buffer-pool",
+        "pages"
+      ]
+    },
+    {
+      "id": "database-internals-005a",
+      "tier": "A",
+      "q": "What does a cost-based optimizer do?",
+      "a": "It picks the plan with the lowest estimated cost.",
+      "tags": [
+        "optimizer",
+        "statistics"
+      ]
+    },
+    {
+      "id": "database-internals-005b",
+      "tier": "B",
+      "q": "Why does ANALYZE or statistics collection matter?",
+      "a": "The optimizer needs row counts, cardinalities, and distributions to estimate a good plan.",
+      "tags": [
+        "optimizer",
+        "statistics"
+      ]
+    },
+    {
+      "id": "database-internals-005c",
+      "tier": "C",
+      "q": "How can bad cardinality estimates hurt a query?",
+      "a": "They can cause the engine to choose the wrong join order, scan type, or index.",
+      "tags": [
+        "optimizer",
+        "statistics"
+      ]
+    },
+    {
+      "id": "database-internals-006a",
+      "tier": "A",
+      "q": "What is MVCC?",
+      "a": "Multi-version concurrency control.",
+      "tags": [
+        "mvcc",
+        "vacuum",
+        "indexing"
+      ]
+    },
+    {
+      "id": "database-internals-006b",
+      "tier": "B",
+      "q": "Why does VACUUM exist in systems like Postgres?",
+      "a": "It reclaims dead row versions and prevents tables from filling with obsolete data.",
+      "tags": [
+        "mvcc",
+        "vacuum",
+        "indexing"
+      ]
+    },
+    {
+      "id": "database-internals-006c",
+      "tier": "C",
+      "q": "When can a low-cardinality index hurt performance?",
+      "a": "When the index is not selective enough and the engine still has to read most of the table.",
+      "tags": [
+        "mvcc",
+        "vacuum",
+        "indexing"
+      ]
+    }
+  ]
+}

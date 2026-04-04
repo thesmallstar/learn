@@ -1,0 +1,11 @@
+{
+  "topic": "processes",
+  "exercises": [
+    {"id":"proc-ex-01","size":"small","title":"Inspect the Process Tree","description":"Use ps and pstree to find your shell, its parent, and PID 1.","command":"ps aux | head && pstree -p","expected_outcome":"You can identify your shell and explain the parent-child relationships in the tree.","prereqs":["Linux"],"tags":["ps","pstree","pid"]},
+    {"id":"proc-ex-02","size":"small","title":"Create a Zombie","description":"Write a short script that forks a child, does not wait, and observe the zombie state.","command":"python3 zombie_demo.py","expected_outcome":"You should see a zombie child in ps until the parent reaps it.","prereqs":["Python 3"],"tags":["zombie","waitpid"]},
+    {"id":"proc-ex-03","size":"medium","title":"Fork and Exec","description":"Write a small C program that forks and runs ls -la in the child, then checks the exit code.","command":"./fork_exec_demo","expected_outcome":"The child should replace itself with ls and the parent should print the exit status.","prereqs":["C compiler"],"tags":["fork","exec","waitpid"]},
+    {"id":"proc-ex-04","size":"medium","title":"Mini Shell","description":"Build a simple command loop that forks, execs, and waits without pipes or redirection.","command":"./mini_shell","expected_outcome":"You can run basic commands interactively and exit cleanly.","prereqs":["C, Rust, or Go"],"tags":["shell","fork","exec"]},
+    {"id":"proc-ex-05","size":"large","title":"Process Pool","description":"Implement N worker processes that consume jobs from a queue and shut down on SIGTERM.","command":"python3 process_pool.py","expected_outcome":"Workers process tasks concurrently and exit gracefully on termination.","prereqs":["Python 3"],"tags":["process-pool","signals","parallelism"]},
+    {"id":"proc-ex-06","size":"large","title":"Syscall Tracer","description":"Use ptrace to log the syscalls made by a child process.","command":"./mini_strace ./target_program","expected_outcome":"You can see syscall numbers or names as the child runs.","prereqs":["C compiler","ptrace support"],"tags":["ptrace","syscalls","debugging"]}
+  ]
+}

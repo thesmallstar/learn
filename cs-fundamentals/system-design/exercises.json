@@ -1,0 +1,94 @@
+{
+  "topic": "system-design",
+  "exercises": [
+    {
+      "id": "system-design-ex-01",
+      "size": "small",
+      "title": "Write Requirements First",
+      "description": "Create a one-page design brief with functional and non-functional requirements.",
+      "command": "mkdir -p docs && $EDITOR docs/requirements.md",
+      "expected_outcome": "You have a crisp problem statement before proposing architecture.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "requirements",
+        "design"
+      ]
+    },
+    {
+      "id": "system-design-ex-02",
+      "size": "small",
+      "title": "Estimate Capacity",
+      "description": "Work through requests per second, storage growth, and bandwidth for a sample system.",
+      "command": "python capacity_estimate.py",
+      "expected_outcome": "You can justify the scale assumptions behind your design.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "capacity",
+        "math"
+      ]
+    },
+    {
+      "id": "system-design-ex-03",
+      "size": "medium",
+      "title": "Design a Cursor API",
+      "description": "Implement a paginated endpoint with stable cursors and idempotent retries.",
+      "command": "python api.py",
+      "expected_outcome": "Large datasets can be fetched safely in pages.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "pagination",
+        "api"
+      ]
+    },
+    {
+      "id": "system-design-ex-04",
+      "size": "medium",
+      "title": "Build a Rate Limiter",
+      "description": "Create a small rate-limited endpoint using a token bucket or sliding window.",
+      "command": "python rate_limiter.py",
+      "expected_outcome": "Burst traffic is controlled without breaking normal traffic.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "rate-limiting"
+      ]
+    },
+    {
+      "id": "system-design-ex-05",
+      "size": "large",
+      "title": "Draft a Full Architecture",
+      "description": "Produce an end-to-end design for a service with storage, cache, queue, and failure handling.",
+      "command": "mkdir -p docs && $EDITOR docs/architecture.md",
+      "expected_outcome": "You have a complete architecture document and data flow diagram.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "architecture",
+        "design"
+      ]
+    },
+    {
+      "id": "system-design-ex-06",
+      "size": "large",
+      "title": "Plan a Shard Migration",
+      "description": "Describe how to move hot data between partitions with minimal downtime.",
+      "command": "mkdir -p docs && $EDITOR docs/shard-migration.md",
+      "expected_outcome": "You can explain a safe migration path and rollback plan.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "sharding",
+        "migration"
+      ]
+    }
+  ]
+}

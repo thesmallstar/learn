@@ -1,0 +1,185 @@
+{
+  "topic": "tls-https",
+  "questions": [
+    {
+      "id": "tls-a01",
+      "tier": "A",
+      "q": "Which three properties does TLS provide?",
+      "a": "Confidentiality, integrity, and authentication",
+      "tags": [
+        "tls",
+        "security"
+      ]
+    },
+    {
+      "id": "tls-a02",
+      "tier": "A",
+      "q": "How many round trips does a full TLS 1.3 handshake require?",
+      "a": "1 round trip",
+      "tags": [
+        "tls13",
+        "handshake"
+      ]
+    },
+    {
+      "id": "tls-a03",
+      "tier": "A",
+      "q": "Which certificate in a chain is self-signed?",
+      "a": "The root certificate",
+      "tags": [
+        "certificates",
+        "chain"
+      ]
+    },
+    {
+      "id": "tls-a04",
+      "tier": "A",
+      "q": "What does OCSP stapling improve?",
+      "a": "Revocation checking performance and privacy",
+      "tags": [
+        "ocsp",
+        "revocation"
+      ]
+    },
+    {
+      "id": "tls-a05",
+      "tier": "A",
+      "q": "What does PFS stand for?",
+      "a": "Perfect Forward Secrecy",
+      "tags": [
+        "pfs",
+        "key-exchange"
+      ]
+    },
+    {
+      "id": "tls-a06",
+      "tier": "A",
+      "q": "What is SNI?",
+      "a": "Server Name Indication",
+      "tags": [
+        "sni",
+        "tls"
+      ]
+    },
+    {
+      "id": "tls-b01",
+      "tier": "B",
+      "q": "Why was RSA key exchange removed in TLS 1.3?",
+      "a": "It did not provide forward secrecy and was less secure than ephemeral key exchange.",
+      "tags": [
+        "rsa",
+        "tls13"
+      ]
+    },
+    {
+      "id": "tls-b02",
+      "tier": "B",
+      "q": "What is the main risk of 0-RTT resumption?",
+      "a": "Replay of early data",
+      "tags": [
+        "0rtt",
+        "replay"
+      ]
+    },
+    {
+      "id": "tls-b03",
+      "tier": "B",
+      "q": "What does the certificate chain establish?",
+      "a": "A trust path from the leaf certificate back to a trusted root",
+      "tags": [
+        "x509",
+        "trust"
+      ]
+    },
+    {
+      "id": "tls-b04",
+      "tier": "B",
+      "q": "Why is SNI often sent in plaintext?",
+      "a": "The server must know which certificate to present before encryption is established.",
+      "tags": [
+        "sni",
+        "privacy"
+      ]
+    },
+    {
+      "id": "tls-b05",
+      "tier": "B",
+      "q": "What role does RSA play in ECDHE_RSA cipher suites?",
+      "a": "It signs the handshake parameters, not the key exchange itself.",
+      "tags": [
+        "cipher-suites",
+        "rsa"
+      ]
+    },
+    {
+      "id": "tls-b06",
+      "tier": "B",
+      "q": "What does mTLS add on top of standard TLS?",
+      "a": "Client certificate authentication",
+      "tags": [
+        "mtls",
+        "auth"
+      ]
+    },
+    {
+      "id": "tls-c01",
+      "tier": "C",
+      "q": "Why does TLS 1.3 simplify the handshake compared with TLS 1.2?",
+      "a": "It removes legacy negotiation paths and moves to a faster, safer default flow.",
+      "tags": [
+        "tls13",
+        "design"
+      ]
+    },
+    {
+      "id": "tls-c02",
+      "tier": "C",
+      "q": "Why is PFS valuable if a long-term key is compromised later?",
+      "a": "Past sessions remain protected because their traffic keys were derived from ephemeral secrets.",
+      "tags": [
+        "pfs",
+        "compromise"
+      ]
+    },
+    {
+      "id": "tls-c03",
+      "tier": "C",
+      "q": "Why is revocation harder than certificate issuance?",
+      "a": "Clients and intermediates may cache certificates, so revocation data must be checked and distributed reliably.",
+      "tags": [
+        "revocation",
+        "ca"
+      ]
+    },
+    {
+      "id": "tls-c04",
+      "tier": "C",
+      "q": "What tradeoff does 0-RTT make for speed?",
+      "a": "It lowers latency but allows early data to be replayed by an attacker.",
+      "tags": [
+        "0rtt",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "tls-c05",
+      "tier": "C",
+      "q": "Why do public CAs and certificate transparency logs both matter?",
+      "a": "CAs issue certificates, while CT logs make issuance auditable and easier to monitor.",
+      "tags": [
+        "ct",
+        "ca"
+      ]
+    },
+    {
+      "id": "tls-c06",
+      "tier": "C",
+      "q": "Why can mTLS be a good fit for internal service-to-service traffic?",
+      "a": "It gives strong machine identity without relying only on bearer tokens.",
+      "tags": [
+        "mtls",
+        "services"
+      ]
+    }
+  ]
+}

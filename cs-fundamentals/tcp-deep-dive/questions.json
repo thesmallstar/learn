@@ -1,0 +1,184 @@
+{
+  "topic": "tcp-deep-dive",
+  "questions": [
+    {
+      "id": "tcp-a01",
+      "tier": "A",
+      "q": "How many packets are exchanged in a normal TCP connection establishment?",
+      "a": "3",
+      "tags": [
+        "handshake"
+      ]
+    },
+    {
+      "id": "tcp-a02",
+      "tier": "A",
+      "q": "What state is used to wait for late packets after closing a connection?",
+      "a": "TIME_WAIT",
+      "tags": [
+        "states",
+        "time-wait"
+      ]
+    },
+    {
+      "id": "tcp-a03",
+      "tier": "A",
+      "q": "What does TCP_NODELAY disable?",
+      "a": "Nagle's algorithm",
+      "tags": [
+        "nagle",
+        "latency"
+      ]
+    },
+    {
+      "id": "tcp-a04",
+      "tier": "A",
+      "q": "What triggers TCP fast retransmit?",
+      "a": "Three duplicate ACKs",
+      "tags": [
+        "retransmit",
+        "acks"
+      ]
+    },
+    {
+      "id": "tcp-a05",
+      "tier": "A",
+      "q": "What is the purpose of window scaling?",
+      "a": "To allow TCP receive windows larger than 64 KB",
+      "tags": [
+        "window",
+        "rfc7323"
+      ]
+    },
+    {
+      "id": "tcp-a06",
+      "tier": "A",
+      "q": "What is the default Linux congestion controller mentioned on the page?",
+      "a": "CUBIC",
+      "tags": [
+        "congestion",
+        "cubic"
+      ]
+    },
+    {
+      "id": "tcp-b01",
+      "tier": "B",
+      "q": "Why does TIME_WAIT last for 2 x MSL?",
+      "a": "To let delayed duplicate segments expire before the same 4-tuple is reused.",
+      "tags": [
+        "time-wait",
+        "msl"
+      ]
+    },
+    {
+      "id": "tcp-b02",
+      "tier": "B",
+      "q": "What problem does TCP_NODELAY solve?",
+      "a": "It reduces latency by sending small writes immediately instead of coalescing them.",
+      "tags": [
+        "nagle",
+        "latency"
+      ]
+    },
+    {
+      "id": "tcp-b03",
+      "tier": "B",
+      "q": "Why does HTTP/3 move away from TCP?",
+      "a": "To avoid TCP head-of-line blocking and get stream-level recovery over QUIC.",
+      "tags": [
+        "quic",
+        "hol"
+      ]
+    },
+    {
+      "id": "tcp-b04",
+      "tier": "B",
+      "q": "What does the listen() backlog control?",
+      "a": "The number of completed connections waiting in the accept queue.",
+      "tags": [
+        "sockets",
+        "backlog"
+      ]
+    },
+    {
+      "id": "tcp-b05",
+      "tier": "B",
+      "q": "How do SYN cookies defend against SYN floods?",
+      "a": "They encode state in the initial sequence number so the server avoids allocating half-open connection state.",
+      "tags": [
+        "syn-cookies",
+        "dos"
+      ]
+    },
+    {
+      "id": "tcp-b06",
+      "tier": "B",
+      "q": "What does cumulative ACK mean?",
+      "a": "Each ACK confirms receipt of all bytes up to the acknowledged sequence number.",
+      "tags": [
+        "acks",
+        "window"
+      ]
+    },
+    {
+      "id": "tcp-c01",
+      "tier": "C",
+      "q": "Why does TCP use a 3-way handshake instead of 2 packets?",
+      "a": "So both sides can confirm reachability and agree on initial sequence numbers before data flows.",
+      "tags": [
+        "handshake",
+        "design"
+      ]
+    },
+    {
+      "id": "tcp-c02",
+      "tier": "C",
+      "q": "Why is slow start called slow start even though cwnd grows exponentially?",
+      "a": "Because it begins with a tiny window and only ramps up quickly after connection start to avoid overwhelming the path.",
+      "tags": [
+        "slow-start",
+        "congestion"
+      ]
+    },
+    {
+      "id": "tcp-c03",
+      "tier": "C",
+      "q": "When is BBR preferable to loss-based congestion control?",
+      "a": "On high-bandwidth or long-RTT paths where keeping queues short matters more than reacting to packet loss.",
+      "tags": [
+        "bbr",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "tcp-c04",
+      "tier": "C",
+      "q": "Why does TCP suffer from head-of-line blocking?",
+      "a": "The receiver must deliver bytes in order, so a missing segment blocks later data in the same stream.",
+      "tags": [
+        "hol",
+        "ordering"
+      ]
+    },
+    {
+      "id": "tcp-c05",
+      "tier": "C",
+      "q": "Why can a spoofed source IP not complete a TCP handshake easily?",
+      "a": "The attacker would need to receive the SYN-ACK and return the final ACK with the correct sequence state.",
+      "tags": [
+        "spoofing",
+        "handshake"
+      ]
+    },
+    {
+      "id": "tcp-c06",
+      "tier": "C",
+      "q": "What tradeoff does SYN cookie mode make during a flood?",
+      "a": "It preserves server resources but can reduce the amount of TCP option state the server remembers.",
+      "tags": [
+        "syn-cookies",
+        "tradeoff"
+      ]
+    }
+  ]
+}

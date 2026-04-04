@@ -1,0 +1,104 @@
+{
+  "topic": "caching-strategies",
+  "exercises": [
+    {
+      "id": "caching-strategies-ex-01",
+      "size": "small",
+      "title": "Inspect Redis TTLs",
+      "description": "Set a key with a TTL and observe how the remaining lifetime changes over time.",
+      "command": "redis-cli SET demo:value 1 EX 30",
+      "expected_outcome": "A key exists with a countdown TTL that shrinks each second.",
+      "prereqs": [
+        "redis-cli installed",
+        "Redis running locally"
+      ],
+      "tags": [
+        "redis",
+        "ttl",
+        "cache"
+      ]
+    },
+    {
+      "id": "caching-strategies-ex-02",
+      "size": "small",
+      "title": "Watch Cache Traffic",
+      "description": "Run Redis MONITOR while a small script reads and writes a single key.",
+      "command": "redis-cli MONITOR",
+      "expected_outcome": "You can see the read and write commands in real time.",
+      "prereqs": [
+        "redis-cli installed",
+        "Redis running locally"
+      ],
+      "tags": [
+        "redis",
+        "monitor",
+        "cache"
+      ]
+    },
+    {
+      "id": "caching-strategies-ex-03",
+      "size": "medium",
+      "title": "Implement Cache-Aside",
+      "description": "Write a tiny client that reads from Redis, falls back to the origin, and populates the cache on miss.",
+      "command": "python cache_aside.py",
+      "expected_outcome": "Repeated reads hit Redis after the first miss.",
+      "prereqs": [
+        "Python",
+        "Redis"
+      ],
+      "tags": [
+        "cache-aside",
+        "python"
+      ]
+    },
+    {
+      "id": "caching-strategies-ex-04",
+      "size": "medium",
+      "title": "Build an LRU Cache",
+      "description": "Implement O(1) get and put using a hash map plus a doubly linked list.",
+      "command": "python lru_cache.py",
+      "expected_outcome": "Old entries are evicted in least-recently-used order.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "lru",
+        "data-structures"
+      ]
+    },
+    {
+      "id": "caching-strategies-ex-05",
+      "size": "large",
+      "title": "Add a Redis Rate Limiter",
+      "description": "Build a sliding-window or token-bucket limiter on Redis and expose it as a reusable helper.",
+      "command": "python rate_limiter.py",
+      "expected_outcome": "Requests above the limit are rejected consistently across workers.",
+      "prereqs": [
+        "Python",
+        "Redis"
+      ],
+      "tags": [
+        "redis",
+        "rate-limiting",
+        "cache"
+      ]
+    },
+    {
+      "id": "caching-strategies-ex-06",
+      "size": "large",
+      "title": "Write-Through Cache Layer",
+      "description": "Create a small service that writes to the database and cache together, then benchmark read latency.",
+      "command": "python write_through_cache.py",
+      "expected_outcome": "Reads are served from cache and updates stay in sync with the origin.",
+      "prereqs": [
+        "Python",
+        "database",
+        "Redis"
+      ],
+      "tags": [
+        "write-through",
+        "consistency"
+      ]
+    }
+  ]
+}

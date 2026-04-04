@@ -1,0 +1,174 @@
+{
+  "topic": "observability",
+  "questions": [
+    {
+      "id": "observability-001",
+      "tier": "A",
+      "q": "What are the three pillars of observability?",
+      "a": "Logs, metrics, and traces.",
+      "tags": [
+        "observability"
+      ]
+    },
+    {
+      "id": "observability-002",
+      "tier": "A",
+      "q": "What is a counter metric?",
+      "a": "A metric that only increases or resets.",
+      "tags": [
+        "metrics"
+      ]
+    },
+    {
+      "id": "observability-003",
+      "tier": "A",
+      "q": "What is a gauge metric?",
+      "a": "A metric that can go up and down.",
+      "tags": [
+        "metrics"
+      ]
+    },
+    {
+      "id": "observability-004",
+      "tier": "A",
+      "q": "What is a histogram used for?",
+      "a": "Measuring the distribution of values such as latency.",
+      "tags": [
+        "metrics"
+      ]
+    },
+    {
+      "id": "observability-005",
+      "tier": "A",
+      "q": "What is an SLI?",
+      "a": "A service level indicator, the measurement that reflects user experience.",
+      "tags": [
+        "slo"
+      ]
+    },
+    {
+      "id": "observability-006",
+      "tier": "A",
+      "q": "What is a trace ID for?",
+      "a": "Correlating all logs and spans for one request or workflow.",
+      "tags": [
+        "tracing"
+      ]
+    },
+    {
+      "id": "observability-007",
+      "tier": "B",
+      "q": "Why is label cardinality dangerous?",
+      "a": "Too many unique label values make metrics expensive and hard to query.",
+      "tags": [
+        "metrics",
+        "cardinality"
+      ]
+    },
+    {
+      "id": "observability-008",
+      "tier": "B",
+      "q": "Why do structured logs help incidents?",
+      "a": "They make it easier to filter, search, and correlate events.",
+      "tags": [
+        "logging"
+      ]
+    },
+    {
+      "id": "observability-009",
+      "tier": "B",
+      "q": "Why do burn-rate alerts exist?",
+      "a": "They detect when an error budget is being consumed too quickly.",
+      "tags": [
+        "slo",
+        "alerting"
+      ]
+    },
+    {
+      "id": "observability-010",
+      "tier": "B",
+      "q": "Why is sampling used in tracing?",
+      "a": "To reduce telemetry volume while still capturing representative traces.",
+      "tags": [
+        "tracing",
+        "sampling"
+      ]
+    },
+    {
+      "id": "observability-011",
+      "tier": "B",
+      "q": "Why do tail latencies matter in SLOs?",
+      "a": "Rare slow requests often determine whether users perceive the service as healthy.",
+      "tags": [
+        "latency",
+        "slo"
+      ]
+    },
+    {
+      "id": "observability-012",
+      "tier": "B",
+      "q": "Why do logs and traces complement each other?",
+      "a": "Traces show request flow, while logs capture detailed context and errors.",
+      "tags": [
+        "logging",
+        "tracing"
+      ]
+    },
+    {
+      "id": "observability-013",
+      "tier": "C",
+      "q": "When should you use traces instead of logs?",
+      "a": "When you need request-level causality across multiple services.",
+      "tags": [
+        "tracing"
+      ]
+    },
+    {
+      "id": "observability-014",
+      "tier": "C",
+      "q": "When is high-cardinality data a bad metric label?",
+      "a": "When each request or user creates a near-unique label value.",
+      "tags": [
+        "metrics",
+        "cardinality"
+      ]
+    },
+    {
+      "id": "observability-015",
+      "tier": "C",
+      "q": "What tradeoff comes with aggressive alerting?",
+      "a": "You catch more issues, but alert fatigue and noise increase.",
+      "tags": [
+        "alerting"
+      ]
+    },
+    {
+      "id": "observability-016",
+      "tier": "C",
+      "q": "Why should an SLO be tied to user impact?",
+      "a": "Because telemetry should measure what the user actually experiences.",
+      "tags": [
+        "slo"
+      ]
+    },
+    {
+      "id": "observability-017",
+      "tier": "C",
+      "q": "What tradeoff comes with very high trace sampling?",
+      "a": "You gain more coverage, but storage and ingestion costs rise sharply.",
+      "tags": [
+        "tracing",
+        "cost"
+      ]
+    },
+    {
+      "id": "observability-018",
+      "tier": "C",
+      "q": "Why does observability improve debugging more than raw data volume?",
+      "a": "Because well-shaped signals reduce search time better than noisy logs do.",
+      "tags": [
+        "observability"
+      ]
+    }
+  ]
+}

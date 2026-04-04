@@ -1,0 +1,172 @@
+{
+  "topic": "cicd-devops",
+  "questions": [
+    {
+      "id": "cicd-devops-001",
+      "tier": "A",
+      "q": "What does CI stand for?",
+      "a": "Continuous Integration.",
+      "tags": [
+        "ci",
+        "devops"
+      ]
+    },
+    {
+      "id": "cicd-devops-002",
+      "tier": "A",
+      "q": "What does CD usually stand for in delivery pipelines?",
+      "a": "Continuous Delivery or Continuous Deployment, depending on context.",
+      "tags": [
+        "cd",
+        "devops"
+      ]
+    },
+    {
+      "id": "cicd-devops-003",
+      "tier": "A",
+      "q": "What is a build artifact?",
+      "a": "A versioned output such as a binary, image, or package produced by the pipeline.",
+      "tags": [
+        "artifact"
+      ]
+    },
+    {
+      "id": "cicd-devops-004",
+      "tier": "A",
+      "q": "What is trunk-based development?",
+      "a": "A workflow where most work lands on a shared main branch in small increments.",
+      "tags": [
+        "git",
+        "branching"
+      ]
+    },
+    {
+      "id": "cicd-devops-005",
+      "tier": "A",
+      "q": "What is a blue-green deployment?",
+      "a": "Running two production environments and switching traffic between them.",
+      "tags": [
+        "deployments"
+      ]
+    },
+    {
+      "id": "cicd-devops-006",
+      "tier": "A",
+      "q": "What is a canary release?",
+      "a": "Releasing a change to a small slice of traffic before full rollout.",
+      "tags": [
+        "deployments"
+      ]
+    },
+    {
+      "id": "cicd-devops-007",
+      "tier": "B",
+      "q": "Why do build caches matter in CI?",
+      "a": "They reduce rebuild time by reusing unchanged dependencies or layers.",
+      "tags": [
+        "ci",
+        "cache"
+      ]
+    },
+    {
+      "id": "cicd-devops-008",
+      "tier": "B",
+      "q": "Why are flaky tests dangerous?",
+      "a": "They reduce confidence in pipeline results and hide real regressions.",
+      "tags": [
+        "testing"
+      ]
+    },
+    {
+      "id": "cicd-devops-009",
+      "tier": "B",
+      "q": "Why are immutable artifacts useful?",
+      "a": "The exact same artifact is promoted between environments, reducing drift.",
+      "tags": [
+        "artifact",
+        "immutability"
+      ]
+    },
+    {
+      "id": "cicd-devops-010",
+      "tier": "B",
+      "q": "Why do feature flags help delivery?",
+      "a": "They decouple deployment from release so you can control exposure safely.",
+      "tags": [
+        "feature-flags"
+      ]
+    },
+    {
+      "id": "cicd-devops-011",
+      "tier": "B",
+      "q": "Why is GitOps attractive?",
+      "a": "Git becomes the source of truth for desired state and change review.",
+      "tags": [
+        "gitops"
+      ]
+    },
+    {
+      "id": "cicd-devops-012",
+      "tier": "B",
+      "q": "Why is rollback planning part of the pipeline design?",
+      "a": "A fast rollback reduces blast radius when a release misbehaves.",
+      "tags": [
+        "rollback"
+      ]
+    },
+    {
+      "id": "cicd-devops-013",
+      "tier": "C",
+      "q": "When would you prefer canary over blue-green?",
+      "a": "When you want progressive risk reduction and production signal before full rollout.",
+      "tags": [
+        "deployments"
+      ]
+    },
+    {
+      "id": "cicd-devops-014",
+      "tier": "C",
+      "q": "When is a monorepo pipeline harder to operate?",
+      "a": "When builds become too coupled and every change triggers too much work.",
+      "tags": [
+        "monorepo"
+      ]
+    },
+    {
+      "id": "cicd-devops-015",
+      "tier": "C",
+      "q": "What tradeoff comes with very strict gates?",
+      "a": "They catch more issues, but they can also slow delivery and frustrate teams.",
+      "tags": [
+        "gates"
+      ]
+    },
+    {
+      "id": "cicd-devops-016",
+      "tier": "C",
+      "q": "Why do teams promote the same artifact rather than rebuild per environment?",
+      "a": "It ensures dev, staging, and prod all run the same tested bits.",
+      "tags": [
+        "promotion"
+      ]
+    },
+    {
+      "id": "cicd-devops-017",
+      "tier": "C",
+      "q": "What is the downside of overusing feature flags?",
+      "a": "Flag debt builds up and creates hidden branches of behavior.",
+      "tags": [
+        "feature-flags"
+      ]
+    },
+    {
+      "id": "cicd-devops-018",
+      "tier": "C",
+      "q": "When should you treat infrastructure as code as the source of truth?",
+      "a": "When reproducibility and reviewability matter more than ad hoc clicks.",
+      "tags": [
+        "iac"
+      ]
+    }
+  ]
+}

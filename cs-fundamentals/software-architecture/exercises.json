@@ -1,0 +1,94 @@
+{
+  "topic": "software-architecture",
+  "exercises": [
+    {
+      "id": "software-architecture-ex-01",
+      "size": "small",
+      "title": "Sketch Module Boundaries",
+      "description": "Map one feature into modules with clear responsibility lines.",
+      "command": "mkdir -p docs && $EDITOR docs/modules.md",
+      "expected_outcome": "You can explain where each responsibility lives.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "modules",
+        "boundaries"
+      ]
+    },
+    {
+      "id": "software-architecture-ex-02",
+      "size": "small",
+      "title": "Refactor a Layer",
+      "description": "Move business logic out of handlers or controllers into a domain service.",
+      "command": "python app.py",
+      "expected_outcome": "The UI or transport layer becomes thinner and easier to test.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "refactor",
+        "domain"
+      ]
+    },
+    {
+      "id": "software-architecture-ex-03",
+      "size": "medium",
+      "title": "Apply Ports and Adapters",
+      "description": "Define a core interface and swap the storage or API adapter behind it.",
+      "command": "python app.py",
+      "expected_outcome": "Infrastructure can change without rewriting core logic.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "hexagonal",
+        "adapters"
+      ]
+    },
+    {
+      "id": "software-architecture-ex-04",
+      "size": "medium",
+      "title": "Design an Event Boundary",
+      "description": "Model an event stream for one business capability and write the event contract.",
+      "command": "mkdir -p docs && $EDITOR docs/events.md",
+      "expected_outcome": "The event boundary is explicit and reviewable.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "event-driven",
+        "contracts"
+      ]
+    },
+    {
+      "id": "software-architecture-ex-05",
+      "size": "large",
+      "title": "Write an ADR Set",
+      "description": "Produce a few architecture decision records for one system boundary.",
+      "command": "mkdir -p docs/adr && $EDITOR docs/adr/0001.md",
+      "expected_outcome": "Your architecture choices are documented with rationale and alternatives.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "adr",
+        "decision"
+      ]
+    },
+    {
+      "id": "software-architecture-ex-06",
+      "size": "large",
+      "title": "Build a Modular Monolith Skeleton",
+      "description": "Create a project structure with explicit modules, interfaces, and tests.",
+      "command": "mkdir -p src tests",
+      "expected_outcome": "The codebase expresses boundaries without splitting into services.",
+      "prereqs": [
+        "language toolchain"
+      ],
+      "tags": [
+        "modular-monolith"
+      ]
+    }
+  ]
+}

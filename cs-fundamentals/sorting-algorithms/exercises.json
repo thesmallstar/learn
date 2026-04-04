@@ -1,0 +1,96 @@
+{
+  "topic": "sorting-algorithms",
+  "exercises": [
+    {
+      "id": "sorting-algorithms-ex-01",
+      "size": "small",
+      "title": "Sort a CSV file",
+      "description": "Use the system sort command to sort a CSV by one column and inspect the result.",
+      "command": "sort -t, -k2,2 data.csv",
+      "expected_outcome": "Rows should be ordered by the chosen column.",
+      "prereqs": [
+        "Unix shell"
+      ],
+      "tags": [
+        "sorting",
+        "cli"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-ex-02",
+      "size": "small",
+      "title": "Compare random and nearly sorted input",
+      "description": "Measure how long your chosen sort takes on random input versus almost-sorted input.",
+      "command": "python3 sort_input_shape_benchmark.py",
+      "expected_outcome": "Nearly sorted input should often be faster for adaptive sorts like timsort.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "timsort",
+        "benchmark"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-ex-03",
+      "size": "medium",
+      "title": "Implement quicksort",
+      "description": "Write an in-place quicksort and verify it works across random and adversarial inputs.",
+      "command": "python3 quicksort_impl.py",
+      "expected_outcome": "The array should end up sorted, with uneven partitions handled correctly.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "quicksort",
+        "partitioning"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-ex-04",
+      "size": "medium",
+      "title": "Implement stable mergesort",
+      "description": "Write a stable mergesort and confirm equal keys keep their original order.",
+      "command": "python3 mergesort_stable.py",
+      "expected_outcome": "Equal elements should retain their relative order after sorting.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "mergesort",
+        "stability"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-ex-05",
+      "size": "large",
+      "title": "Build an external merge sort",
+      "description": "Sort a data set larger than memory by chunking, sorting chunks, and merging them on disk.",
+      "command": "python3 external_merge_sort.py",
+      "expected_outcome": "The final output should be sorted without loading the full input into memory.",
+      "prereqs": [
+        "Python 3.10+",
+        "file I/O"
+      ],
+      "tags": [
+        "external-sort",
+        "mergesort"
+      ]
+    },
+    {
+      "id": "sorting-algorithms-ex-06",
+      "size": "large",
+      "title": "Benchmark bounded-integer sorts",
+      "description": "Compare counting sort with a comparison sort on integer keys from a small range.",
+      "command": "python3 counting_sort_benchmark.py",
+      "expected_outcome": "Counting sort should win when the key range is small relative to n.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "counting-sort",
+        "performance"
+      ]
+    }
+  ]
+}

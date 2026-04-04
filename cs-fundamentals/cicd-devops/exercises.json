@@ -1,0 +1,97 @@
+{
+  "topic": "cicd-devops",
+  "exercises": [
+    {
+      "id": "cicd-devops-ex-01",
+      "size": "small",
+      "title": "Inspect a Git DAG",
+      "description": "Use git log or git graph tools to understand how commits flow into main.",
+      "command": "git log --graph --oneline --decorate --all",
+      "expected_outcome": "You can explain the shape of the repository history.",
+      "prereqs": [
+        "git"
+      ],
+      "tags": [
+        "git",
+        "history"
+      ]
+    },
+    {
+      "id": "cicd-devops-ex-02",
+      "size": "small",
+      "title": "Run a Tiny CI Job",
+      "description": "Lint or test a project locally using the same commands your CI would run.",
+      "command": "npm test",
+      "expected_outcome": "You have a single repeatable command for local and CI validation.",
+      "prereqs": [
+        "project with tests"
+      ],
+      "tags": [
+        "ci",
+        "testing"
+      ]
+    },
+    {
+      "id": "cicd-devops-ex-03",
+      "size": "medium",
+      "title": "Add Build Caching",
+      "description": "Configure your pipeline or Docker build to reuse unchanged dependencies.",
+      "command": "docker build --cache-from app:cache .",
+      "expected_outcome": "Subsequent builds complete faster with cache hits.",
+      "prereqs": [
+        "Docker"
+      ],
+      "tags": [
+        "cache",
+        "build"
+      ]
+    },
+    {
+      "id": "cicd-devops-ex-04",
+      "size": "medium",
+      "title": "Add a Canary Gate",
+      "description": "Release a small fraction of traffic and make promotion depend on health metrics.",
+      "command": "kubectl apply -f canary.yaml",
+      "expected_outcome": "A bad release can be stopped before full exposure.",
+      "prereqs": [
+        "kubectl",
+        "cluster access"
+      ],
+      "tags": [
+        "canary",
+        "rollout"
+      ]
+    },
+    {
+      "id": "cicd-devops-ex-05",
+      "size": "large",
+      "title": "Build a Delivery Pipeline",
+      "description": "Create a pipeline that tests, packages, and promotes the same artifact through environments.",
+      "command": "bash pipeline.sh",
+      "expected_outcome": "Artifact promotion is repeatable and auditable end to end.",
+      "prereqs": [
+        "shell",
+        "CI system"
+      ],
+      "tags": [
+        "pipeline",
+        "delivery"
+      ]
+    },
+    {
+      "id": "cicd-devops-ex-06",
+      "size": "large",
+      "title": "Document a Release Process",
+      "description": "Write a release and rollback runbook with ownership, checks, and failure steps.",
+      "command": "mkdir -p docs && $EDITOR docs/release-runbook.md",
+      "expected_outcome": "You have a concrete operational procedure for safe releases.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "runbook",
+        "ops"
+      ]
+    }
+  ]
+}

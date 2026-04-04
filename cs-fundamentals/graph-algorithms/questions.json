@@ -1,0 +1,185 @@
+{
+  "topic": "graph-algorithms",
+  "questions": [
+    {
+      "id": "graph-algorithms-001a",
+      "tier": "A",
+      "q": "What is the difference between an adjacency list and an adjacency matrix?",
+      "a": "An adjacency list stores neighbors per node; a matrix stores edge presence in a 2D grid.",
+      "tags": [
+        "graph-representation",
+        "adjacency"
+      ]
+    },
+    {
+      "id": "graph-algorithms-001b",
+      "tier": "B",
+      "q": "Why is an adjacency list preferred for sparse graphs?",
+      "a": "It uses less memory and iterates only over real edges.",
+      "tags": [
+        "graph-representation",
+        "adjacency"
+      ]
+    },
+    {
+      "id": "graph-algorithms-001c",
+      "tier": "C",
+      "q": "When would an adjacency matrix be the better choice?",
+      "a": "When the graph is dense or you need constant-time edge existence checks.",
+      "tags": [
+        "graph-representation",
+        "adjacency"
+      ]
+    },
+    {
+      "id": "graph-algorithms-002a",
+      "tier": "A",
+      "q": "What does BFS guarantee on an unweighted graph?",
+      "a": "The shortest path in number of edges.",
+      "tags": [
+        "bfs",
+        "queue"
+      ]
+    },
+    {
+      "id": "graph-algorithms-002b",
+      "tier": "B",
+      "q": "Why does BFS use a queue?",
+      "a": "It explores nodes in layers, so the first time you reach a node is via the fewest edges.",
+      "tags": [
+        "bfs",
+        "queue"
+      ]
+    },
+    {
+      "id": "graph-algorithms-002c",
+      "tier": "C",
+      "q": "When should BFS be your first choice?",
+      "a": "When all edges have equal weight and you need minimum-hop reachability or levels.",
+      "tags": [
+        "bfs",
+        "queue"
+      ]
+    },
+    {
+      "id": "graph-algorithms-003a",
+      "tier": "A",
+      "q": "What is DFS especially good for?",
+      "a": "Exploring depth, backtracking, and component structure.",
+      "tags": [
+        "dfs",
+        "stack"
+      ]
+    },
+    {
+      "id": "graph-algorithms-003b",
+      "tier": "B",
+      "q": "Why is DFS often implemented with recursion or a stack?",
+      "a": "The call stack naturally tracks the path you are exploring.",
+      "tags": [
+        "dfs",
+        "stack"
+      ]
+    },
+    {
+      "id": "graph-algorithms-003c",
+      "tier": "C",
+      "q": "When would DFS be better than BFS?",
+      "a": "When you need exhaustive path exploration, cycle detection, or topological reasoning.",
+      "tags": [
+        "dfs",
+        "stack"
+      ]
+    },
+    {
+      "id": "graph-algorithms-004a",
+      "tier": "A",
+      "q": "What key constraint does Dijkstra require?",
+      "a": "All edge weights must be nonnegative.",
+      "tags": [
+        "dijkstra",
+        "shortest-path"
+      ]
+    },
+    {
+      "id": "graph-algorithms-004b",
+      "tier": "B",
+      "q": "Why does Dijkstra fail with negative edges?",
+      "a": "Its greedy choice can be invalidated after a later negative-weight relaxation.",
+      "tags": [
+        "dijkstra",
+        "shortest-path"
+      ]
+    },
+    {
+      "id": "graph-algorithms-004c",
+      "tier": "C",
+      "q": "When should you use Dijkstra instead of Bellman-Ford?",
+      "a": "When the graph has nonnegative weights and you want faster shortest-path computation.",
+      "tags": [
+        "dijkstra",
+        "shortest-path"
+      ]
+    },
+    {
+      "id": "graph-algorithms-005a",
+      "tier": "A",
+      "q": "What can Bellman-Ford handle that Dijkstra cannot?",
+      "a": "Negative edge weights and negative cycle detection.",
+      "tags": [
+        "bellman-ford",
+        "negative-weights"
+      ]
+    },
+    {
+      "id": "graph-algorithms-005b",
+      "tier": "B",
+      "q": "Why is Bellman-Ford slower than Dijkstra?",
+      "a": "It relaxes all edges repeatedly, typically up to V - 1 passes.",
+      "tags": [
+        "bellman-ford",
+        "negative-weights"
+      ]
+    },
+    {
+      "id": "graph-algorithms-005c",
+      "tier": "C",
+      "q": "When is Bellman-Ford the right tool?",
+      "a": "When negative weights exist or you need to detect whether a negative cycle is reachable.",
+      "tags": [
+        "bellman-ford",
+        "negative-weights"
+      ]
+    },
+    {
+      "id": "graph-algorithms-006a",
+      "tier": "A",
+      "q": "What does topological sort produce?",
+      "a": "An ordering of nodes in a DAG where every edge points forward.",
+      "tags": [
+        "topological-sort",
+        "dag"
+      ]
+    },
+    {
+      "id": "graph-algorithms-006b",
+      "tier": "B",
+      "q": "Why is topological sort useful?",
+      "a": "It gives a valid dependency order for builds, scheduling, and compilation steps.",
+      "tags": [
+        "topological-sort",
+        "dag"
+      ]
+    },
+    {
+      "id": "graph-algorithms-006c",
+      "tier": "C",
+      "q": "When is topological sort impossible?",
+      "a": "When the graph has a cycle, because no linear order can satisfy all dependencies.",
+      "tags": [
+        "topological-sort",
+        "dag"
+      ]
+    }
+  ]
+}

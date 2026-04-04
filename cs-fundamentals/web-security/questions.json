@@ -1,0 +1,185 @@
+{
+  "topic": "web-security",
+  "questions": [
+    {
+      "id": "ws-a01",
+      "tier": "A",
+      "q": "Which three components define a web origin under the Same-Origin Policy?",
+      "a": "Scheme, host, and port",
+      "tags": [
+        "sop",
+        "origin"
+      ]
+    },
+    {
+      "id": "ws-a02",
+      "tier": "A",
+      "q": "When does a browser send a CORS preflight request?",
+      "a": "Before a cross-origin request that uses a non-simple method or header",
+      "tags": [
+        "cors",
+        "preflight"
+      ]
+    },
+    {
+      "id": "ws-a03",
+      "tier": "A",
+      "q": "Which XSS type stores the payload on the server?",
+      "a": "Stored XSS",
+      "tags": [
+        "xss",
+        "stored"
+      ]
+    },
+    {
+      "id": "ws-a04",
+      "tier": "A",
+      "q": "What does the HttpOnly cookie attribute prevent?",
+      "a": "JavaScript from reading the cookie",
+      "tags": [
+        "cookies",
+        "httponly"
+      ]
+    },
+    {
+      "id": "ws-a05",
+      "tier": "A",
+      "q": "What SameSite value blocks a cookie on all cross-site requests?",
+      "a": "Strict",
+      "tags": [
+        "cookies",
+        "samesite"
+      ]
+    },
+    {
+      "id": "ws-a06",
+      "tier": "A",
+      "q": "What CSP feature lets you allow a specific inline script?",
+      "a": "A nonce",
+      "tags": [
+        "csp",
+        "nonce"
+      ]
+    },
+    {
+      "id": "ws-b01",
+      "tier": "B",
+      "q": "Why does CSRF still work even when SOP exists?",
+      "a": "The browser will send the victim's cookies with a cross-site request unless the app defends against it.",
+      "tags": [
+        "csrf",
+        "sop"
+      ]
+    },
+    {
+      "id": "ws-b02",
+      "tier": "B",
+      "q": "Why is HttpOnly not a full defense against XSS?",
+      "a": "It blocks cookie theft, but injected script can still act on behalf of the user.",
+      "tags": [
+        "xss",
+        "cookies"
+      ]
+    },
+    {
+      "id": "ws-b03",
+      "tier": "B",
+      "q": "What is the difference between reflected and stored XSS?",
+      "a": "Reflected payloads come from the current request; stored payloads are saved and served later.",
+      "tags": [
+        "xss",
+        "types"
+      ]
+    },
+    {
+      "id": "ws-b04",
+      "tier": "B",
+      "q": "Why does CORS not replace SOP?",
+      "a": "CORS is an opt-in exception mechanism, while SOP is the default browser isolation rule.",
+      "tags": [
+        "cors",
+        "sop"
+      ]
+    },
+    {
+      "id": "ws-b05",
+      "tier": "B",
+      "q": "What does the X-Frame-Options or frame-ancestors CSP directive protect against?",
+      "a": "Clickjacking by preventing the page from being embedded in an unwanted frame.",
+      "tags": [
+        "clickjacking",
+        "csp"
+      ]
+    },
+    {
+      "id": "ws-b06",
+      "tier": "B",
+      "q": "Why is SSRF dangerous?",
+      "a": "It lets an attacker make the server fetch internal or privileged network resources.",
+      "tags": [
+        "ssrf",
+        "network"
+      ]
+    },
+    {
+      "id": "ws-c01",
+      "tier": "C",
+      "q": "Why is SameSite=Lax helpful but not enough as a sole CSRF defense?",
+      "a": "It blocks many cross-site subrequests, but sensitive flows can still need explicit CSRF tokens.",
+      "tags": [
+        "csrf",
+        "samesite"
+      ]
+    },
+    {
+      "id": "ws-c02",
+      "tier": "C",
+      "q": "Why is a CSP nonce stronger than a broad allowlist for inline scripts?",
+      "a": "The nonce ties execution to server-generated randomness instead of trusting all inline code.",
+      "tags": [
+        "csp",
+        "nonce"
+      ]
+    },
+    {
+      "id": "ws-c03",
+      "tier": "C",
+      "q": "Why do modern applications combine multiple defenses for XSS?",
+      "a": "Input validation, output encoding, CSP, and HttpOnly each cover different failure modes.",
+      "tags": [
+        "xss",
+        "defense-in-depth"
+      ]
+    },
+    {
+      "id": "ws-c04",
+      "tier": "C",
+      "q": "Why can open redirects and SSRF become chained attacks?",
+      "a": "An attacker can use redirect or fetch behavior to reach internal endpoints indirectly.",
+      "tags": [
+        "ssrf",
+        "redirects"
+      ]
+    },
+    {
+      "id": "ws-c05",
+      "tier": "C",
+      "q": "Why is origin-based security easier for browsers than for servers alone?",
+      "a": "Browsers enforce the policy automatically, while servers must implement validation themselves.",
+      "tags": [
+        "sop",
+        "browser"
+      ]
+    },
+    {
+      "id": "ws-c06",
+      "tier": "C",
+      "q": "What tradeoff does a strict CSP impose on front-end code?",
+      "a": "It reduces injection risk but can make inline scripts and third-party integrations harder to manage.",
+      "tags": [
+        "csp",
+        "tradeoff"
+      ]
+    }
+  ]
+}

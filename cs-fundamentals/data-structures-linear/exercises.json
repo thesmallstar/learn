@@ -1,0 +1,99 @@
+{
+  "topic": "data-structures-linear",
+  "exercises": [
+    {
+      "id": "data-structures-linear-ex-01",
+      "size": "small",
+      "title": "Benchmark front inserts",
+      "description": "Compare repeated front inserts against appends in a dynamic array implementation and note the difference.",
+      "command": "python3 bench_list_insert_vs_append.py",
+      "expected_outcome": "Front inserts should be much slower than appends because they force shifting.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "arrays",
+        "dynamic-array",
+        "performance"
+      ]
+    },
+    {
+      "id": "data-structures-linear-ex-02",
+      "size": "small",
+      "title": "Trace stack order",
+      "description": "Push a small sequence of values onto a stack and pop them to confirm LIFO behavior.",
+      "command": "python3 stack_lifo_demo.py",
+      "expected_outcome": "The last value pushed should be the first value popped.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "stack",
+        "lifo"
+      ]
+    },
+    {
+      "id": "data-structures-linear-ex-03",
+      "size": "medium",
+      "title": "Build a circular-buffer queue",
+      "description": "Implement enqueue and dequeue with a fixed-capacity circular buffer and handle wraparound correctly.",
+      "command": "python3 queue_circular_buffer.py",
+      "expected_outcome": "Enqueue and dequeue should both stay O(1) without array shifting.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "queue",
+        "circular-buffer"
+      ]
+    },
+    {
+      "id": "data-structures-linear-ex-04",
+      "size": "medium",
+      "title": "Reverse a linked list",
+      "description": "Write an iterative function that reverses a singly linked list and verify the new head and tail.",
+      "command": "python3 reverse_linked_list.py",
+      "expected_outcome": "The list order should be reversed in-place with pointer rewiring only.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "linked-list",
+        "pointers"
+      ]
+    },
+    {
+      "id": "data-structures-linear-ex-05",
+      "size": "large",
+      "title": "Undo/redo with two stacks",
+      "description": "Model an editor history using separate undo and redo stacks, then exercise insert, undo, and redo flows.",
+      "command": "python3 undo_redo_two_stacks.py",
+      "expected_outcome": "Undo and redo should both work in O(1) per operation.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "stack",
+        "undo",
+        "redo"
+      ]
+    },
+    {
+      "id": "data-structures-linear-ex-06",
+      "size": "large",
+      "title": "Bounded work queue benchmark",
+      "description": "Build a bounded producer-consumer queue and compare a linked-list implementation with a circular buffer.",
+      "command": "python3 bounded_queue_benchmark.py",
+      "expected_outcome": "The circular-buffer version should use less overhead and keep throughput steady.",
+      "prereqs": [
+        "Python 3.10+",
+        "threading basics"
+      ],
+      "tags": [
+        "queue",
+        "benchmark",
+        "concurrency"
+      ]
+    }
+  ]
+}

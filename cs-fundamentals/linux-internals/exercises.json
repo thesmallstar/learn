@@ -1,0 +1,11 @@
+{
+  "topic": "linux-internals",
+  "exercises": [
+    {"id":"lin-ex-01","size":"small","title":"Read Kernel and Host Info","description":"Inspect uname and procfs to identify your kernel version and current process info.","command":"uname -a && cat /proc/self/status | head","expected_outcome":"You can identify the kernel version and key fields for the current process.","prereqs":["Linux"],"tags":["uname","procfs","kernel"]},
+    {"id":"lin-ex-02","size":"small","title":"Inspect Control Groups","description":"Find the cgroup membership of your current shell and interpret the paths.","command":"cat /proc/self/cgroup","expected_outcome":"You can see which cgroups your process belongs to.","prereqs":["Linux"],"tags":["cgroups","procfs"]},
+    {"id":"lin-ex-03","size":"medium","title":"Test File Permissions","description":"Create a file, change its mode, and verify access as different users or groups.","command":"chmod 640 demo.txt && ls -l demo.txt","expected_outcome":"You can explain how owner, group, and other permissions change access.","prereqs":["Linux shell"],"tags":["chmod","permissions"]},
+    {"id":"lin-ex-04","size":"medium","title":"Namespace Sandbox","description":"Use unshare to create a new namespace and inspect how the process view changes.","command":"unshare -Urnm bash","expected_outcome":"You get a shell with isolated user, mount, or network context.","prereqs":["unshare","Linux"],"tags":["namespaces","unshare","containers"]},
+    {"id":"lin-ex-05","size":"large","title":"Service Unit","description":"Write and start a simple systemd service or timer and verify its logs and restart behavior.","command":"systemctl --user start demo.service","expected_outcome":"The service starts under systemd supervision and its logs are visible with journalctl.","prereqs":["systemd"],"tags":["systemd","service","journalctl"]},
+    {"id":"lin-ex-06","size":"large","title":"Capability Demo","description":"Grant a binary a single capability and compare its behavior with and without that capability.","command":"setcap cap_net_bind_service=+ep ./server_demo","expected_outcome":"The binary can perform the privileged action without full root access.","prereqs":["setcap","Linux"],"tags":["capabilities","security","permissions"]}
+  ]
+}

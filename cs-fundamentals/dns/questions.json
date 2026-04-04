@@ -1,0 +1,185 @@
+{
+  "topic": "dns",
+  "questions": [
+    {
+      "id": "dns-a01",
+      "tier": "A",
+      "q": "In a typical DNS lookup, which server does the resolver query first?",
+      "a": "A root server",
+      "tags": [
+        "resolution",
+        "root"
+      ]
+    },
+    {
+      "id": "dns-a02",
+      "tier": "A",
+      "q": "Which DNS record type maps a name to an IPv4 address?",
+      "a": "A",
+      "tags": [
+        "records",
+        "ipv4"
+      ]
+    },
+    {
+      "id": "dns-a03",
+      "tier": "A",
+      "q": "Which record is used for reverse DNS lookups?",
+      "a": "PTR",
+      "tags": [
+        "records",
+        "reverse-dns"
+      ]
+    },
+    {
+      "id": "dns-a04",
+      "tier": "A",
+      "q": "What is the main purpose of TTL in DNS?",
+      "a": "To tell resolvers how long they may cache a record",
+      "tags": [
+        "ttl",
+        "cache"
+      ]
+    },
+    {
+      "id": "dns-a05",
+      "tier": "A",
+      "q": "Why can a CNAME not be placed at the zone apex?",
+      "a": "Because the apex must also hold other records like NS and SOA.",
+      "tags": [
+        "cname",
+        "zone-apex"
+      ]
+    },
+    {
+      "id": "dns-a06",
+      "tier": "A",
+      "q": "What mechanism authorizes mail senders for a domain?",
+      "a": "SPF",
+      "tags": [
+        "txt",
+        "email"
+      ]
+    },
+    {
+      "id": "dns-b01",
+      "tier": "B",
+      "q": "What is the correct order of servers in recursive resolution?",
+      "a": "Root, TLD, authoritative",
+      "tags": [
+        "resolution",
+        "hierarchy"
+      ]
+    },
+    {
+      "id": "dns-b02",
+      "tier": "B",
+      "q": "What does DNSSEC add?",
+      "a": "Cryptographic authenticity and integrity for DNS data.",
+      "tags": [
+        "dnssec",
+        "security"
+      ]
+    },
+    {
+      "id": "dns-b03",
+      "tier": "B",
+      "q": "Why do low TTL values help during a migration?",
+      "a": "They reduce cache lifetime so clients pick up new answers faster.",
+      "tags": [
+        "ttl",
+        "migration"
+      ]
+    },
+    {
+      "id": "dns-b04",
+      "tier": "B",
+      "q": "What is split-horizon DNS?",
+      "a": "Serving different DNS answers based on where the query comes from.",
+      "tags": [
+        "split-horizon",
+        "internal"
+      ]
+    },
+    {
+      "id": "dns-b05",
+      "tier": "B",
+      "q": "Why is DNS amplification effective for attackers?",
+      "a": "Small spoofed requests can trigger much larger replies from many servers.",
+      "tags": [
+        "amplification",
+        "dos"
+      ]
+    },
+    {
+      "id": "dns-b06",
+      "tier": "B",
+      "q": "What is anycast used for in DNS?",
+      "a": "To serve the same IP from many locations and route clients to a nearby instance.",
+      "tags": [
+        "anycast",
+        "root"
+      ]
+    },
+    {
+      "id": "dns-c01",
+      "tier": "C",
+      "q": "Why does DNS use both recursion and delegation?",
+      "a": "Recursion simplifies clients, while delegation distributes authority across zones.",
+      "tags": [
+        "delegation",
+        "design"
+      ]
+    },
+    {
+      "id": "dns-c02",
+      "tier": "C",
+      "q": "What tradeoff comes with a very low TTL on critical records?",
+      "a": "Faster changes, but more cache misses and higher query volume.",
+      "tags": [
+        "ttl",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "dns-c03",
+      "tier": "C",
+      "q": "Why can DNS failures break a service even if the service itself is healthy?",
+      "a": "Clients cannot discover or refresh the correct endpoint if name resolution fails.",
+      "tags": [
+        "reliability",
+        "dns"
+      ]
+    },
+    {
+      "id": "dns-c04",
+      "tier": "C",
+      "q": "Why are TXT records commonly used for verification and policy?",
+      "a": "They are flexible and easy to add without changing the service protocol itself.",
+      "tags": [
+        "txt",
+        "policy"
+      ]
+    },
+    {
+      "id": "dns-c05",
+      "tier": "C",
+      "q": "Why does negative caching matter?",
+      "a": "It reduces repeated lookups for names that do not exist, saving load on authoritative servers.",
+      "tags": [
+        "cache",
+        "negative-caching"
+      ]
+    },
+    {
+      "id": "dns-c06",
+      "tier": "C",
+      "q": "Why is DNS still a bottleneck in many systems?",
+      "a": "Because every new hostname or cache miss adds latency before the application can connect.",
+      "tags": [
+        "latency",
+        "bottleneck"
+      ]
+    }
+  ]
+}

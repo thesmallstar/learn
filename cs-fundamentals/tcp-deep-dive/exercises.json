@@ -1,0 +1,95 @@
+{
+  "topic": "tcp-deep-dive",
+  "exercises": [
+    {
+      "id": "tcp-ex-01",
+      "size": "small",
+      "title": "Inspect live connections",
+      "description": "Use ss to inspect TCP state, queues, and PIDs for your active connections.",
+      "command": "ss -tnp",
+      "expected_outcome": "You can identify ESTABLISHED sockets and their owning processes.",
+      "prereqs": [
+        "Linux"
+      ],
+      "tags": [
+        "ss",
+        "connections"
+      ]
+    },
+    {
+      "id": "tcp-ex-02",
+      "size": "small",
+      "title": "Watch a handshake",
+      "description": "Capture a TCP handshake to a public host or local server and label SYN, SYN-ACK, and ACK.",
+      "command": "sudo tcpdump -i any -n tcp",
+      "expected_outcome": "You see the three handshake packets in order.",
+      "prereqs": [
+        "tcpdump installed"
+      ],
+      "tags": [
+        "tcpdump",
+        "handshake"
+      ]
+    },
+    {
+      "id": "tcp-ex-03",
+      "size": "medium",
+      "title": "Write a TCP echo server",
+      "description": "Build a raw-socket echo server and test it with nc.",
+      "command": "python tcp_echo_server.py",
+      "expected_outcome": "The server accepts a connection and echoes payloads back.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "sockets",
+        "echo"
+      ]
+    },
+    {
+      "id": "tcp-ex-04",
+      "size": "medium",
+      "title": "Create many short connections",
+      "description": "Open many short-lived connections to a local server and observe TIME_WAIT growth.",
+      "command": "python short_conn_burst.py",
+      "expected_outcome": "ss shows many TIME_WAIT sockets after the burst.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "time-wait",
+        "load"
+      ]
+    },
+    {
+      "id": "tcp-ex-05",
+      "size": "large",
+      "title": "Build a tiny HTTP server on TCP",
+      "description": "Implement a basic GET-only HTTP/1.1 server with sockets and no framework.",
+      "command": "python mini_http_server.py",
+      "expected_outcome": "A browser or curl can fetch a response from your server.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "tcp",
+        "http"
+      ]
+    },
+    {
+      "id": "tcp-ex-06",
+      "size": "large",
+      "title": "Benchmark pooling vs no pooling",
+      "description": "Write a client benchmark that measures throughput with a fresh TCP connection per request and with pooling.",
+      "command": "python tcp_pool_bench.py",
+      "expected_outcome": "Pooled connections show lower latency and higher throughput.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "pooling",
+        "performance"
+      ]
+    }
+  ]
+}

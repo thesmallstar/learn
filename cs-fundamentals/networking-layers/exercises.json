@@ -1,0 +1,95 @@
+{
+  "topic": "networking-layers",
+  "exercises": [
+    {
+      "id": "nl-ex-01",
+      "size": "small",
+      "title": "Inspect your interfaces",
+      "description": "Run ip addr and identify your active interface, IP address, and netmask.",
+      "command": "ip addr",
+      "expected_outcome": "You can point to the interface name, IPv4 address, and prefix length.",
+      "prereqs": [
+        "Linux or WSL"
+      ],
+      "tags": [
+        "ip",
+        "interfaces"
+      ]
+    },
+    {
+      "id": "nl-ex-02",
+      "size": "small",
+      "title": "Trace a route",
+      "description": "Run traceroute or tracepath to a public host and identify at least three hops.",
+      "command": "traceroute google.com",
+      "expected_outcome": "You see TTL-based hop discovery and per-hop round-trip times.",
+      "prereqs": [
+        "traceroute installed"
+      ],
+      "tags": [
+        "traceroute",
+        "icmp"
+      ]
+    },
+    {
+      "id": "nl-ex-03",
+      "size": "medium",
+      "title": "Build a subnet calculator",
+      "description": "Write a small script that converts a CIDR into network, broadcast, and usable host range.",
+      "command": "python subnet_calc.py 192.168.10.0/24",
+      "expected_outcome": "The script prints correct network math for arbitrary prefixes.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "cidr",
+        "subnetting"
+      ]
+    },
+    {
+      "id": "nl-ex-04",
+      "size": "medium",
+      "title": "Capture ARP traffic",
+      "description": "Use tcpdump while pinging a host on your LAN and identify ARP resolution before the ICMP echo.",
+      "command": "sudo tcpdump -i any -n arp or icmp",
+      "expected_outcome": "You can see ARP request/reply frames and the following ICMP exchange.",
+      "prereqs": [
+        "tcpdump installed"
+      ],
+      "tags": [
+        "arp",
+        "tcpdump"
+      ]
+    },
+    {
+      "id": "nl-ex-05",
+      "size": "large",
+      "title": "Implement longest-prefix routing",
+      "description": "Write a small router simulator that stores CIDR routes and picks the best match for a destination IP.",
+      "command": "python route_sim.py",
+      "expected_outcome": "Lookups choose the most specific prefix and fall back to a default route.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "routing",
+        "prefix-match"
+      ]
+    },
+    {
+      "id": "nl-ex-06",
+      "size": "large",
+      "title": "Build a packet path explainer",
+      "description": "Create a script that takes a source, destination, and protocol and prints the OSI layers involved end to end.",
+      "command": "python path_explainer.py",
+      "expected_outcome": "The output shows encapsulation and forwarding decisions per layer.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "osi",
+        "encapsulation"
+      ]
+    }
+  ]
+}

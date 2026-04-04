@@ -1,0 +1,23 @@
+{
+  "topic": "cpu-architecture",
+  "questions": [
+    {"id":"cpu-001","tier":"A","q":"What are the five classic stages of a simple RISC pipeline?","a":"Fetch, decode, execute, memory, write-back.","tags":["pipeline","risc"]},
+    {"id":"cpu-002","tier":"A","q":"What does SIMD stand for?","a":"Single Instruction, Multiple Data.","tags":["simd","vectorization"]},
+    {"id":"cpu-003","tier":"A","q":"What is the main purpose of branch prediction?","a":"To guess the next control-flow path early and keep the pipeline full.","tags":["branch-prediction","pipeline"]},
+    {"id":"cpu-004","tier":"A","q":"What is the cache line size commonly used on modern x86 CPUs?","a":"64 bytes.","tags":["cache","cache-line"]},
+    {"id":"cpu-005","tier":"A","q":"What does SMT stand for?","a":"Simultaneous multithreading.","tags":["smt","hyper-threading"]},
+    {"id":"cpu-006","tier":"A","q":"What kind of data does a CPU register hold compared with RAM?","a":"The smallest, fastest working set used directly by instructions.","tags":["registers","memory"]},
+    {"id":"cpu-007","tier":"B","q":"Why does an out-of-order CPU improve throughput?","a":"It keeps useful work moving while waiting on stalls by reordering independent instructions.","tags":["out-of-order","throughput"]},
+    {"id":"cpu-008","tier":"B","q":"Why is a branch misprediction expensive?","a":"The CPU must discard speculative work and refill the pipeline from the correct path.","tags":["branch-prediction","mispredict"]},
+    {"id":"cpu-009","tier":"B","q":"What problem does cache locality solve for performance?","a":"It reduces slow memory accesses by reusing data already near the CPU.","tags":["locality","cache"]},
+    {"id":"cpu-010","tier":"B","q":"Why can vectorized code be faster than scalar code?","a":"One instruction operates on many values at once, increasing work per cycle.","tags":["simd","vectorization"]},
+    {"id":"cpu-011","tier":"B","q":"Why do modern CPUs use deep pipelines and wide issue width together?","a":"Deep pipelines raise clock potential, while wide issue executes more independent work per cycle.","tags":["pipeline","superscalar"]},
+    {"id":"cpu-012","tier":"B","q":"What is false sharing?","a":"Two threads update different variables that happen to share the same cache line.","tags":["cache","false-sharing","coherence"]},
+    {"id":"cpu-013","tier":"C","q":"When would you prefer a higher clock speed over more cores?","a":"When the workload is mostly single-threaded, latency-sensitive, or limited by serial sections.","tags":["cores","frequency","tradeoff"]},
+    {"id":"cpu-014","tier":"C","q":"Why can aggressive speculative execution be a security risk?","a":"Speculation can leak microarchitectural state even when the speculative path is later discarded.","tags":["speculation","security","spectre"]},
+    {"id":"cpu-015","tier":"C","q":"How do you decide between optimizing branch prediction and data layout?","a":"Profile first; if stalls come from control flow, improve predictability, otherwise improve data locality.","tags":["profiling","branch-prediction","locality"]},
+    {"id":"cpu-016","tier":"C","q":"Why can adding more execution units stop helping after a point?","a":"Independent work, memory bandwidth, or front-end fetch/decode can become the bottleneck.","tags":["bottleneck","superscalar"]},
+    {"id":"cpu-017","tier":"C","q":"When is manual vectorization worth the cost?","a":"When a hot loop is stable, arithmetic-heavy, and the speedup is large enough to justify complexity.","tags":["simd","optimization","tradeoff"]},
+    {"id":"cpu-018","tier":"C","q":"What tradeoff does SMT introduce?","a":"It can improve utilization, but threads also compete for shared core resources and may hurt isolation.","tags":["smt","contention","tradeoff"]}
+  ]
+}

@@ -1,0 +1,185 @@
+{
+  "topic": "software-architecture",
+  "questions": [
+    {
+      "id": "software-architecture-001",
+      "tier": "A",
+      "q": "What is a monolith?",
+      "a": "A single deployable application that contains most of the product logic.",
+      "tags": [
+        "architecture",
+        "monolith"
+      ]
+    },
+    {
+      "id": "software-architecture-002",
+      "tier": "A",
+      "q": "What is a microservice?",
+      "a": "A small service focused on one business capability and deployed independently.",
+      "tags": [
+        "architecture",
+        "microservice"
+      ]
+    },
+    {
+      "id": "software-architecture-003",
+      "tier": "A",
+      "q": "What is coupling?",
+      "a": "How strongly components depend on each other.",
+      "tags": [
+        "architecture",
+        "coupling"
+      ]
+    },
+    {
+      "id": "software-architecture-004",
+      "tier": "A",
+      "q": "What is cohesion?",
+      "a": "How closely related the responsibilities inside a module are.",
+      "tags": [
+        "architecture",
+        "cohesion"
+      ]
+    },
+    {
+      "id": "software-architecture-005",
+      "tier": "A",
+      "q": "What is a bounded context?",
+      "a": "A boundary where a domain model has a clear meaning.",
+      "tags": [
+        "architecture",
+        "ddd"
+      ]
+    },
+    {
+      "id": "software-architecture-006",
+      "tier": "A",
+      "q": "What does SOLID refer to?",
+      "a": "A set of object-oriented design principles.",
+      "tags": [
+        "architecture",
+        "solid"
+      ]
+    },
+    {
+      "id": "software-architecture-007",
+      "tier": "B",
+      "q": "Why does a modular monolith often age better than a big ball of mud?",
+      "a": "It keeps boundaries explicit without the overhead of distributed deployment.",
+      "tags": [
+        "architecture",
+        "modular-monolith"
+      ]
+    },
+    {
+      "id": "software-architecture-008",
+      "tier": "B",
+      "q": "Why is dependency inversion useful?",
+      "a": "It keeps high-level policy from depending directly on low-level details.",
+      "tags": [
+        "architecture",
+        "dip"
+      ]
+    },
+    {
+      "id": "software-architecture-009",
+      "tier": "B",
+      "q": "Why does hexagonal architecture place adapters at the edge?",
+      "a": "To keep business logic independent of transport and storage concerns.",
+      "tags": [
+        "architecture",
+        "hexagonal"
+      ]
+    },
+    {
+      "id": "software-architecture-010",
+      "tier": "B",
+      "q": "Why do event-driven systems need clear contracts?",
+      "a": "Events become integration points and must stay stable and understandable.",
+      "tags": [
+        "architecture",
+        "events"
+      ]
+    },
+    {
+      "id": "software-architecture-011",
+      "tier": "B",
+      "q": "Why does CQRS split reads and writes?",
+      "a": "Because the read model and write model often have different performance needs.",
+      "tags": [
+        "architecture",
+        "cqrs"
+      ]
+    },
+    {
+      "id": "software-architecture-012",
+      "tier": "B",
+      "q": "Why is shared database access often a smell in service design?",
+      "a": "It couples services through schema changes and hidden write paths.",
+      "tags": [
+        "architecture",
+        "shared-db"
+      ]
+    },
+    {
+      "id": "software-architecture-013",
+      "tier": "C",
+      "q": "When should you split a service boundary?",
+      "a": "When ownership, scaling, or change cadence clearly diverge.",
+      "tags": [
+        "architecture",
+        "boundaries"
+      ]
+    },
+    {
+      "id": "software-architecture-014",
+      "tier": "C",
+      "q": "When is a layered architecture enough?",
+      "a": "When the domain is small and the team benefits from simplicity over abstraction.",
+      "tags": [
+        "architecture",
+        "layers"
+      ]
+    },
+    {
+      "id": "software-architecture-015",
+      "tier": "C",
+      "q": "What tradeoff comes with microservices?",
+      "a": "Independent deployment and scale, but more operational and distributed complexity.",
+      "tags": [
+        "architecture",
+        "microservices"
+      ]
+    },
+    {
+      "id": "software-architecture-016",
+      "tier": "C",
+      "q": "Why should core business rules live near the domain model?",
+      "a": "So they are easier to test, reuse, and protect from infrastructure churn.",
+      "tags": [
+        "architecture",
+        "domain"
+      ]
+    },
+    {
+      "id": "software-architecture-017",
+      "tier": "C",
+      "q": "What tradeoff comes with a clean architecture boundary?",
+      "a": "You get easier change management, but you may introduce extra indirection.",
+      "tags": [
+        "architecture",
+        "clean"
+      ]
+    },
+    {
+      "id": "software-architecture-018",
+      "tier": "C",
+      "q": "When is a refactor toward better boundaries worth it?",
+      "a": "When repeated change, bugs, or ownership friction justify the cost.",
+      "tags": [
+        "architecture",
+        "refactor"
+      ]
+    }
+  ]
+}

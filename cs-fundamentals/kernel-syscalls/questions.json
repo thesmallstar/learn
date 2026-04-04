@@ -1,0 +1,23 @@
+{
+  "topic": "kernel-syscalls",
+  "questions": [
+    {"id":"ks-001","tier":"A","q":"What is a system call?","a":"A controlled entry into the kernel to request a privileged operation.","tags":["syscall","kernel"]},
+    {"id":"ks-002","tier":"A","q":"What is user space?","a":"The unprivileged part of the system where applications run.","tags":["user-space","kernel"]},
+    {"id":"ks-003","tier":"A","q":"What is kernel space?","a":"The privileged part of the OS that manages hardware and system resources.","tags":["kernel-space","os"]},
+    {"id":"ks-004","tier":"A","q":"Name three common file-related system calls.","a":"open, read, write.","tags":["file-io","syscalls"]},
+    {"id":"ks-005","tier":"A","q":"What does errno represent?","a":"The error code set by the last failing system or library call.","tags":["errno","errors"]},
+    {"id":"ks-006","tier":"A","q":"What is a trap or exception in this context?","a":"A CPU transition into kernel mode caused by a syscall or fault.","tags":["trap","privilege"]},
+    {"id":"ks-007","tier":"B","q":"Why are system calls slower than normal function calls?","a":"They cross a privilege boundary and often involve saving state and switching modes.","tags":["syscall-cost","context-switch"]},
+    {"id":"ks-008","tier":"B","q":"Why does the kernel validate user pointers on syscalls?","a":"User memory can be invalid or malicious, so the kernel must prevent faults and corruption.","tags":["validation","memory-safety"]},
+    {"id":"ks-009","tier":"B","q":"What does copy_to_user() conceptually do?","a":"It safely copies kernel data into user memory with access checks.","tags":["copy-to-user","syscalls"]},
+    {"id":"ks-010","tier":"B","q":"Why does vDSO exist?","a":"It exposes some fast kernel-provided helpers to user space without a full syscall.","tags":["vdso","optimization"]},
+    {"id":"ks-011","tier":"B","q":"What is the role of an ABI in syscalls?","a":"It defines how arguments, registers, and return values are passed to the kernel interface.","tags":["abi","syscalls"]},
+    {"id":"ks-012","tier":"B","q":"Why do many syscalls return -1 on error and set errno?","a":"It gives a consistent failure signal while preserving a detailed error code.","tags":["errno","errors"]},
+    {"id":"ks-013","tier":"C","q":"When is batching syscalls worth it?","a":"When you can reduce boundary crossings enough to offset the extra complexity.","tags":["batching","tradeoff"]},
+    {"id":"ks-014","tier":"C","q":"Why would you prefer a library call over a syscall when possible?","a":"Library calls stay in user space and are usually much cheaper.","tags":["library-call","performance"]},
+    {"id":"ks-015","tier":"C","q":"What tradeoff does a restrictive seccomp policy introduce?","a":"It reduces attack surface, but it can break legitimate functionality if the filter is too narrow.","tags":["seccomp","security","tradeoff"]},
+    {"id":"ks-016","tier":"C","q":"Why can async interfaces still rely on syscalls under the hood?","a":"The runtime may batch or poll with syscalls, but the application sees a higher-level abstraction.","tags":["async","syscalls"]},
+    {"id":"ks-017","tier":"C","q":"When is a raw syscall wrapper useful?","a":"When you need exact kernel behavior, new features, or a minimal dependency path.","tags":["wrapper","syscalls"]},
+    {"id":"ks-018","tier":"C","q":"What tradeoff do kernel interfaces make compared with direct hardware access?","a":"They add overhead, but they provide safety, fairness, and portability.","tags":["kernel","tradeoff"]}
+  ]
+}

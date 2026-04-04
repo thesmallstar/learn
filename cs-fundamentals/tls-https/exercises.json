@@ -1,0 +1,95 @@
+{
+  "topic": "tls-https",
+  "exercises": [
+    {
+      "id": "tls-ex-01",
+      "size": "small",
+      "title": "Inspect a certificate chain",
+      "description": "Use openssl s_client to connect to a site and inspect the presented chain.",
+      "command": "openssl s_client -connect example.com:443 -servername example.com",
+      "expected_outcome": "You can see the leaf cert, intermediates, and negotiated cipher.",
+      "prereqs": [
+        "OpenSSL installed"
+      ],
+      "tags": [
+        "openssl",
+        "certs"
+      ]
+    },
+    {
+      "id": "tls-ex-02",
+      "size": "small",
+      "title": "Compare HTTPS versions",
+      "description": "Use curl to compare TLS behavior and protocol negotiation on a site.",
+      "command": "curl -vk https://example.com",
+      "expected_outcome": "You can see TLS handshake details and the negotiated version.",
+      "prereqs": [
+        "curl installed"
+      ],
+      "tags": [
+        "https",
+        "tls"
+      ]
+    },
+    {
+      "id": "tls-ex-03",
+      "size": "medium",
+      "title": "Generate a local certificate",
+      "description": "Create a self-signed certificate and serve a local HTTPS site with it.",
+      "command": "openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem",
+      "expected_outcome": "You can run a local HTTPS endpoint with a valid test cert file pair.",
+      "prereqs": [
+        "OpenSSL installed"
+      ],
+      "tags": [
+        "certs",
+        "local-https"
+      ]
+    },
+    {
+      "id": "tls-ex-04",
+      "size": "medium",
+      "title": "Inspect revocation behavior",
+      "description": "Check whether a certificate advertises OCSP and compare with stapled responses.",
+      "command": "openssl s_client -status -connect example.com:443",
+      "expected_outcome": "You can observe whether OCSP stapling is present.",
+      "prereqs": [
+        "OpenSSL installed"
+      ],
+      "tags": [
+        "ocsp",
+        "revocation"
+      ]
+    },
+    {
+      "id": "tls-ex-05",
+      "size": "large",
+      "title": "Build an HTTPS server",
+      "description": "Create a local HTTPS server and configure it to use a certificate and key.",
+      "command": "python https_server.py",
+      "expected_outcome": "A browser can connect over HTTPS to your local server.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "https",
+        "server"
+      ]
+    },
+    {
+      "id": "tls-ex-06",
+      "size": "large",
+      "title": "Compare TLS 1.2 and 1.3",
+      "description": "Benchmark or at least inspect the handshake behavior of TLS 1.2 versus TLS 1.3 on the same endpoint.",
+      "command": "openssl s_client -tls1_2 -connect example.com:443",
+      "expected_outcome": "You can explain the handshake and round-trip differences.",
+      "prereqs": [
+        "OpenSSL installed"
+      ],
+      "tags": [
+        "tls12",
+        "tls13"
+      ]
+    }
+  ]
+}

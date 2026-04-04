@@ -1,0 +1,97 @@
+{
+  "topic": "graph-algorithms",
+  "exercises": [
+    {
+      "id": "graph-algorithms-ex-01",
+      "size": "small",
+      "title": "Run BFS and DFS on a sample graph",
+      "description": "Visit the same graph with BFS and DFS and compare the visitation order.",
+      "command": "python3 bfs_dfs_demo.py",
+      "expected_outcome": "BFS should visit by layers while DFS should go deep along one path.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "bfs",
+        "dfs"
+      ]
+    },
+    {
+      "id": "graph-algorithms-ex-02",
+      "size": "small",
+      "title": "Compare graph representations",
+      "description": "Store the same graph as an adjacency list and adjacency matrix and compare memory use.",
+      "command": "python3 graph_representation_compare.py",
+      "expected_outcome": "Sparse graphs should be much cheaper to store as adjacency lists.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "adjacency-list",
+        "adjacency-matrix"
+      ]
+    },
+    {
+      "id": "graph-algorithms-ex-03",
+      "size": "medium",
+      "title": "Implement Dijkstra",
+      "description": "Write a shortest-path solver for nonnegative weighted graphs using a priority queue.",
+      "command": "python3 dijkstra_impl.py",
+      "expected_outcome": "The solver should return minimum distances from the source to every node.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "dijkstra",
+        "priority-queue"
+      ]
+    },
+    {
+      "id": "graph-algorithms-ex-04",
+      "size": "medium",
+      "title": "Implement topological sort",
+      "description": "Compute a dependency order for a DAG and detect cycles when the order is impossible.",
+      "command": "python3 topological_sort.py",
+      "expected_outcome": "Every edge should point from an earlier node to a later node in the final order.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "topological-sort",
+        "dag"
+      ]
+    },
+    {
+      "id": "graph-algorithms-ex-05",
+      "size": "large",
+      "title": "Build Kruskal with union-find",
+      "description": "Implement minimum spanning tree construction with disjoint-set union and test it on weighted graphs.",
+      "command": "python3 kruskal_union_find.py",
+      "expected_outcome": "The selected edges should connect all nodes with minimum total weight and no cycles.",
+      "prereqs": [
+        "Python 3.10+",
+        "graph basics"
+      ],
+      "tags": [
+        "mst",
+        "union-find"
+      ]
+    },
+    {
+      "id": "graph-algorithms-ex-06",
+      "size": "large",
+      "title": "Solve weighted grid paths with A*",
+      "description": "Build an A* pathfinder on a grid and compare it with Dijkstra on the same map.",
+      "command": "python3 a_star_grid.py",
+      "expected_outcome": "A* should explore fewer nodes when the heuristic is admissible.",
+      "prereqs": [
+        "Python 3.10+",
+        "heuristics"
+      ],
+      "tags": [
+        "a-star",
+        "shortest-path"
+      ]
+    }
+  ]
+}

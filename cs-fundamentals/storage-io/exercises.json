@@ -1,0 +1,11 @@
+{
+  "topic": "storage-io",
+  "exercises": [
+    {"id":"io-ex-01","size":"small","title":"Inspect Block Devices","description":"List disks and partitions, then identify the filesystem and mount point for your main volume.","command":"lsblk -f","expected_outcome":"You can explain which block device backs your root filesystem.","prereqs":["Linux"],"tags":["lsblk","filesystem","storage"]},
+    {"id":"io-ex-02","size":"small","title":"Observe Disk Activity","description":"Watch live I/O metrics while a copy runs and identify the busy device.","command":"iostat -xz 1","expected_outcome":"You can read util%, await, and throughput while I/O is active.","prereqs":["sysstat package"],"tags":["iostat","latency","throughput"]},
+    {"id":"io-ex-03","size":"medium","title":"Buffered vs Direct Write","description":"Write a file with and without cache bypass and compare observed behavior.","command":"dd if=/dev/zero of=test.bin bs=1M count=512 conv=fdatasync","expected_outcome":"You can see the effect of forcing data to storage at the end of the write.","prereqs":["Linux","dd"],"tags":["fsync","buffered-io"]},
+    {"id":"io-ex-04","size":"medium","title":"fio Read/Write Test","description":"Run fio with sequential and random profiles on a test file and compare IOPS and latency.","command":"fio --name=test --filename=fio.dat --size=256M --rw=randread --bs=4k --numjobs=1 --iodepth=16","expected_outcome":"Random 4K reads should show lower throughput and higher latency than sequential runs.","prereqs":["fio"],"tags":["fio","random-io","benchmark"]},
+    {"id":"io-ex-05","size":"large","title":"Toy Write-Ahead Log","description":"Build a tiny append-only log with checkpoints and recovery after a simulated crash.","command":"./wal_demo","expected_outcome":"After restart, the program should replay the log and recover committed state.","prereqs":["C, Rust, or Go"],"tags":["wal","recovery","durability"]},
+    {"id":"io-ex-06","size":"large","title":"Cache Effects on File Reads","description":"Measure repeated file reads before and after dropping caches, then compare timings.","command":"sync && echo 3 | sudo tee /proc/sys/vm/drop_caches","expected_outcome":"The first read should be slower than the cached read after data is hot again.","prereqs":["root access","Linux"],"tags":["page-cache","filesystem","benchmark"]}
+  ]
+}

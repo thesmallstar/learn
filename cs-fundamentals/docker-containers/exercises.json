@@ -1,0 +1,100 @@
+{
+  "topic": "docker-containers",
+  "exercises": [
+    {
+      "id": "docker-containers-ex-01",
+      "size": "small",
+      "title": "Inspect a Running Container",
+      "description": "Use docker inspect to find namespaces, cgroup paths, and mounted volumes.",
+      "command": "docker inspect <container>",
+      "expected_outcome": "You can identify runtime isolation and filesystem settings.",
+      "prereqs": [
+        "Docker"
+      ],
+      "tags": [
+        "inspect",
+        "namespaces"
+      ]
+    },
+    {
+      "id": "docker-containers-ex-02",
+      "size": "small",
+      "title": "Enter a Network Namespace",
+      "description": "Join a container network namespace from the host and observe its interfaces.",
+      "command": "nsenter --net=/proc/<pid>/ns/net ip addr",
+      "expected_outcome": "You see the container network stack from the host.",
+      "prereqs": [
+        "Linux",
+        "nsenter",
+        "root or sudo"
+      ],
+      "tags": [
+        "nsenter",
+        "network"
+      ]
+    },
+    {
+      "id": "docker-containers-ex-03",
+      "size": "medium",
+      "title": "Write a Multi-Stage Dockerfile",
+      "description": "Build a small Go or Python app in one stage and copy the runtime artifact into a tiny final image.",
+      "command": "docker build -t app .",
+      "expected_outcome": "The final image is much smaller than the build image.",
+      "prereqs": [
+        "Docker"
+      ],
+      "tags": [
+        "build",
+        "multi-stage"
+      ]
+    },
+    {
+      "id": "docker-containers-ex-04",
+      "size": "medium",
+      "title": "Run a Container Manually",
+      "description": "Use unshare and chroot to create a lightweight isolated process tree.",
+      "command": "unshare --pid --fork --mount-proc chroot rootfs /bin/sh",
+      "expected_outcome": "You get a shell in a manually isolated environment.",
+      "prereqs": [
+        "Linux",
+        "root or sudo",
+        "chroot rootfs"
+      ],
+      "tags": [
+        "namespaces",
+        "chroot"
+      ]
+    },
+    {
+      "id": "docker-containers-ex-05",
+      "size": "large",
+      "title": "Build a Minimal Runtime",
+      "description": "Create a small shell-based runtime that sets up namespaces and launches a process with basic isolation.",
+      "command": "bash runtime.sh",
+      "expected_outcome": "A process starts inside your own container-like environment.",
+      "prereqs": [
+        "Linux",
+        "root or sudo"
+      ],
+      "tags": [
+        "runtime",
+        "namespaces"
+      ]
+    },
+    {
+      "id": "docker-containers-ex-06",
+      "size": "large",
+      "title": "Compose a 3-Tier App",
+      "description": "Stand up nginx, an app service, and PostgreSQL with health checks and networking.",
+      "command": "docker compose up -d",
+      "expected_outcome": "All services come up and can talk to one another.",
+      "prereqs": [
+        "Docker Compose"
+      ],
+      "tags": [
+        "compose",
+        "networking"
+      ]
+    }
+  ]
+}

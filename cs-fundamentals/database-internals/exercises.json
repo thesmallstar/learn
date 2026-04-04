@@ -1,0 +1,99 @@
+{
+  "topic": "database-internals",
+  "exercises": [
+    {
+      "id": "database-internals-ex-01",
+      "size": "small",
+      "title": "Compare query plans",
+      "description": "Run the same SQL query before and after adding an index and inspect the plan change.",
+      "command": "psql -f explain_index_compare.sql",
+      "expected_outcome": "The indexed version should avoid a full table scan when the predicate is selective.",
+      "prereqs": [
+        "Postgres or SQLite",
+        "SQL basics"
+      ],
+      "tags": [
+        "explain",
+        "index"
+      ]
+    },
+    {
+      "id": "database-internals-ex-02",
+      "size": "small",
+      "title": "Inspect active sessions",
+      "description": "Use the database shell to list active connections and identify long-running queries.",
+      "command": "psql -c \"select pid, state, query from pg_stat_activity;\"",
+      "expected_outcome": "You should see which sessions are active, idle, or waiting.",
+      "prereqs": [
+        "Postgres"
+      ],
+      "tags": [
+        "connections",
+        "observability"
+      ]
+    },
+    {
+      "id": "database-internals-ex-03",
+      "size": "medium",
+      "title": "Measure seq scan vs index scan",
+      "description": "Create a table, load data, and compare a range query with and without an index.",
+      "command": "python3 seq_scan_vs_index_scan.py",
+      "expected_outcome": "The indexed range query should touch fewer rows or pages.",
+      "prereqs": [
+        "Python 3.10+",
+        "SQL database"
+      ],
+      "tags": [
+        "index-scan",
+        "performance"
+      ]
+    },
+    {
+      "id": "database-internals-ex-04",
+      "size": "medium",
+      "title": "Observe WAL growth",
+      "description": "Run a write-heavy workload and watch how the write-ahead log changes over time.",
+      "command": "python3 wal_growth_observer.py",
+      "expected_outcome": "WAL activity should increase as inserts and updates accumulate.",
+      "prereqs": [
+        "Python 3.10+",
+        "database internals basics"
+      ],
+      "tags": [
+        "wal",
+        "writes"
+      ]
+    },
+    {
+      "id": "database-internals-ex-05",
+      "size": "large",
+      "title": "Build a log-structured key-value store",
+      "description": "Append writes to a log, rebuild state on startup, and compact old segments.",
+      "command": "python3 lsm_kv_store.py",
+      "expected_outcome": "Reads should reconstruct the latest value while compaction reduces old data.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "lsm-tree",
+        "compaction"
+      ]
+    },
+    {
+      "id": "database-internals-ex-06",
+      "size": "large",
+      "title": "Benchmark range scans",
+      "description": "Compare range queries on a table scan versus a B-tree-backed index.",
+      "command": "python3 range_scan_benchmark.py",
+      "expected_outcome": "The indexed path should outperform the table scan for selective ranges.",
+      "prereqs": [
+        "Python 3.10+",
+        "SQL database"
+      ],
+      "tags": [
+        "b-tree",
+        "range-scan"
+      ]
+    }
+  ]
+}

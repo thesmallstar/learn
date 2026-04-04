@@ -1,0 +1,99 @@
+{
+  "topic": "message-queues",
+  "exercises": [
+    {
+      "id": "message-queues-ex-01",
+      "size": "small",
+      "title": "Inspect Broker Lag",
+      "description": "Check the lag or depth of a queue and compare it with the active consumer count.",
+      "command": "python queue_depth.py",
+      "expected_outcome": "You can see whether consumers are keeping up with producers.",
+      "prereqs": [
+        "Python",
+        "a local queue or broker"
+      ],
+      "tags": [
+        "lag",
+        "observability"
+      ]
+    },
+    {
+      "id": "message-queues-ex-02",
+      "size": "small",
+      "title": "Trace an Ack Path",
+      "description": "Send one message and confirm the broker marks it acknowledged after processing.",
+      "command": "python ack_demo.py",
+      "expected_outcome": "A processed message disappears from the in-flight set.",
+      "prereqs": [
+        "Python",
+        "broker locally available"
+      ],
+      "tags": [
+        "ack",
+        "delivery"
+      ]
+    },
+    {
+      "id": "message-queues-ex-03",
+      "size": "medium",
+      "title": "Build an Idempotent Consumer",
+      "description": "Write a consumer that ignores duplicate message IDs and only applies side effects once.",
+      "command": "python idempotent_consumer.py",
+      "expected_outcome": "Retries do not duplicate the resulting state.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "idempotency",
+        "consumer"
+      ]
+    },
+    {
+      "id": "message-queues-ex-04",
+      "size": "medium",
+      "title": "Implement a DLQ Path",
+      "description": "Route messages that fail too many times into a dead-letter queue with their failure reason.",
+      "command": "python dlq_demo.py",
+      "expected_outcome": "Bad messages stop blocking healthy ones and land in a DLQ.",
+      "prereqs": [
+        "Python",
+        "broker"
+      ],
+      "tags": [
+        "dlq",
+        "retries"
+      ]
+    },
+    {
+      "id": "message-queues-ex-05",
+      "size": "large",
+      "title": "Build a Retryable Job Runner",
+      "description": "Create a small async worker that pulls jobs, retries transient failures, and persists status.",
+      "command": "python worker.py",
+      "expected_outcome": "Jobs survive worker restarts and transient failures without losing progress.",
+      "prereqs": [
+        "Python",
+        "Redis or RabbitMQ"
+      ],
+      "tags": [
+        "worker",
+        "retries"
+      ]
+    },
+    {
+      "id": "message-queues-ex-06",
+      "size": "large",
+      "title": "Design an Event Pipeline",
+      "description": "Model a producer, broker, consumer group, and DLQ for an end-to-end event flow.",
+      "command": "mkdir -p docs && $EDITOR docs/event-pipeline.md",
+      "expected_outcome": "You end with a concrete design for message routing, retries, and failure handling.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "architecture",
+        "events"
+      ]
+    }
+  ]
+}

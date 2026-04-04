@@ -1,0 +1,172 @@
+{
+  "topic": "distributed-systems",
+  "questions": [
+    {
+      "id": "distributed-systems-001",
+      "tier": "A",
+      "q": "What does CAP stand for?",
+      "a": "Consistency, availability, and partition tolerance.",
+      "tags": [
+        "cap"
+      ]
+    },
+    {
+      "id": "distributed-systems-002",
+      "tier": "A",
+      "q": "What is a quorum?",
+      "a": "A majority of nodes required to make a decision.",
+      "tags": [
+        "quorum"
+      ]
+    },
+    {
+      "id": "distributed-systems-003",
+      "tier": "A",
+      "q": "What is a leader in a replicated system?",
+      "a": "The node that coordinates writes or consensus rounds.",
+      "tags": [
+        "leader"
+      ]
+    },
+    {
+      "id": "distributed-systems-004",
+      "tier": "A",
+      "q": "What is consistent hashing used for?",
+      "a": "To spread keys across nodes while minimizing movement when nodes change.",
+      "tags": [
+        "hashing"
+      ]
+    },
+    {
+      "id": "distributed-systems-005",
+      "tier": "A",
+      "q": "What is a vector clock used for?",
+      "a": "Tracking causal ordering between events.",
+      "tags": [
+        "vector-clock"
+      ]
+    },
+    {
+      "id": "distributed-systems-006",
+      "tier": "A",
+      "q": "What is an idempotent operation?",
+      "a": "An operation that has the same effect when repeated.",
+      "tags": [
+        "idempotency"
+      ]
+    },
+    {
+      "id": "distributed-systems-007",
+      "tier": "B",
+      "q": "Why is exactly-once processing difficult in distributed systems?",
+      "a": "Network and process failures can happen between side effects and acknowledgements.",
+      "tags": [
+        "exactly-once"
+      ]
+    },
+    {
+      "id": "distributed-systems-008",
+      "tier": "B",
+      "q": "Why does split brain happen?",
+      "a": "Nodes lose contact and both sides believe they should continue independently.",
+      "tags": [
+        "split-brain"
+      ]
+    },
+    {
+      "id": "distributed-systems-009",
+      "tier": "B",
+      "q": "Why do fencing tokens help in failover?",
+      "a": "They let only the newest leader act, preventing stale leaders from writing.",
+      "tags": [
+        "fencing",
+        "failover"
+      ]
+    },
+    {
+      "id": "distributed-systems-010",
+      "tier": "B",
+      "q": "Why is linearizability stronger than serializability?",
+      "a": "It also preserves real-time order of operations across clients.",
+      "tags": [
+        "consistency"
+      ]
+    },
+    {
+      "id": "distributed-systems-011",
+      "tier": "B",
+      "q": "Why does 2PC block when the coordinator dies at the wrong time?",
+      "a": "Participants may be left waiting for a commit or abort decision.",
+      "tags": [
+        "2pc"
+      ]
+    },
+    {
+      "id": "distributed-systems-012",
+      "tier": "B",
+      "q": "Why are retries dangerous without idempotency?",
+      "a": "A retried request can apply the same side effect more than once.",
+      "tags": [
+        "retries",
+        "idempotency"
+      ]
+    },
+    {
+      "id": "distributed-systems-013",
+      "tier": "C",
+      "q": "When would you prefer eventual consistency over strong consistency?",
+      "a": "When availability, latency, or geographic distribution matter more than immediate agreement.",
+      "tags": [
+        "consistency",
+        "availability"
+      ]
+    },
+    {
+      "id": "distributed-systems-014",
+      "tier": "C",
+      "q": "When is quorum-based replication a good fit?",
+      "a": "When you want tolerance to node failures while still keeping reads and writes bounded.",
+      "tags": [
+        "quorum",
+        "replication"
+      ]
+    },
+    {
+      "id": "distributed-systems-015",
+      "tier": "C",
+      "q": "How would you handle leader failover safely?",
+      "a": "Use heartbeats, elections, and fencing so only the newest leader can write.",
+      "tags": [
+        "leader-election"
+      ]
+    },
+    {
+      "id": "distributed-systems-016",
+      "tier": "C",
+      "q": "When does consistent hashing matter most?",
+      "a": "When node membership changes often and you want limited key reshuffling.",
+      "tags": [
+        "hashing"
+      ]
+    },
+    {
+      "id": "distributed-systems-017",
+      "tier": "C",
+      "q": "What tradeoff comes with strong consistency across regions?",
+      "a": "Higher write latency and more sensitivity to network partitions.",
+      "tags": [
+        "consistency",
+        "latency"
+      ]
+    },
+    {
+      "id": "distributed-systems-018",
+      "tier": "C",
+      "q": "Why do systems use monotonic timestamps or logical clocks?",
+      "a": "To reason about ordering without trusting wall-clock time alone.",
+      "tags": [
+        "clocks"
+      ]
+    }
+  ]
+}

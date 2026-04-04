@@ -1,0 +1,187 @@
+{
+  "topic": "message-queues",
+  "questions": [
+    {
+      "id": "message-queues-001",
+      "tier": "A",
+      "q": "What is the main difference between a queue and a pub/sub topic?",
+      "a": "A queue delivers each message to one consumer, while pub/sub fan-outs to many subscribers.",
+      "tags": [
+        "queue",
+        "pubsub"
+      ]
+    },
+    {
+      "id": "message-queues-002",
+      "tier": "A",
+      "q": "What does ACK mean in a brokered message system?",
+      "a": "It confirms that a consumer processed or accepted the message.",
+      "tags": [
+        "queue",
+        "ack"
+      ]
+    },
+    {
+      "id": "message-queues-003",
+      "tier": "A",
+      "q": "What is a dead-letter queue?",
+      "a": "A queue for messages that could not be processed successfully after retries.",
+      "tags": [
+        "queue",
+        "dlq"
+      ]
+    },
+    {
+      "id": "message-queues-004",
+      "tier": "A",
+      "q": "What is a consumer group?",
+      "a": "A set of consumers that share work across partitions or messages.",
+      "tags": [
+        "queue",
+        "consumer-group"
+      ]
+    },
+    {
+      "id": "message-queues-005",
+      "tier": "A",
+      "q": "What is a partition in a log-based broker?",
+      "a": "An ordered shard of a topic that can be consumed independently.",
+      "tags": [
+        "queue",
+        "partition"
+      ]
+    },
+    {
+      "id": "message-queues-006",
+      "tier": "A",
+      "q": "What does offset mean in Kafka-like systems?",
+      "a": "The position of a message within a partition.",
+      "tags": [
+        "queue",
+        "offset"
+      ]
+    },
+    {
+      "id": "message-queues-007",
+      "tier": "B",
+      "q": "Why do message brokers often provide at-least-once delivery by default?",
+      "a": "Because retries after failures are safer than losing messages.",
+      "tags": [
+        "queue",
+        "delivery"
+      ]
+    },
+    {
+      "id": "message-queues-008",
+      "tier": "B",
+      "q": "Why is exactly-once delivery hard to guarantee?",
+      "a": "Failures can happen between producing, consuming, and committing state.",
+      "tags": [
+        "queue",
+        "exactly-once"
+      ]
+    },
+    {
+      "id": "message-queues-009",
+      "tier": "B",
+      "q": "Why do consumers need idempotency?",
+      "a": "Because duplicate deliveries can happen during retries or rebalances.",
+      "tags": [
+        "queue",
+        "idempotency"
+      ]
+    },
+    {
+      "id": "message-queues-010",
+      "tier": "B",
+      "q": "Why is ordering easier within one partition than across many?",
+      "a": "A single partition has one total sequence, while many partitions do not.",
+      "tags": [
+        "queue",
+        "ordering"
+      ]
+    },
+    {
+      "id": "message-queues-011",
+      "tier": "B",
+      "q": "What is backpressure in queue systems?",
+      "a": "It is a signal to slow producers or reduce intake when consumers lag.",
+      "tags": [
+        "queue",
+        "backpressure"
+      ]
+    },
+    {
+      "id": "message-queues-012",
+      "tier": "B",
+      "q": "Why do poison messages need special handling?",
+      "a": "They fail repeatedly and can block throughput if they are retried forever.",
+      "tags": [
+        "queue",
+        "poison-message"
+      ]
+    },
+    {
+      "id": "message-queues-013",
+      "tier": "C",
+      "q": "When would you choose a queue over a direct synchronous API call?",
+      "a": "When you want buffering, retry isolation, and asynchronous processing.",
+      "tags": [
+        "queue",
+        "architecture"
+      ]
+    },
+    {
+      "id": "message-queues-014",
+      "tier": "C",
+      "q": "When would a log-based broker be a better fit than a classic queue?",
+      "a": "When you need replay, multiple consumers, and durable event history.",
+      "tags": [
+        "queue",
+        "log",
+        "kafka"
+      ]
+    },
+    {
+      "id": "message-queues-015",
+      "tier": "C",
+      "q": "How would you design around duplicate deliveries?",
+      "a": "Make handlers idempotent, dedupe by message ID, and commit side effects carefully.",
+      "tags": [
+        "queue",
+        "dedupe"
+      ]
+    },
+    {
+      "id": "message-queues-016",
+      "tier": "C",
+      "q": "When is a DLQ better than infinite retries?",
+      "a": "When a message is invalid or depends on a fix that cannot be made automatically.",
+      "tags": [
+        "queue",
+        "dlq"
+      ]
+    },
+    {
+      "id": "message-queues-017",
+      "tier": "C",
+      "q": "What tradeoff comes with ordering guarantees?",
+      "a": "Stronger ordering usually reduces parallelism and can lower throughput.",
+      "tags": [
+        "queue",
+        "ordering",
+        "throughput"
+      ]
+    },
+    {
+      "id": "message-queues-018",
+      "tier": "C",
+      "q": "When should producers batch messages?",
+      "a": "When throughput matters more than per-message latency and the broker supports it.",
+      "tags": [
+        "queue",
+        "batching"
+      ]
+    }
+  ]
+}

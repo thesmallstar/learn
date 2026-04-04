@@ -1,0 +1,100 @@
+{
+  "topic": "cloud-computing",
+  "exercises": [
+    {
+      "id": "cloud-computing-ex-01",
+      "size": "small",
+      "title": "Create and Serve an S3 Object",
+      "description": "Upload a file, generate a presigned URL, and fetch it without credentials.",
+      "command": "aws s3 presign s3://bucket/file.txt",
+      "expected_outcome": "The object is accessible for a limited time through the signed URL.",
+      "prereqs": [
+        "AWS CLI",
+        "S3 access"
+      ],
+      "tags": [
+        "s3",
+        "url"
+      ]
+    },
+    {
+      "id": "cloud-computing-ex-02",
+      "size": "small",
+      "title": "Test an IAM Policy",
+      "description": "Simulate whether a role can perform a specific cloud action.",
+      "command": "aws iam simulate-principal-policy",
+      "expected_outcome": "You can predict allow or deny before deploying code.",
+      "prereqs": [
+        "AWS CLI",
+        "IAM permissions"
+      ],
+      "tags": [
+        "iam",
+        "policy"
+      ]
+    },
+    {
+      "id": "cloud-computing-ex-03",
+      "size": "medium",
+      "title": "Build a VPC by Hand",
+      "description": "Create subnets, route tables, an internet gateway, and security groups from scratch.",
+      "command": "terraform apply",
+      "expected_outcome": "You end with a usable VPC and controlled network boundaries.",
+      "prereqs": [
+        "Terraform",
+        "cloud account"
+      ],
+      "tags": [
+        "vpc",
+        "networking"
+      ]
+    },
+    {
+      "id": "cloud-computing-ex-04",
+      "size": "medium",
+      "title": "Deploy a Lambda Image Processor",
+      "description": "Trigger a function on object upload and resize the image with least-privilege IAM.",
+      "command": "aws lambda invoke",
+      "expected_outcome": "An uploaded image produces a resized output artifact.",
+      "prereqs": [
+        "AWS CLI",
+        "Lambda access"
+      ],
+      "tags": [
+        "lambda",
+        "s3"
+      ]
+    },
+    {
+      "id": "cloud-computing-ex-05",
+      "size": "large",
+      "title": "Build a Highly Available Web App",
+      "description": "Stand up a load balancer, two app instances, and a multi-AZ database tier.",
+      "command": "terraform apply",
+      "expected_outcome": "The app survives an AZ failure test with minimal disruption.",
+      "prereqs": [
+        "Terraform",
+        "cloud account"
+      ],
+      "tags": [
+        "ha",
+        "architecture"
+      ]
+    },
+    {
+      "id": "cloud-computing-ex-06",
+      "size": "large",
+      "title": "Parameterize Infrastructure as Code",
+      "description": "Refactor the app setup into reusable Terraform modules for dev and prod.",
+      "command": "terraform plan",
+      "expected_outcome": "The same code can provision multiple environments cleanly.",
+      "prereqs": [
+        "Terraform"
+      ],
+      "tags": [
+        "iac",
+        "terraform"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "topic": "performance-engineering",
+  "exercises": [
+    {
+      "id": "performance-engineering-ex-01",
+      "size": "small",
+      "title": "Profile a Script",
+      "description": "Run a CPU profiler on a small program and identify the hottest function.",
+      "command": "python -m cProfile script.py",
+      "expected_outcome": "You can point at the top CPU consumers.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "profiling",
+        "cpu"
+      ]
+    },
+    {
+      "id": "performance-engineering-ex-02",
+      "size": "small",
+      "title": "Load Test a Local Server",
+      "description": "Push a simple HTTP server with ab or wrk and find the first saturation point.",
+      "command": "wrk -t2 -c50 -d30s http://localhost:8000",
+      "expected_outcome": "You can see throughput and latency degrade as load rises.",
+      "prereqs": [
+        "wrk or ab",
+        "local server"
+      ],
+      "tags": [
+        "load-test"
+      ]
+    },
+    {
+      "id": "performance-engineering-ex-03",
+      "size": "medium",
+      "title": "Generate a Flame Graph",
+      "description": "Capture a CPU profile for a Node or Python service and turn it into a flame graph.",
+      "command": "perf record -F 99 -g -- python app.py",
+      "expected_outcome": "You can visually trace time spent in the hot path.",
+      "prereqs": [
+        "perf",
+        "Linux"
+      ],
+      "tags": [
+        "flamegraph",
+        "profiling"
+      ]
+    },
+    {
+      "id": "performance-engineering-ex-04",
+      "size": "medium",
+      "title": "Find an N+1 Query",
+      "description": "Instrument a small ORM-backed app and reduce repeated queries by batching or preloading.",
+      "command": "python app.py",
+      "expected_outcome": "Query count drops after the optimization.",
+      "prereqs": [
+        "Python",
+        "ORM-backed app"
+      ],
+      "tags": [
+        "n+1",
+        "database"
+      ]
+    },
+    {
+      "id": "performance-engineering-ex-05",
+      "size": "large",
+      "title": "Run a k6 Ramp Test",
+      "description": "Ramp load from zero to high concurrency and record P99 latency over time.",
+      "command": "k6 run test.js",
+      "expected_outcome": "You can identify the inflection point where latency rises sharply.",
+      "prereqs": [
+        "k6"
+      ],
+      "tags": [
+        "k6",
+        "latency"
+      ]
+    },
+    {
+      "id": "performance-engineering-ex-06",
+      "size": "large",
+      "title": "Benchmark Connection Pooling",
+      "description": "Compare a service with and without PgBouncer or a similar pooler under load.",
+      "command": "docker compose up",
+      "expected_outcome": "Pooling changes throughput and latency in measurable ways.",
+      "prereqs": [
+        "Docker",
+        "PostgreSQL"
+      ],
+      "tags": [
+        "pooling",
+        "benchmark"
+      ]
+    }
+  ]
+}

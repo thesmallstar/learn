@@ -1,0 +1,188 @@
+{
+  "topic": "nosql-databases",
+  "questions": [
+    {
+      "id": "nosql-databases-001a",
+      "tier": "A",
+      "q": "What is a document database?",
+      "a": "A database that stores self-contained documents such as JSON or BSON.",
+      "tags": [
+        "document-db",
+        "schema-flexibility"
+      ]
+    },
+    {
+      "id": "nosql-databases-001b",
+      "tier": "B",
+      "q": "Why do document stores help with flexible schemas?",
+      "a": "Different records can carry different fields without expensive schema migrations.",
+      "tags": [
+        "document-db",
+        "schema-flexibility"
+      ]
+    },
+    {
+      "id": "nosql-databases-001c",
+      "tier": "C",
+      "q": "When is a document store a better fit than a relational table?",
+      "a": "When objects are naturally nested and you usually read them as whole aggregates.",
+      "tags": [
+        "document-db",
+        "schema-flexibility"
+      ]
+    },
+    {
+      "id": "nosql-databases-002a",
+      "tier": "A",
+      "q": "What is a key-value store?",
+      "a": "A simple mapping from key to value.",
+      "tags": [
+        "key-value",
+        "lookup"
+      ]
+    },
+    {
+      "id": "nosql-databases-002b",
+      "tier": "B",
+      "q": "Why are key-value stores so fast?",
+      "a": "They avoid complex joins and usually route directly to the stored value.",
+      "tags": [
+        "key-value",
+        "lookup"
+      ]
+    },
+    {
+      "id": "nosql-databases-002c",
+      "tier": "C",
+      "q": "When is a key-value store enough by itself?",
+      "a": "When the access pattern is mostly direct lookup by key and the value shape is simple.",
+      "tags": [
+        "key-value",
+        "lookup"
+      ]
+    },
+    {
+      "id": "nosql-databases-003a",
+      "tier": "A",
+      "q": "What is a wide-column database?",
+      "a": "A system that stores rows with flexible columns grouped by partition.",
+      "tags": [
+        "wide-column",
+        "cassandra"
+      ]
+    },
+    {
+      "id": "nosql-databases-003b",
+      "tier": "B",
+      "q": "Why are wide-column systems good for write-heavy workloads?",
+      "a": "They keep writes append-friendly and avoid heavy page rewrites.",
+      "tags": [
+        "wide-column",
+        "cassandra"
+      ]
+    },
+    {
+      "id": "nosql-databases-003c",
+      "tier": "C",
+      "q": "When would you choose wide-column storage?",
+      "a": "When your data is naturally partitioned by a key and you need high write throughput.",
+      "tags": [
+        "wide-column",
+        "cassandra"
+      ]
+    },
+    {
+      "id": "nosql-databases-004a",
+      "tier": "A",
+      "q": "What does a graph database model directly?",
+      "a": "Nodes and edges.",
+      "tags": [
+        "graph-db",
+        "traversal"
+      ]
+    },
+    {
+      "id": "nosql-databases-004b",
+      "tier": "B",
+      "q": "Why are graph databases strong at relationship queries?",
+      "a": "Traversals over explicit edges are cheaper than emulating the same pattern with many joins.",
+      "tags": [
+        "graph-db",
+        "traversal"
+      ]
+    },
+    {
+      "id": "nosql-databases-004c",
+      "tier": "C",
+      "q": "When should you choose a graph database?",
+      "a": "When relationships and multi-hop traversals are central to the workload.",
+      "tags": [
+        "graph-db",
+        "traversal"
+      ]
+    },
+    {
+      "id": "nosql-databases-005a",
+      "tier": "A",
+      "q": "What is special about time-series or search-oriented NoSQL systems?",
+      "a": "They optimize for timestamped writes or indexed text queries.",
+      "tags": [
+        "time-series",
+        "search"
+      ]
+    },
+    {
+      "id": "nosql-databases-005b",
+      "tier": "B",
+      "q": "Why do time-series systems use retention or downsampling?",
+      "a": "They keep recent high-resolution data while reducing storage for older observations.",
+      "tags": [
+        "time-series",
+        "search"
+      ]
+    },
+    {
+      "id": "nosql-databases-005c",
+      "tier": "C",
+      "q": "When would a time-series or search engine beat a general-purpose database?",
+      "a": "When the query pattern is dominated by time windows, aggregations, or full-text search.",
+      "tags": [
+        "time-series",
+        "search"
+      ]
+    },
+    {
+      "id": "nosql-databases-006a",
+      "tier": "A",
+      "q": "What do sharding and replica sets solve?",
+      "a": "Sharding spreads data across nodes; replica sets improve availability.",
+      "tags": [
+        "sharding",
+        "replication",
+        "consistency"
+      ]
+    },
+    {
+      "id": "nosql-databases-006b",
+      "tier": "B",
+      "q": "Why is partition-key choice so important in NoSQL systems?",
+      "a": "It determines how evenly data and traffic are distributed across the cluster.",
+      "tags": [
+        "sharding",
+        "replication",
+        "consistency"
+      ]
+    },
+    {
+      "id": "nosql-databases-006c",
+      "tier": "C",
+      "q": "How does CAP or PACELC shape NoSQL design?",
+      "a": "You must trade consistency, availability, latency, and partition tolerance against each other.",
+      "tags": [
+        "sharding",
+        "replication",
+        "consistency"
+      ]
+    }
+  ]
+}

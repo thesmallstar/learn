@@ -1,0 +1,96 @@
+{
+  "topic": "hash-tables",
+  "exercises": [
+    {
+      "id": "hash-tables-ex-01",
+      "size": "small",
+      "title": "Measure collisions",
+      "description": "Hash a few thousand strings into a small bucket array and count how many buckets collide.",
+      "command": "python3 hash_collision_counter.py",
+      "expected_outcome": "You should see collisions rise as the table gets smaller or the key set gets more biased.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "hash-table",
+        "collisions"
+      ]
+    },
+    {
+      "id": "hash-tables-ex-02",
+      "size": "small",
+      "title": "Compare lookup paths",
+      "description": "Time a linear search over a list versus a dictionary lookup for the same key set.",
+      "command": "python3 lookup_list_vs_dict.py",
+      "expected_outcome": "Dictionary lookup should stay near constant time while linear search scales with n.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "lookup",
+        "benchmark"
+      ]
+    },
+    {
+      "id": "hash-tables-ex-03",
+      "size": "medium",
+      "title": "Implement chaining",
+      "description": "Build a small hash table with separate chaining and support insert, get, and delete.",
+      "command": "python3 chaining_hash_table.py",
+      "expected_outcome": "Lookups should stay simple even when several keys land in the same bucket.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "chaining",
+        "hash-table"
+      ]
+    },
+    {
+      "id": "hash-tables-ex-04",
+      "size": "medium",
+      "title": "Implement linear probing",
+      "description": "Write an open-addressed table with linear probing and tombstones for deletes.",
+      "command": "python3 linear_probing_hash_table.py",
+      "expected_outcome": "Probes should advance until an empty or matching slot is found.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "open-addressing",
+        "linear-probing"
+      ]
+    },
+    {
+      "id": "hash-tables-ex-05",
+      "size": "large",
+      "title": "Build a consistent hash ring",
+      "description": "Model node placement with virtual replicas and show how keys move when a node is added or removed.",
+      "command": "python3 consistent_hash_ring.py",
+      "expected_outcome": "Only a small subset of keys should remap after each membership change.",
+      "prereqs": [
+        "Python 3.10+"
+      ],
+      "tags": [
+        "consistent-hashing",
+        "distributed-systems"
+      ]
+    },
+    {
+      "id": "hash-tables-ex-06",
+      "size": "large",
+      "title": "Benchmark load factor tradeoffs",
+      "description": "Measure lookup and insert latency as the table approaches different load factors.",
+      "command": "python3 hash_table_load_factor_benchmark.py",
+      "expected_outcome": "Performance should worsen as the table fills and collision cost grows.",
+      "prereqs": [
+        "Python 3.10+",
+        "benchmarking basics"
+      ],
+      "tags": [
+        "load-factor",
+        "performance"
+      ]
+    }
+  ]
+}

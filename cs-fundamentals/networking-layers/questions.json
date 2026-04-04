@@ -1,0 +1,185 @@
+{
+  "topic": "networking-layers",
+  "questions": [
+    {
+      "id": "nl-a01",
+      "tier": "A",
+      "q": "Which OSI layer is responsible for logical addressing and routing?",
+      "a": "Network layer (Layer 3)",
+      "tags": [
+        "osi",
+        "routing"
+      ]
+    },
+    {
+      "id": "nl-a02",
+      "tier": "A",
+      "q": "In the TCP/IP model, which layer combines the OSI Physical and Data Link layers?",
+      "a": "Link layer",
+      "tags": [
+        "tcp-ip",
+        "osi"
+      ]
+    },
+    {
+      "id": "nl-a03",
+      "tier": "A",
+      "q": "What protocol resolves an IP address to a MAC address on a local network?",
+      "a": "ARP",
+      "tags": [
+        "arp",
+        "ethernet"
+      ]
+    },
+    {
+      "id": "nl-a04",
+      "tier": "A",
+      "q": "What is the correct PDU order from application down to physical?",
+      "a": "Data, segment, packet, frame, bits",
+      "tags": [
+        "encapsulation",
+        "pdu"
+      ]
+    },
+    {
+      "id": "nl-a05",
+      "tier": "A",
+      "q": "What routing rule picks the most specific matching prefix?",
+      "a": "Longest prefix match",
+      "tags": [
+        "routing",
+        "ip"
+      ]
+    },
+    {
+      "id": "nl-a06",
+      "tier": "A",
+      "q": "What is the main purpose of VLANs?",
+      "a": "To logically segment a Layer 2 network",
+      "tags": [
+        "vlan",
+        "switching"
+      ]
+    },
+    {
+      "id": "nl-b01",
+      "tier": "B",
+      "q": "How does traceroute discover the path to a destination?",
+      "a": "It sends packets with increasing TTL values and learns each hop from ICMP time exceeded replies.",
+      "tags": [
+        "traceroute",
+        "icmp"
+      ]
+    },
+    {
+      "id": "nl-b02",
+      "tier": "B",
+      "q": "What is the difference between BGP and OSPF?",
+      "a": "BGP is used between autonomous systems; OSPF is an interior gateway protocol used within one AS.",
+      "tags": [
+        "bgp",
+        "ospf"
+      ]
+    },
+    {
+      "id": "nl-b03",
+      "tier": "B",
+      "q": "Why do routers care about IP prefixes rather than host names?",
+      "a": "Routing happens on IP addresses, and prefixes let routers forward traffic efficiently without resolving application names.",
+      "tags": [
+        "routing",
+        "ip"
+      ]
+    },
+    {
+      "id": "nl-b04",
+      "tier": "B",
+      "q": "What does ICMP mainly provide?",
+      "a": "Network diagnostics and error reporting, such as unreachable or time exceeded messages.",
+      "tags": [
+        "icmp",
+        "diagnostics"
+      ]
+    },
+    {
+      "id": "nl-b05",
+      "tier": "B",
+      "q": "Why does fragmentation exist in IPv4?",
+      "a": "To let packets cross links with smaller MTUs, although modern networks try to avoid it.",
+      "tags": [
+        "ipv4",
+        "mtu"
+      ]
+    },
+    {
+      "id": "nl-b06",
+      "tier": "B",
+      "q": "What is port multiplexing on the transport layer?",
+      "a": "Using port numbers so one host can run many networked applications at once.",
+      "tags": [
+        "ports",
+        "transport"
+      ]
+    },
+    {
+      "id": "nl-c01",
+      "tier": "C",
+      "q": "Why are the network and transport layers separated?",
+      "a": "So routers can forward packets without understanding application state, while transport handles end-to-end delivery semantics.",
+      "tags": [
+        "layers",
+        "design"
+      ]
+    },
+    {
+      "id": "nl-c02",
+      "tier": "C",
+      "q": "When would you choose UDP over TCP?",
+      "a": "When low latency or app-level control matters more than built-in reliability, such as DNS, voice, or gaming.",
+      "tags": [
+        "udp",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "nl-c03",
+      "tier": "C",
+      "q": "Why does NAT exist in most enterprise and home networks?",
+      "a": "It conserves public IPv4 space and hides internal addressing behind a shared public IP.",
+      "tags": [
+        "nat",
+        "ipv4"
+      ]
+    },
+    {
+      "id": "nl-c04",
+      "tier": "C",
+      "q": "Why can a switch make forwarding decisions faster than a router at Layer 3?",
+      "a": "A switch forwards on learned MAC addresses in a local broadcast domain, while a router must examine IP routing state.",
+      "tags": [
+        "switch",
+        "router"
+      ]
+    },
+    {
+      "id": "nl-c05",
+      "tier": "C",
+      "q": "Why is BGP often described as policy-based rather than shortest-path routing?",
+      "a": "Because AS operators choose routes based on business policy, not just hop count or latency.",
+      "tags": [
+        "bgp",
+        "policy"
+      ]
+    },
+    {
+      "id": "nl-c06",
+      "tier": "C",
+      "q": "Explain why MTU mismatches can hurt performance.",
+      "a": "Packets may need fragmentation or be dropped, which adds overhead and can trigger retransmissions or path MTU discovery issues.",
+      "tags": [
+        "mtu",
+        "performance"
+      ]
+    }
+  ]
+}

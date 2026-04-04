@@ -1,0 +1,11 @@
+{
+  "topic": "threads-concurrency",
+  "exercises": [
+    {"id":"thr-ex-01","size":"small","title":"See Thread Count","description":"Run a multithreaded program and inspect its live threads with ps or top.","command":"ps -L -p $$","expected_outcome":"You can see the threads attached to the current process.","prereqs":["Linux"],"tags":["threads","ps","inspection"]},
+    {"id":"thr-ex-02","size":"small","title":"Race a Shared Counter","description":"Write a tiny program where multiple threads increment the same counter without locking.","command":"python3 race_counter.py","expected_outcome":"The final count should sometimes be wrong or inconsistent.","prereqs":["Python 3"],"tags":["race-condition","shared-state"]},
+    {"id":"thr-ex-03","size":"medium","title":"Mutex Protected Counter","description":"Fix the race by protecting the counter with a mutex or lock.","command":"python3 locked_counter.py","expected_outcome":"The final count should be correct across repeated runs.","prereqs":["Python 3"],"tags":["mutex","correctness"]},
+    {"id":"thr-ex-04","size":"medium","title":"Producer-Consumer Queue","description":"Build a bounded queue with a mutex and condition variables for producers and consumers.","command":"./producer_consumer_demo","expected_outcome":"Producers block when the queue is full and consumers wake them back up.","prereqs":["C, Rust, or Go"],"tags":["condition-variable","queue","sync"]},
+    {"id":"thr-ex-05","size":"large","title":"Thread Pool","description":"Implement a reusable thread pool with a work queue and graceful shutdown.","command":"./thread_pool_demo","expected_outcome":"Tasks run in parallel and the pool drains cleanly on shutdown.","prereqs":["C++, Rust, Go, or Python"],"tags":["thread-pool","parallelism"]},
+    {"id":"thr-ex-06","size":"large","title":"Lock Contention Benchmark","description":"Benchmark a shared lock under increasing thread counts and record throughput.","command":"./lock_contention_bench","expected_outcome":"Throughput should flatten or drop as contention rises.","prereqs":["perf or benchmark harness"],"tags":["contention","benchmark","locking"]}
+  ]
+}

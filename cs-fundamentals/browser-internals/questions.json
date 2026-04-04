@@ -1,0 +1,185 @@
+{
+  "topic": "browser-internals",
+  "questions": [
+    {
+      "id": "br-a01",
+      "tier": "A",
+      "q": "What is built by combining the DOM and CSSOM?",
+      "a": "The render tree",
+      "tags": [
+        "rendering",
+        "dom"
+      ]
+    },
+    {
+      "id": "br-a02",
+      "tier": "A",
+      "q": "What does V8 hidden class optimization help with?",
+      "a": "Fast property access on objects with stable shapes",
+      "tags": [
+        "v8",
+        "hidden-class"
+      ]
+    },
+    {
+      "id": "br-a03",
+      "tier": "A",
+      "q": "When do microtasks run in the event loop?",
+      "a": "After the current task finishes and before the next macrotask",
+      "tags": [
+        "event-loop",
+        "microtasks"
+      ]
+    },
+    {
+      "id": "br-a04",
+      "tier": "A",
+      "q": "What does LCP measure?",
+      "a": "The time until the largest visible content element is rendered",
+      "tags": [
+        "web-vitals",
+        "lcp"
+      ]
+    },
+    {
+      "id": "br-a05",
+      "tier": "A",
+      "q": "Which resource hint requests an asset with high priority for the current page?",
+      "a": "Preload",
+      "tags": [
+        "resource-hints",
+        "preload"
+      ]
+    },
+    {
+      "id": "br-a06",
+      "tier": "A",
+      "q": "Which cache strategy returns cached content immediately and refreshes in the background?",
+      "a": "Stale-while-revalidate",
+      "tags": [
+        "cache",
+        "service-worker"
+      ]
+    },
+    {
+      "id": "br-b01",
+      "tier": "B",
+      "q": "Why are parser-blocking scripts expensive?",
+      "a": "They stop HTML parsing until the script is fetched and executed.",
+      "tags": [
+        "parser",
+        "scripts"
+      ]
+    },
+    {
+      "id": "br-b02",
+      "tier": "B",
+      "q": "Why are CSS transforms cheaper than changing layout-affecting properties?",
+      "a": "Transforms usually avoid layout and paint work and can be handled by compositing.",
+      "tags": [
+        "css",
+        "compositing"
+      ]
+    },
+    {
+      "id": "br-b03",
+      "tier": "B",
+      "q": "Why is HTTP/2 better than HTTP/1.1 for many small assets?",
+      "a": "It multiplexes requests over one connection and reduces connection overhead.",
+      "tags": [
+        "http2",
+        "performance"
+      ]
+    },
+    {
+      "id": "br-b04",
+      "tier": "B",
+      "q": "What happens when TurboFan sees a type assumption violation?",
+      "a": "It deoptimizes and falls back to a less specialized code path.",
+      "tags": [
+        "jit",
+        "deopt"
+      ]
+    },
+    {
+      "id": "br-b05",
+      "tier": "B",
+      "q": "What is the role of a service worker?",
+      "a": "It intercepts network requests and can provide caching, offline behavior, and background work.",
+      "tags": [
+        "service-worker",
+        "offline"
+      ]
+    },
+    {
+      "id": "br-b06",
+      "tier": "B",
+      "q": "Why does cache validation with ETag help?",
+      "a": "It avoids refetching unchanged content while still confirming freshness.",
+      "tags": [
+        "etag",
+        "cache"
+      ]
+    },
+    {
+      "id": "br-c01",
+      "tier": "C",
+      "q": "Why does splitting code improve initial page load?",
+      "a": "It lets the browser download only the code needed for the first render.",
+      "tags": [
+        "code-splitting",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "br-c02",
+      "tier": "C",
+      "q": "Why can microtask starvation hurt rendering?",
+      "a": "A long chain of microtasks can delay the browser from returning to rendering and input handling.",
+      "tags": [
+        "microtasks",
+        "starvation"
+      ]
+    },
+    {
+      "id": "br-c03",
+      "tier": "C",
+      "q": "Why does connection pooling help page loads?",
+      "a": "It reduces handshake overhead and reuses warmed connections for subresource fetches.",
+      "tags": [
+        "pooling",
+        "network"
+      ]
+    },
+    {
+      "id": "br-c04",
+      "tier": "C",
+      "q": "Why are critical CSS and inline styles useful for first paint?",
+      "a": "They let the browser render above-the-fold content without waiting for large stylesheet downloads.",
+      "tags": [
+        "critical-css",
+        "rendering"
+      ]
+    },
+    {
+      "id": "br-c05",
+      "tier": "C",
+      "q": "Why are service workers powerful but risky?",
+      "a": "They can fully control fetches and caches, so bugs can trap users behind stale assets.",
+      "tags": [
+        "service-worker",
+        "caching"
+      ]
+    },
+    {
+      "id": "br-c06",
+      "tier": "C",
+      "q": "Why does browser performance work often focus on the critical path rather than total bytes?",
+      "a": "The slowest render-blocking work determines when the user sees useful content.",
+      "tags": [
+        "critical-path",
+        "performance"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "topic": "threads-concurrency",
+  "questions": [
+    {"id":"thr-001","tier":"A","q":"What is a thread?","a":"An execution path within a process that shares memory with its peers.","tags":["thread","process"]},
+    {"id":"thr-002","tier":"A","q":"What is a mutex used for?","a":"Mutual exclusion around a critical section.","tags":["mutex","locking"]},
+    {"id":"thr-003","tier":"A","q":"What is a semaphore?","a":"A counter-based synchronization primitive used to control access to shared resources.","tags":["semaphore","sync"]},
+    {"id":"thr-004","tier":"A","q":"What is a deadlock?","a":"A state where threads wait forever for each other to release resources.","tags":["deadlock","concurrency"]},
+    {"id":"thr-005","tier":"A","q":"What is a race condition?","a":"A bug where the result depends on the timing or interleaving of concurrent operations.","tags":["race-condition","bug"]},
+    {"id":"thr-006","tier":"A","q":"What is a critical section?","a":"A block of code that must not be executed by more than one thread at a time.","tags":["critical-section","locking"]},
+    {"id":"thr-007","tier":"B","q":"Why does shared mutable state make concurrency hard?","a":"Multiple threads can observe and modify the same data in inconsistent orders.","tags":["shared-state","race-condition"]},
+    {"id":"thr-008","tier":"B","q":"Why can lock contention hurt throughput?","a":"Threads spend time waiting instead of doing useful work, so parallelism drops.","tags":["contention","throughput"]},
+    {"id":"thr-009","tier":"B","q":"What is livelock?","a":"Threads keep reacting to each other but never make forward progress.","tags":["livelock","concurrency"]},
+    {"id":"thr-010","tier":"B","q":"Why are atomic operations useful?","a":"They let threads update shared state without an intermediate inconsistent state.","tags":["atomics","memory-model"]},
+    {"id":"thr-011","tier":"B","q":"What is the difference between a mutex and a read-write lock?","a":"A mutex allows one holder; a read-write lock can allow many readers or one writer.","tags":["mutex","rwlock"]},
+    {"id":"thr-012","tier":"B","q":"Why do condition variables exist?","a":"They let threads sleep until a condition becomes true without busy waiting.","tags":["condition-variable","waiting"]},
+    {"id":"thr-013","tier":"C","q":"When would you choose threads over processes?","a":"When you want shared memory, low overhead, and the workload is mostly in-process coordination.","tags":["threads","processes","tradeoff"]},
+    {"id":"thr-014","tier":"C","q":"What tradeoff does fine-grained locking introduce?","a":"It improves concurrency, but increases code complexity and can raise deadlock risk.","tags":["locking","tradeoff"]},
+    {"id":"thr-015","tier":"C","q":"When is lock-free programming worth the effort?","a":"When contention is high enough that lock overhead is the bottleneck and correctness can still be proven.","tags":["lock-free","tradeoff"]},
+    {"id":"thr-016","tier":"C","q":"Why can async I/O be better than a thread per connection?","a":"It avoids the memory and scheduling cost of many blocked threads.","tags":["async","io","tradeoff"]},
+    {"id":"thr-017","tier":"C","q":"What tradeoff does a larger thread pool introduce?","a":"It can absorb bursts better, but too many workers increase contention and context switching.","tags":["thread-pool","tradeoff"]},
+    {"id":"thr-018","tier":"C","q":"Why is reducing lock scope usually good practice?","a":"Shorter critical sections reduce waiting time and improve concurrency.","tags":["locking","scope"]}
+  ]
+}

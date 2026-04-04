@@ -1,0 +1,185 @@
+{
+  "topic": "authentication",
+  "questions": [
+    {
+      "id": "au-a01",
+      "tier": "A",
+      "q": "What is the difference between authentication and authorization?",
+      "a": "Authentication verifies identity; authorization checks permissions.",
+      "tags": [
+        "authn",
+        "authz"
+      ]
+    },
+    {
+      "id": "au-a02",
+      "tier": "A",
+      "q": "A JWT consists of three parts. What are they?",
+      "a": "Header, payload, and signature",
+      "tags": [
+        "jwt",
+        "tokens"
+      ]
+    },
+    {
+      "id": "au-a03",
+      "tier": "A",
+      "q": "What does PKCE protect against?",
+      "a": "Authorization code interception in OAuth 2.0",
+      "tags": [
+        "oauth",
+        "pkce"
+      ]
+    },
+    {
+      "id": "au-a04",
+      "tier": "A",
+      "q": "Which OAuth grant is used for machine-to-machine communication?",
+      "a": "Client Credentials",
+      "tags": [
+        "oauth",
+        "machine-to-machine"
+      ]
+    },
+    {
+      "id": "au-a05",
+      "tier": "A",
+      "q": "In OpenID Connect, what is the purpose of the ID token?",
+      "a": "To prove the user has authenticated",
+      "tags": [
+        "oidc",
+        "id-token"
+      ]
+    },
+    {
+      "id": "au-a06",
+      "tier": "A",
+      "q": "What makes WebAuthn resistant to phishing?",
+      "a": "It binds credentials to the real origin and uses public-key cryptography.",
+      "tags": [
+        "webauthn",
+        "phishing"
+      ]
+    },
+    {
+      "id": "au-b01",
+      "tier": "B",
+      "q": "Why is HS256 less suitable than RS256 for distributed microservices?",
+      "a": "A shared HMAC secret must be distributed widely, while RSA lets services verify without sharing the signing key.",
+      "tags": [
+        "jwt",
+        "algorithms"
+      ]
+    },
+    {
+      "id": "au-b02",
+      "tier": "B",
+      "q": "Why are short-lived access tokens paired with refresh tokens?",
+      "a": "Access tokens limit exposure, while refresh tokens let the client obtain new access tokens safely.",
+      "tags": [
+        "access-token",
+        "refresh-token"
+      ]
+    },
+    {
+      "id": "au-b03",
+      "tier": "B",
+      "q": "Why is SHA-256 unsuitable for password hashing?",
+      "a": "It is too fast and easy to brute force; password hashing needs deliberate slowness and salting.",
+      "tags": [
+        "passwords",
+        "hashing"
+      ]
+    },
+    {
+      "id": "au-b04",
+      "tier": "B",
+      "q": "How does RBAC differ from ABAC?",
+      "a": "RBAC grants access by role; ABAC evaluates attributes and policy conditions.",
+      "tags": [
+        "rbac",
+        "abac"
+      ]
+    },
+    {
+      "id": "au-b05",
+      "tier": "B",
+      "q": "What problem does rate limiting help with in auth systems?",
+      "a": "It slows brute-force attacks and reduces abuse of login and token endpoints.",
+      "tags": [
+        "rate-limit",
+        "security"
+      ]
+    },
+    {
+      "id": "au-b06",
+      "tier": "B",
+      "q": "Why is a session cookie often simpler than a JWT for browser apps?",
+      "a": "The server can revoke or rotate session state centrally without shipping token logic to the client.",
+      "tags": [
+        "sessions",
+        "cookies"
+      ]
+    },
+    {
+      "id": "au-c01",
+      "tier": "C",
+      "q": "Why is token signing not the same as token encryption?",
+      "a": "Signing proves integrity and origin, but the payload can still be readable unless it is separately encrypted.",
+      "tags": [
+        "jwt",
+        "crypto"
+      ]
+    },
+    {
+      "id": "au-c02",
+      "tier": "C",
+      "q": "Why do password hashing algorithms use cost factors or memory hardness?",
+      "a": "To make offline attacks expensive and slow down brute-force guessing.",
+      "tags": [
+        "bcrypt",
+        "argon2"
+      ]
+    },
+    {
+      "id": "au-c03",
+      "tier": "C",
+      "q": "What tradeoff do stateless JWTs make compared with sessions?",
+      "a": "They simplify horizontal scaling, but revocation and immediate invalidation become harder.",
+      "tags": [
+        "jwt",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "au-c04",
+      "tier": "C",
+      "q": "Why can WebAuthn improve account security even if passwords are reused elsewhere?",
+      "a": "The private key never leaves the authenticator and the credential is origin-bound.",
+      "tags": [
+        "webauthn",
+        "security"
+      ]
+    },
+    {
+      "id": "au-c05",
+      "tier": "C",
+      "q": "Why does OIDC exist on top of OAuth 2.0?",
+      "a": "OAuth handles authorization, while OIDC adds a standard identity layer for authentication.",
+      "tags": [
+        "oidc",
+        "oauth"
+      ]
+    },
+    {
+      "id": "au-c06",
+      "tier": "C",
+      "q": "Why is auth often described as a system, not a single login endpoint?",
+      "a": "It spans identity proofing, session handling, token issuance, revocation, authorization, and monitoring.",
+      "tags": [
+        "architecture",
+        "auth"
+      ]
+    }
+  ]
+}

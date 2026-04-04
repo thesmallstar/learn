@@ -1,0 +1,101 @@
+{
+  "topic": "kubernetes",
+  "exercises": [
+    {
+      "id": "kubernetes-ex-01",
+      "size": "small",
+      "title": "Watch Pod Events",
+      "description": "Follow events while a pod schedules, starts, and becomes ready.",
+      "command": "kubectl get events -w",
+      "expected_outcome": "You can trace the pod lifecycle in order.",
+      "prereqs": [
+        "kubectl",
+        "cluster access"
+      ],
+      "tags": [
+        "events",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "kubernetes-ex-02",
+      "size": "small",
+      "title": "Inspect a Pod Shell",
+      "description": "Exec into a pod and inspect processes, cgroups, and network state.",
+      "command": "kubectl exec -it <pod> -- sh",
+      "expected_outcome": "You can see the in-pod view of the process namespace.",
+      "prereqs": [
+        "kubectl",
+        "cluster access"
+      ],
+      "tags": [
+        "exec",
+        "debugging"
+      ]
+    },
+    {
+      "id": "kubernetes-ex-03",
+      "size": "medium",
+      "title": "Deploy PostgreSQL with PVC",
+      "description": "Run a stateful workload, delete the pod, and verify the data survives.",
+      "command": "kubectl apply -f statefulset.yaml",
+      "expected_outcome": "Storage persists across pod replacement.",
+      "prereqs": [
+        "kubectl",
+        "cluster access"
+      ],
+      "tags": [
+        "statefulset",
+        "storage"
+      ]
+    },
+    {
+      "id": "kubernetes-ex-04",
+      "size": "medium",
+      "title": "Write a NetworkPolicy",
+      "description": "Allow traffic only between selected pods and verify other traffic is blocked.",
+      "command": "kubectl apply -f networkpolicy.yaml",
+      "expected_outcome": "Only approved pod-to-pod traffic succeeds.",
+      "prereqs": [
+        "kubectl",
+        "cluster with NetworkPolicy support"
+      ],
+      "tags": [
+        "networkpolicy",
+        "security"
+      ]
+    },
+    {
+      "id": "kubernetes-ex-05",
+      "size": "large",
+      "title": "Build a Custom Controller",
+      "description": "Watch a CRD and create or update a ConfigMap when the resource changes.",
+      "command": "go run main.go",
+      "expected_outcome": "The controller continuously reconciles desired state.",
+      "prereqs": [
+        "Go or Python",
+        "cluster access"
+      ],
+      "tags": [
+        "controller",
+        "operator"
+      ]
+    },
+    {
+      "id": "kubernetes-ex-06",
+      "size": "large",
+      "title": "Create a Canary Rollout",
+      "description": "Split traffic between stable and canary versions and add a rollback path.",
+      "command": "kubectl apply -f canary.yaml",
+      "expected_outcome": "You can shift traffic gradually and stop the rollout if metrics regress.",
+      "prereqs": [
+        "kubectl",
+        "cluster access"
+      ],
+      "tags": [
+        "canary",
+        "deployments"
+      ]
+    }
+  ]
+}

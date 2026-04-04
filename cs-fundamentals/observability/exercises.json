@@ -1,0 +1,98 @@
+{
+  "topic": "observability",
+  "exercises": [
+    {
+      "id": "observability-ex-01",
+      "size": "small",
+      "title": "Expose Basic Metrics",
+      "description": "Add a counter and histogram to a small app and scrape them locally.",
+      "command": "python metrics_app.py",
+      "expected_outcome": "Your app exposes measurable operational signals.",
+      "prereqs": [
+        "Python",
+        "Prometheus client"
+      ],
+      "tags": [
+        "metrics",
+        "instrumentation"
+      ]
+    },
+    {
+      "id": "observability-ex-02",
+      "size": "small",
+      "title": "Measure Syscall Cost",
+      "description": "Run a command through strace and inspect the heaviest syscalls.",
+      "command": "strace -c ls",
+      "expected_outcome": "You can identify where system time is spent.",
+      "prereqs": [
+        "strace",
+        "Linux"
+      ],
+      "tags": [
+        "strace",
+        "syscalls"
+      ]
+    },
+    {
+      "id": "observability-ex-03",
+      "size": "medium",
+      "title": "Add Correlated Logs",
+      "description": "Emit JSON logs with a request ID across multiple handlers.",
+      "command": "python app.py",
+      "expected_outcome": "Each request can be traced through several log lines.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "logs",
+        "correlation"
+      ]
+    },
+    {
+      "id": "observability-ex-04",
+      "size": "medium",
+      "title": "Set Up a Local Stack",
+      "description": "Connect an app to Prometheus and Grafana and create one alert rule.",
+      "command": "docker compose up",
+      "expected_outcome": "You can see metrics in a dashboard and alert on them.",
+      "prereqs": [
+        "Docker"
+      ],
+      "tags": [
+        "prometheus",
+        "grafana"
+      ]
+    },
+    {
+      "id": "observability-ex-05",
+      "size": "large",
+      "title": "Instrument a Distributed Trace",
+      "description": "Add OpenTelemetry spans across two services and inspect them in a trace UI.",
+      "command": "docker compose up",
+      "expected_outcome": "You can follow a single request across service boundaries.",
+      "prereqs": [
+        "Docker",
+        "OpenTelemetry"
+      ],
+      "tags": [
+        "tracing",
+        "otel"
+      ]
+    },
+    {
+      "id": "observability-ex-06",
+      "size": "large",
+      "title": "Build an SLO Dashboard",
+      "description": "Define a success-rate SLI, compute burn rate, and show the result in Grafana.",
+      "command": "mkdir -p dashboards && $EDITOR dashboards/slo.md",
+      "expected_outcome": "You have a concrete error-budget view for the service.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "slo",
+        "dashboard"
+      ]
+    }
+  ]
+}

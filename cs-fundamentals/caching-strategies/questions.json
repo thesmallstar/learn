@@ -1,0 +1,187 @@
+{
+  "topic": "caching-strategies",
+  "questions": [
+    {
+      "id": "caching-strategies-001",
+      "tier": "A",
+      "q": "What cache pattern reads from the source of truth on a miss and then stores the result?",
+      "a": "Cache-aside.",
+      "tags": [
+        "cache",
+        "pattern"
+      ]
+    },
+    {
+      "id": "caching-strategies-002",
+      "tier": "A",
+      "q": "What eviction policy removes the least recently used item?",
+      "a": "LRU.",
+      "tags": [
+        "cache",
+        "eviction"
+      ]
+    },
+    {
+      "id": "caching-strategies-003",
+      "tier": "A",
+      "q": "What does TTL stand for in caching?",
+      "a": "Time to live.",
+      "tags": [
+        "cache",
+        "ttl"
+      ]
+    },
+    {
+      "id": "caching-strategies-004",
+      "tier": "A",
+      "q": "What do you call a key that gets disproportionate traffic?",
+      "a": "A hot key.",
+      "tags": [
+        "cache",
+        "hot-key"
+      ]
+    },
+    {
+      "id": "caching-strategies-005",
+      "tier": "A",
+      "q": "What metric is hits divided by total requests?",
+      "a": "Cache hit ratio.",
+      "tags": [
+        "cache",
+        "metrics"
+      ]
+    },
+    {
+      "id": "caching-strategies-006",
+      "tier": "A",
+      "q": "What is negative caching?",
+      "a": "Caching a miss or empty result to avoid repeated lookups.",
+      "tags": [
+        "cache",
+        "misses"
+      ]
+    },
+    {
+      "id": "caching-strategies-007",
+      "tier": "B",
+      "q": "Why is cache invalidation hard?",
+      "a": "Updates can race with reads, so stale copies can survive until eviction or TTL.",
+      "tags": [
+        "cache",
+        "consistency"
+      ]
+    },
+    {
+      "id": "caching-strategies-008",
+      "tier": "B",
+      "q": "Why does a cache stampede happen?",
+      "a": "Many requests miss the same key at once and all try to rebuild it.",
+      "tags": [
+        "cache",
+        "stampede"
+      ]
+    },
+    {
+      "id": "caching-strategies-009",
+      "tier": "B",
+      "q": "Why would you choose write-through over cache-aside?",
+      "a": "You want simpler consistency and can afford slower writes.",
+      "tags": [
+        "cache",
+        "write-through"
+      ]
+    },
+    {
+      "id": "caching-strategies-010",
+      "tier": "B",
+      "q": "Why can write-behind be risky?",
+      "a": "Data can be lost if the cache fails before dirty entries are flushed.",
+      "tags": [
+        "cache",
+        "write-behind"
+      ]
+    },
+    {
+      "id": "caching-strategies-011",
+      "tier": "B",
+      "q": "Why can LFU beat LRU on skewed workloads?",
+      "a": "Frequency matters more than recency when a few keys dominate traffic.",
+      "tags": [
+        "cache",
+        "lfu",
+        "lru"
+      ]
+    },
+    {
+      "id": "caching-strategies-012",
+      "tier": "B",
+      "q": "What does a Bloom filter help with in caching?",
+      "a": "It helps prevent cache penetration by cheaply rejecting known misses.",
+      "tags": [
+        "cache",
+        "bloom-filter"
+      ]
+    },
+    {
+      "id": "caching-strategies-013",
+      "tier": "C",
+      "q": "When would you place a CDN in front of an app cache?",
+      "a": "When you serve static or globally read-heavy content and want edge latency reduction.",
+      "tags": [
+        "cache",
+        "cdn"
+      ]
+    },
+    {
+      "id": "caching-strategies-014",
+      "tier": "C",
+      "q": "When is cache-aside a good fit for session data?",
+      "a": "When the source of truth is durable elsewhere and session reads need low latency.",
+      "tags": [
+        "cache",
+        "sessions"
+      ]
+    },
+    {
+      "id": "caching-strategies-015",
+      "tier": "C",
+      "q": "How would you reduce stampede risk on a hot key?",
+      "a": "Use request coalescing, stale-while-revalidate, jittered TTLs, or a per-key lock.",
+      "tags": [
+        "cache",
+        "stampede"
+      ]
+    },
+    {
+      "id": "caching-strategies-016",
+      "tier": "C",
+      "q": "When is write-through better than cache-aside?",
+      "a": "When you want a single write path and can tolerate the extra write latency.",
+      "tags": [
+        "cache",
+        "write-through"
+      ]
+    },
+    {
+      "id": "caching-strategies-017",
+      "tier": "C",
+      "q": "What is the tradeoff of TTL-based invalidation?",
+      "a": "It is simple, but you accept a bounded window of stale reads.",
+      "tags": [
+        "cache",
+        "ttl",
+        "consistency"
+      ]
+    },
+    {
+      "id": "caching-strategies-018",
+      "tier": "C",
+      "q": "When would you skip caching entirely?",
+      "a": "When the hit rate is low, the data is cheap to fetch, or freshness is critical.",
+      "tags": [
+        "cache",
+        "tradeoff"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "topic": "linux-internals",
+  "questions": [
+    {"id":"lin-001","tier":"A","q":"What is /proc?","a":"A virtual filesystem exposing kernel and process information.","tags":["procfs","kernel"]},
+    {"id":"lin-002","tier":"A","q":"What is cgroups used for?","a":"Resource accounting and limits for groups of processes.","tags":["cgroups","resources"]},
+    {"id":"lin-003","tier":"A","q":"What are namespaces used for?","a":"To isolate views of system resources such as PIDs, mounts, and networks.","tags":["namespaces","isolation"]},
+    {"id":"lin-004","tier":"A","q":"What is systemd?","a":"A Linux init system and service manager.","tags":["systemd","init"]},
+    {"id":"lin-005","tier":"A","q":"What does chmod control?","a":"Basic file permission bits for owner, group, and others.","tags":["permissions","chmod"]},
+    {"id":"lin-006","tier":"A","q":"What is a capability in Linux?","a":"A fine-grained privilege bit that splits root powers into smaller pieces.","tags":["capabilities","security"]},
+    {"id":"lin-007","tier":"B","q":"Why is /proc useful for debugging?","a":"It exposes live kernel and process state without special tooling.","tags":["procfs","debugging"]},
+    {"id":"lin-008","tier":"B","q":"Why do namespaces matter for containers?","a":"They make a process believe it has its own isolated system view.","tags":["containers","namespaces"]},
+    {"id":"lin-009","tier":"B","q":"Why are capabilities safer than full root access?","a":"They grant only the specific privilege needed instead of all administrator powers.","tags":["capabilities","least-privilege"]},
+    {"id":"lin-010","tier":"B","q":"What is seccomp used for?","a":"Restricting the set of system calls a process may make.","tags":["seccomp","sandboxing"]},
+    {"id":"lin-011","tier":"B","q":"What role do SELinux and AppArmor play?","a":"They add mandatory access control policies on top of Unix permissions.","tags":["selinux","apparmor","security"]},
+    {"id":"lin-012","tier":"B","q":"Why does systemd replace older init scripts in many distros?","a":"It provides dependency-aware service management, supervision, and boot orchestration.","tags":["systemd","boot"]},
+    {"id":"lin-013","tier":"C","q":"When would you use a namespace without cgroups?","a":"When you want isolation of view but do not need explicit resource limits.","tags":["namespaces","cgroups","tradeoff"]},
+    {"id":"lin-014","tier":"C","q":"What tradeoff does strict MAC policy introduce?","a":"It improves security, but policy mistakes can block legitimate behavior and slow operations work.","tags":["mac","security","tradeoff"]},
+    {"id":"lin-015","tier":"C","q":"Why can kernel introspection be both powerful and dangerous?","a":"It helps diagnose issues deeply, but it can expose sensitive state or encourage invasive changes.","tags":["kernel","debugging","tradeoff"]},
+    {"id":"lin-016","tier":"C","q":"How do capabilities and namespaces complement each other in containers?","a":"Namespaces isolate the environment, while capabilities limit what the process can do inside it.","tags":["containers","security"]},
+    {"id":"lin-017","tier":"C","q":"What is the tradeoff of using systemd units for everything?","a":"You gain centralized control and observability, but config can become more complex.","tags":["systemd","operations","tradeoff"]},
+    {"id":"lin-018","tier":"C","q":"Why do Linux internals matter when debugging production issues?","a":"They explain how the kernel is actually scheduling, isolating, and limiting the workload.","tags":["debugging","kernel","production"]}
+  ]
+}

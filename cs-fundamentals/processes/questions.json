@@ -1,0 +1,23 @@
+{
+  "topic": "processes",
+  "questions": [
+    {"id":"proc-001","tier":"A","q":"What is a process ID?","a":"A unique numeric identifier for a running process.","tags":["pid","process"]},
+    {"id":"proc-002","tier":"A","q":"What does fork() do?","a":"It creates a child process by duplicating the caller.","tags":["fork","process-creation"]},
+    {"id":"proc-003","tier":"A","q":"What does exec() do after fork()?","a":"It replaces the current process image with a new program.","tags":["exec","process-creation"]},
+    {"id":"proc-004","tier":"A","q":"What is a zombie process?","a":"A process that has exited but still has an entry until the parent reaps it.","tags":["zombie","wait"]},
+    {"id":"proc-005","tier":"A","q":"What is an orphan process?","a":"A running child whose parent has exited, so init or a subreaper adopts it.","tags":["orphan","init"]},
+    {"id":"proc-006","tier":"A","q":"What is context switching?","a":"Saving one process state and restoring another so the CPU can switch between them.","tags":["context-switch","scheduler"]},
+    {"id":"proc-007","tier":"B","q":"Why are fork() and exec() separate calls?","a":"Fork creates a configurable child, and exec runs a new program after setup is complete.","tags":["fork","exec","design"]},
+    {"id":"proc-008","tier":"B","q":"Why must a parent call wait() or waitpid()?","a":"To collect the child's exit status and release its zombie process entry.","tags":["waitpid","zombie"]},
+    {"id":"proc-009","tier":"B","q":"What happens to open file descriptors across fork()?","a":"The child inherits copies of the parent's descriptors pointing to the same open file descriptions.","tags":["file-descriptors","fork"]},
+    {"id":"proc-010","tier":"B","q":"Why can a shell not ignore SIGCHLD forever?","a":"It would leak zombie children because exited processes would never be reaped.","tags":["sigchld","reaping"]},
+    {"id":"proc-011","tier":"B","q":"What is the purpose of a process group?","a":"It lets the terminal or shell send signals to a related set of processes together.","tags":["process-group","signals"]},
+    {"id":"proc-012","tier":"B","q":"Why is a blocking system call significant to scheduling?","a":"The kernel can deschedule the process and run something else while it waits.","tags":["blocking","scheduler"]},
+    {"id":"proc-013","tier":"C","q":"Why do shells use fork/exec instead of spawning a brand new interpreter each time?","a":"It is cheaper and preserves shell state such as environment, redirections, and job control.","tags":["shell","fork","tradeoff"]},
+    {"id":"proc-014","tier":"C","q":"When would you prefer processes over threads?","a":"When you want stronger isolation, separate failure domains, or simpler memory safety boundaries.","tags":["processes","threads","tradeoff"]},
+    {"id":"proc-015","tier":"C","q":"What is the tradeoff of forking a large process tree?","a":"It is flexible, but many children increase scheduler overhead and memory pressure.","tags":["fork","scaling","tradeoff"]},
+    {"id":"proc-016","tier":"C","q":"Why does a daemon often double-fork?","a":"To detach from the controlling terminal and avoid becoming a zombie-prone session child.","tags":["daemon","session"]},
+    {"id":"proc-017","tier":"C","q":"What tradeoff does graceful shutdown introduce?","a":"It improves correctness and cleanup, but it can delay termination and complicate signal handling.","tags":["shutdown","signals","tradeoff"]},
+    {"id":"proc-018","tier":"C","q":"Why can a process pool be better than one process per task?","a":"It amortizes startup cost and limits resource usage while still providing parallelism.","tags":["pool","parallelism","tradeoff"]}
+  ]
+}

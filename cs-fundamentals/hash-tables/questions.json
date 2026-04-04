@@ -1,0 +1,185 @@
+{
+  "topic": "hash-tables",
+  "questions": [
+    {
+      "id": "hash-tables-001a",
+      "tier": "A",
+      "q": "What is the average-case complexity of hash table lookup?",
+      "a": "O(1).",
+      "tags": [
+        "hash-table",
+        "complexity"
+      ]
+    },
+    {
+      "id": "hash-tables-001b",
+      "tier": "B",
+      "q": "Why are hash tables fast in the average case?",
+      "a": "A good hash spreads keys uniformly so bucket access stays close to constant time.",
+      "tags": [
+        "hash-table",
+        "complexity"
+      ]
+    },
+    {
+      "id": "hash-tables-001c",
+      "tier": "C",
+      "q": "When can a hash table degrade toward O(n)?",
+      "a": "When many keys collide because of a poor hash function, a high load factor, or adversarial input.",
+      "tags": [
+        "hash-table",
+        "complexity"
+      ]
+    },
+    {
+      "id": "hash-tables-002a",
+      "tier": "A",
+      "q": "What two properties should a good hash function have?",
+      "a": "Uniformity and avalanche behavior.",
+      "tags": [
+        "hash-function",
+        "security"
+      ]
+    },
+    {
+      "id": "hash-tables-002b",
+      "tier": "B",
+      "q": "Why does avalanche behavior matter?",
+      "a": "Small key changes should flip many output bits so nearby keys do not cluster.",
+      "tags": [
+        "hash-function",
+        "security"
+      ]
+    },
+    {
+      "id": "hash-tables-002c",
+      "tier": "C",
+      "q": "Why is a predictable hash a security risk?",
+      "a": "An attacker can craft colliding keys and force worst-case behavior.",
+      "tags": [
+        "hash-function",
+        "security"
+      ]
+    },
+    {
+      "id": "hash-tables-003a",
+      "tier": "A",
+      "q": "What is the load factor of a hash table?",
+      "a": "Items divided by buckets.",
+      "tags": [
+        "load-factor",
+        "resizing"
+      ]
+    },
+    {
+      "id": "hash-tables-003b",
+      "tier": "B",
+      "q": "Why does a higher load factor hurt performance?",
+      "a": "More keys share the same table, so collisions and probe lengths increase.",
+      "tags": [
+        "load-factor",
+        "resizing"
+      ]
+    },
+    {
+      "id": "hash-tables-003c",
+      "tier": "C",
+      "q": "Why do implementations resize instead of letting the table fill up?",
+      "a": "Resizing keeps lookups and inserts fast, and the one-time O(n) cost is amortized over many operations.",
+      "tags": [
+        "load-factor",
+        "resizing"
+      ]
+    },
+    {
+      "id": "hash-tables-004a",
+      "tier": "A",
+      "q": "What collision strategy stores a list per bucket?",
+      "a": "Chaining.",
+      "tags": [
+        "chaining",
+        "collisions"
+      ]
+    },
+    {
+      "id": "hash-tables-004b",
+      "tier": "B",
+      "q": "Why can chaining be easier to reason about than open addressing?",
+      "a": "Each bucket can grow independently, so deletion and growth are simpler.",
+      "tags": [
+        "chaining",
+        "collisions"
+      ]
+    },
+    {
+      "id": "hash-tables-004c",
+      "tier": "C",
+      "q": "When is chaining a better choice than open addressing?",
+      "a": "When deletions are frequent or the table needs to tolerate very high load factors.",
+      "tags": [
+        "chaining",
+        "collisions"
+      ]
+    },
+    {
+      "id": "hash-tables-005a",
+      "tier": "A",
+      "q": "What collision strategy probes other slots in the array?",
+      "a": "Open addressing.",
+      "tags": [
+        "open-addressing",
+        "probes"
+      ]
+    },
+    {
+      "id": "hash-tables-005b",
+      "tier": "B",
+      "q": "Why is open addressing cache-friendly?",
+      "a": "The entire table lives in one array, so probes touch nearby memory locations.",
+      "tags": [
+        "open-addressing",
+        "probes"
+      ]
+    },
+    {
+      "id": "hash-tables-005c",
+      "tier": "C",
+      "q": "When does open addressing become a poor fit?",
+      "a": "When the table gets crowded and probe sequences get long or deletions are frequent.",
+      "tags": [
+        "open-addressing",
+        "probes"
+      ]
+    },
+    {
+      "id": "hash-tables-006a",
+      "tier": "A",
+      "q": "What problem does consistent hashing solve?",
+      "a": "Minimizing key movement when nodes change.",
+      "tags": [
+        "consistent-hashing",
+        "distributed-systems"
+      ]
+    },
+    {
+      "id": "hash-tables-006b",
+      "tier": "B",
+      "q": "Why is consistent hashing useful in distributed caches?",
+      "a": "Adding or removing a node only remaps a small fraction of keys.",
+      "tags": [
+        "consistent-hashing",
+        "distributed-systems"
+      ]
+    },
+    {
+      "id": "hash-tables-006c",
+      "tier": "C",
+      "q": "When would you prefer consistent hashing over regular modulo partitioning?",
+      "a": "When backend membership changes often and you want stable key placement.",
+      "tags": [
+        "consistent-hashing",
+        "distributed-systems"
+      ]
+    }
+  ]
+}

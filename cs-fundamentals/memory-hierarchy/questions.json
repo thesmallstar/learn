@@ -1,0 +1,23 @@
+{
+  "topic": "memory-hierarchy",
+  "questions": [
+    {"id":"mem-001","tier":"A","q":"What is the order of the memory hierarchy from fastest to slowest in a typical system?","a":"Registers, L1/L2/L3 cache, RAM, storage.","tags":["hierarchy","latency"]},
+    {"id":"mem-002","tier":"A","q":"What is the common x86 page size?","a":"4 KB.","tags":["paging","page-size"]},
+    {"id":"mem-003","tier":"A","q":"What does TLB stand for?","a":"Translation Lookaside Buffer.","tags":["tlb","virtual-memory"]},
+    {"id":"mem-004","tier":"A","q":"What is copy-on-write?","a":"A shared page is duplicated only when one process writes to it.","tags":["cow","paging"]},
+    {"id":"mem-005","tier":"A","q":"What does mmap() let a process do?","a":"Map files or anonymous memory into its virtual address space.","tags":["mmap","virtual-memory"]},
+    {"id":"mem-006","tier":"A","q":"What is a cache line?","a":"The fixed-size block moved between memory and cache.","tags":["cache","cache-line"]},
+    {"id":"mem-007","tier":"B","q":"Why are page faults expensive?","a":"They interrupt execution so the kernel can map in the missing page from RAM or disk.","tags":["page-fault","paging"]},
+    {"id":"mem-008","tier":"B","q":"Why does locality matter for performance?","a":"It lets the CPU reuse data already fetched into cache or nearby memory.","tags":["locality","cache"]},
+    {"id":"mem-009","tier":"B","q":"Why does a TLB miss slow down address translation?","a":"The CPU must walk page tables instead of using a cached virtual-to-physical translation.","tags":["tlb","page-table"]},
+    {"id":"mem-010","tier":"B","q":"What problem does virtual memory solve?","a":"It gives each process an isolated, large, contiguous address space independent of physical RAM layout.","tags":["virtual-memory","isolation"]},
+    {"id":"mem-011","tier":"B","q":"Why can sequential access be much faster than random access?","a":"Prefetching and cache lines work well when accesses are predictable and contiguous.","tags":["prefetch","locality"]},
+    {"id":"mem-012","tier":"B","q":"What is NUMA awareness about?","a":"Keeping memory access close to the CPU socket that uses it most.","tags":["numa","latency"]},
+    {"id":"mem-013","tier":"C","q":"When do huge pages help, and when do they hurt?","a":"They help when TLB pressure is high, but they can waste memory and reduce flexibility.","tags":["huge-pages","tlb","tradeoff"]},
+    {"id":"mem-014","tier":"C","q":"Why can a memory allocator influence application latency?","a":"Allocator behavior affects fragmentation, locality, lock contention, and page fault frequency.","tags":["allocator","latency"]},
+    {"id":"mem-015","tier":"C","q":"How do you choose between more RAM and a better access pattern?","a":"Fix the access pattern first if misses are avoidable; buy RAM when the working set is truly too large.","tags":["working-set","tradeoff"]},
+    {"id":"mem-016","tier":"C","q":"Why can mmap be preferable to read for large files?","a":"It lets the kernel page data in on demand and can reduce copies for selective access.","tags":["mmap","io","tradeoff"]},
+    {"id":"mem-017","tier":"C","q":"What tradeoff do cache-friendly data layouts introduce?","a":"They often improve speed but can make code harder to maintain or extend.","tags":["layout","maintainability","tradeoff"]},
+    {"id":"mem-018","tier":"C","q":"Why does CoW help fork-heavy programs?","a":"It avoids copying pages until they are modified, saving time and memory for read-mostly workloads.","tags":["cow","fork","tradeoff"]}
+  ]
+}

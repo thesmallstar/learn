@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CS Drill Mode — learn.surkar.in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/drill.css">
+</head>
+<body>
+<nav>
+  <a href="/">learn.surkar.in</a>
+  <a href="../">cs-fundamentals</a>
+</nav>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-card">
+      <div class="hero-kicker">Active Recall</div>
+      <h1>Drill Mode</h1>
+      <p class="hero-copy">Randomized practice across selected topics with reveal-first recall, self-rating, and local spaced repetition scheduling.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><span class="stat-label">Selected Topics</span><span class="stat-value" id="selected-count">0</span></div>
+      <div class="stat-card"><span class="stat-label">Cards Loaded</span><span class="stat-value" id="total-count">0</span></div>
+      <div class="stat-card"><span class="stat-label">Due Today</span><span class="stat-value" id="due-count">0</span></div>
+      <div class="stat-card"><span class="stat-label">Streak</span><span class="stat-value" id="streak-count">0</span></div>
+    </div>
+  </section>
+
+  <section class="layout">
+    <aside class="panel">
+      <h2>Topic Selector</h2>
+      <p class="panel-copy">Pick focused topic clusters or keep everything enabled for broad review.</p>
+      <div class="topic-actions">
+        <button id="select-all" class="active">Select all</button>
+        <button id="clear-all">Clear all</button>
+        <a href="./stats/" class="topic-shortcut" id="stats-link">View stats</a>
+      </div>
+      <div class="mode-pills" style="margin:0.9rem 0;">
+        <button data-mode="due" class="active">Due today</button>
+        <button data-mode="cram">Cram mode</button>
+        <button data-mode="new">New cards only</button>
+        <button data-mode="weak">Weak spots</button>
+      </div>
+      <div class="topic-grid" id="topic-grid"></div>
+    </aside>
+
+    <section class="session-panel" id="card-host"></section>
+  </section>
+</main>
+
+<script src="../assets/catalog.js"></script>
+<script src="../assets/study-utils.js"></script>
+<script src="../assets/drill.js"></script>
+</body>
+</html>

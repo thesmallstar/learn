@@ -1,0 +1,185 @@
+{
+  "topic": "http-protocol",
+  "questions": [
+    {
+      "id": "http-a01",
+      "tier": "A",
+      "q": "Which HTTP method is safe and idempotent?",
+      "a": "GET",
+      "tags": [
+        "methods",
+        "idempotency"
+      ]
+    },
+    {
+      "id": "http-a02",
+      "tier": "A",
+      "q": "What status code means the client is being rate-limited?",
+      "a": "429",
+      "tags": [
+        "status-codes",
+        "rate-limit"
+      ]
+    },
+    {
+      "id": "http-a03",
+      "tier": "A",
+      "q": "What header lets a client validate a cached response with the origin?",
+      "a": "If-None-Match",
+      "tags": [
+        "cache",
+        "etag"
+      ]
+    },
+    {
+      "id": "http-a04",
+      "tier": "A",
+      "q": "Which protocol does HTTP/3 run over?",
+      "a": "QUIC over UDP",
+      "tags": [
+        "http3",
+        "quic"
+      ]
+    },
+    {
+      "id": "http-a05",
+      "tier": "A",
+      "q": "What header compression format does HTTP/2 use?",
+      "a": "HPACK",
+      "tags": [
+        "http2",
+        "compression"
+      ]
+    },
+    {
+      "id": "http-a06",
+      "tier": "A",
+      "q": "Which real-time protocol is unidirectional from server to client?",
+      "a": "SSE",
+      "tags": [
+        "sse",
+        "realtime"
+      ]
+    },
+    {
+      "id": "http-b01",
+      "tier": "B",
+      "q": "What problem does HTTP/2 multiplexing solve?",
+      "a": "It allows multiple streams over one connection without serializing requests one after another.",
+      "tags": [
+        "http2",
+        "multiplexing"
+      ]
+    },
+    {
+      "id": "http-b02",
+      "tier": "B",
+      "q": "Why does HTTP/2 still suffer from head-of-line blocking?",
+      "a": "Because TCP still delivers one ordered byte stream underneath the multiplexed streams.",
+      "tags": [
+        "hol",
+        "tcp"
+      ]
+    },
+    {
+      "id": "http-b03",
+      "tier": "B",
+      "q": "How does a WebSocket connection begin?",
+      "a": "With an HTTP Upgrade request and response.",
+      "tags": [
+        "websocket",
+        "upgrade"
+      ]
+    },
+    {
+      "id": "http-b04",
+      "tier": "B",
+      "q": "What is the default serialization format in gRPC?",
+      "a": "Protocol Buffers",
+      "tags": [
+        "grpc",
+        "protobuf"
+      ]
+    },
+    {
+      "id": "http-b05",
+      "tier": "B",
+      "q": "Why is HTTP/3 better at network changes than HTTP/2?",
+      "a": "QUIC connections are identified independently of the underlying network path.",
+      "tags": [
+        "quic",
+        "mobility"
+      ]
+    },
+    {
+      "id": "http-b06",
+      "tier": "B",
+      "q": "What does a 204 response indicate?",
+      "a": "The request succeeded but there is no response body.",
+      "tags": [
+        "status-codes",
+        "rest"
+      ]
+    },
+    {
+      "id": "http-c01",
+      "tier": "C",
+      "q": "When would you pick SSE instead of WebSockets?",
+      "a": "When you only need server-to-client updates and want a simpler HTTP-based stream.",
+      "tags": [
+        "sse",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "http-c02",
+      "tier": "C",
+      "q": "Why does HTTP/1.1 keep-alive matter?",
+      "a": "It avoids paying a full TCP handshake and slow-start cost for every request.",
+      "tags": [
+        "keepalive",
+        "latency"
+      ]
+    },
+    {
+      "id": "http-c03",
+      "tier": "C",
+      "q": "Why is gRPC a poor fit for browsers compared with REST?",
+      "a": "Browsers do not natively expose the same gRPC transport and tooling model as simple HTTP APIs.",
+      "tags": [
+        "grpc",
+        "browser"
+      ]
+    },
+    {
+      "id": "http-c04",
+      "tier": "C",
+      "q": "Why can chunked transfer encoding help streaming responses?",
+      "a": "It lets the server send data before knowing the final content length.",
+      "tags": [
+        "chunked",
+        "streaming"
+      ]
+    },
+    {
+      "id": "http-c05",
+      "tier": "C",
+      "q": "What tradeoff does HTTP/3 make by running over UDP?",
+      "a": "It reimplements reliability and congestion control in user space to gain flexibility.",
+      "tags": [
+        "http3",
+        "tradeoff"
+      ]
+    },
+    {
+      "id": "http-c06",
+      "tier": "C",
+      "q": "Why are idempotent methods important for retries?",
+      "a": "A client can safely retry them after a timeout without creating duplicate side effects.",
+      "tags": [
+        "idempotency",
+        "retries"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "topic": "symmetric-encryption",
+  "exercises": [
+    {
+      "id": "symmetric-encryption-ex-01",
+      "size": "small",
+      "title": "Encrypt a File",
+      "description": "Use a CLI tool to encrypt and decrypt a small file with a symmetric key.",
+      "command": "openssl enc -aes-256-cbc -in plain.txt -out secret.bin",
+      "expected_outcome": "The original file can be recovered only with the correct key.",
+      "prereqs": [
+        "openssl"
+      ],
+      "tags": [
+        "openssl",
+        "encryption"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-ex-02",
+      "size": "small",
+      "title": "Compare Cipher Modes",
+      "description": "Encrypt the same data in ECB, CBC, and GCM and compare the outputs.",
+      "command": "openssl enc -aes-128-ecb",
+      "expected_outcome": "You can see why some modes leak structure or provide authentication.",
+      "prereqs": [
+        "openssl"
+      ],
+      "tags": [
+        "modes",
+        "aes"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-ex-03",
+      "size": "medium",
+      "title": "Write a File Vault",
+      "description": "Build a tiny encrypt/decrypt utility that stores ciphertext on disk and derives keys from a password.",
+      "command": "python vault.py",
+      "expected_outcome": "Files are encrypted at rest and only decrypt with the correct secret.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "vault",
+        "kdf"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-ex-04",
+      "size": "medium",
+      "title": "Add Authenticated Encryption",
+      "description": "Update the vault to verify integrity before decrypting the payload.",
+      "command": "python vault.py",
+      "expected_outcome": "Tampered ciphertext fails verification before plaintext is exposed.",
+      "prereqs": [
+        "Python"
+      ],
+      "tags": [
+        "aead",
+        "integrity"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-ex-05",
+      "size": "large",
+      "title": "Build a Key Rotation Flow",
+      "description": "Create a runbook or script that rotates data-encryption keys without losing access.",
+      "command": "mkdir -p docs && $EDITOR docs/key-rotation.md",
+      "expected_outcome": "You can explain re-encryption, rollout, and rollback steps.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "rotation",
+        "runbook"
+      ]
+    },
+    {
+      "id": "symmetric-encryption-ex-06",
+      "size": "large",
+      "title": "Design a Secret Storage Scheme",
+      "description": "Design how to store, rotate, and access symmetric keys for an app safely.",
+      "command": "mkdir -p docs && $EDITOR docs/secret-storage.md",
+      "expected_outcome": "You have a practical scheme for secret distribution and rotation.",
+      "prereqs": [
+        "editor"
+      ],
+      "tags": [
+        "secrets",
+        "architecture"
+      ]
+    }
+  ]
+}

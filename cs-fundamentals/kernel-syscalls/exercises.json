@@ -1,0 +1,11 @@
+{
+  "topic": "kernel-syscalls",
+  "exercises": [
+    {"id":"ks-ex-01","size":"small","title":"Trace a Command","description":"Use strace to see the syscalls made by a simple command.","command":"strace -c ls","expected_outcome":"You can identify the most frequent syscalls in the command.","prereqs":["strace"],"tags":["strace","syscalls","inspection"]},
+    {"id":"ks-ex-02","size":"small","title":"Read the Current Syscall","description":"Inspect the current process syscall information exposed by the kernel.","command":"cat /proc/self/syscall","expected_outcome":"You can see the active syscall slot and its arguments.","prereqs":["Linux"],"tags":["proc","syscalls"]},
+    {"id":"ks-ex-03","size":"medium","title":"File I/O in C","description":"Write a small program that opens, reads, writes, and closes a file using raw syscalls or wrappers.","command":"./file_io_demo","expected_outcome":"The program should create or modify a file and handle errors cleanly.","prereqs":["C compiler"],"tags":["open","read","write"]},
+    {"id":"ks-ex-04","size":"medium","title":"Syscall Timing","description":"Measure the cost of repeatedly calling getpid() or another cheap syscall.","command":"./syscall_cost_bench","expected_outcome":"You can compare syscall overhead with a regular function call.","prereqs":["C compiler","perf optional"],"tags":["benchmark","syscall-cost"]},
+    {"id":"ks-ex-05","size":"large","title":"Tiny Shell Pipeline","description":"Implement a mini shell feature that spawns a child process, redirects stdout, and handles exit codes.","command":"./syscall_shell_demo","expected_outcome":"You can observe correct process and file descriptor behavior.","prereqs":["C, Rust, or Go"],"tags":["fork","exec","dup2"]},
+    {"id":"ks-ex-06","size":"large","title":"Seccomp Filter","description":"Add a restrictive seccomp filter to a test program and verify blocked syscalls fail.","command":"./seccomp_demo","expected_outcome":"Disallowed syscalls should be denied while the allowed path still runs.","prereqs":["libseccomp or raw BPF support"],"tags":["seccomp","security","sandboxing"]}
+  ]
+}

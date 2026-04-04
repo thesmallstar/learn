@@ -1,0 +1,23 @@
+{
+  "topic": "storage-io",
+  "questions": [
+    {"id":"io-001","tier":"A","q":"What does fsync() do?","a":"It forces buffered file data and metadata to reach durable storage.","tags":["fsync","durability"]},
+    {"id":"io-002","tier":"A","q":"What is WAL in databases?","a":"Write-Ahead Logging.","tags":["wal","databases"]},
+    {"id":"io-003","tier":"A","q":"What is the key advantage of SSDs over HDDs?","a":"Much lower access latency and no mechanical seeks.","tags":["ssd","hdd","latency"]},
+    {"id":"io-004","tier":"A","q":"What is IOPS?","a":"Input/output operations per second.","tags":["iops","throughput"]},
+    {"id":"io-005","tier":"A","q":"What is the page cache?","a":"Kernel memory used to cache file data between storage and applications.","tags":["page-cache","kernel"]},
+    {"id":"io-006","tier":"A","q":"What does sequential I/O usually optimize for?","a":"Throughput and fewer seeks or random flash writes.","tags":["io","throughput"]},
+    {"id":"io-007","tier":"B","q":"Why is random I/O often slower than sequential I/O?","a":"Random access defeats prefetching and forces more device seeks or flash page updates.","tags":["random-io","sequential-io"]},
+    {"id":"io-008","tier":"B","q":"Why does fsync matter for databases?","a":"It protects committed data from being lost if the OS or machine crashes.","tags":["fsync","database-durability"]},
+    {"id":"io-009","tier":"B","q":"What is write amplification?","a":"When a small logical write causes much larger physical write work below it.","tags":["write-amplification","storage"]},
+    {"id":"io-010","tier":"B","q":"Why do file systems use journaling or log structures?","a":"To recover consistent metadata and sometimes data after crashes.","tags":["journaling","filesystem"]},
+    {"id":"io-011","tier":"B","q":"What is the difference between latency and throughput for storage?","a":"Latency is per-operation delay; throughput is total work completed per unit time.","tags":["latency","throughput"]},
+    {"id":"io-012","tier":"B","q":"Why does direct I/O exist?","a":"It bypasses the page cache for workloads that manage their own buffering or want predictable behavior.","tags":["direct-io","page-cache"]},
+    {"id":"io-013","tier":"C","q":"When would you prefer an append-only design over random in-place updates?","a":"When you want simpler crash recovery, higher write throughput, or lower write amplification.","tags":["append-only","tradeoff"]},
+    {"id":"io-014","tier":"C","q":"When is it worth paying the cost of fsync on every write?","a":"When data loss is unacceptable and the workload can tolerate the latency.","tags":["fsync","durability","tradeoff"]},
+    {"id":"io-015","tier":"C","q":"How do you choose between RAID and application-level replication?","a":"RAID protects a disk set locally; replication protects availability across failures and is usually a system-level decision.","tags":["raid","replication","tradeoff"]},
+    {"id":"io-016","tier":"C","q":"Why can a page cache help and hurt at the same time?","a":"It speeds repeated reads, but it can also hide true memory pressure or duplicate buffering.","tags":["page-cache","tradeoff"]},
+    {"id":"io-017","tier":"C","q":"What tradeoff does stronger consistency on storage updates introduce?","a":"It usually reduces throughput because the system must wait for durable confirmation more often.","tags":["consistency","durability","tradeoff"]},
+    {"id":"io-018","tier":"C","q":"Why can smaller random writes age SSDs faster?","a":"Flash pages must be erased and rewritten in larger blocks, so small updates create extra internal copying.","tags":["ssd","flash","tradeoff"]}
+  ]
+}

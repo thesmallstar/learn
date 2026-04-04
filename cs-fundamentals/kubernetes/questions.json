@@ -1,0 +1,185 @@
+{
+  "topic": "kubernetes",
+  "questions": [
+    {
+      "id": "kubernetes-001",
+      "tier": "A",
+      "q": "What is a Pod?",
+      "a": "The smallest deployable unit in Kubernetes, usually one or more tightly coupled containers.",
+      "tags": [
+        "kubernetes",
+        "pod"
+      ]
+    },
+    {
+      "id": "kubernetes-002",
+      "tier": "A",
+      "q": "What does a Deployment manage?",
+      "a": "A desired-state rollout for stateless pods.",
+      "tags": [
+        "kubernetes",
+        "deployment"
+      ]
+    },
+    {
+      "id": "kubernetes-003",
+      "tier": "A",
+      "q": "What does a Service provide?",
+      "a": "A stable virtual endpoint for a set of pods.",
+      "tags": [
+        "kubernetes",
+        "service"
+      ]
+    },
+    {
+      "id": "kubernetes-004",
+      "tier": "A",
+      "q": "What is a ConfigMap for?",
+      "a": "Non-secret configuration data.",
+      "tags": [
+        "kubernetes",
+        "configmap"
+      ]
+    },
+    {
+      "id": "kubernetes-005",
+      "tier": "A",
+      "q": "What is a Secret for?",
+      "a": "Sensitive configuration such as passwords, tokens, or certificates.",
+      "tags": [
+        "kubernetes",
+        "secret"
+      ]
+    },
+    {
+      "id": "kubernetes-006",
+      "tier": "A",
+      "q": "What is a StatefulSet for?",
+      "a": "Workloads that need stable identities and persistent storage.",
+      "tags": [
+        "kubernetes",
+        "statefulset"
+      ]
+    },
+    {
+      "id": "kubernetes-007",
+      "tier": "B",
+      "q": "Why do readiness probes matter?",
+      "a": "They keep traffic away from pods that are not ready to serve requests.",
+      "tags": [
+        "kubernetes",
+        "probes"
+      ]
+    },
+    {
+      "id": "kubernetes-008",
+      "tier": "B",
+      "q": "Why do liveness probes matter?",
+      "a": "They restart pods that are wedged or unhealthy.",
+      "tags": [
+        "kubernetes",
+        "probes"
+      ]
+    },
+    {
+      "id": "kubernetes-009",
+      "tier": "B",
+      "q": "Why are resource requests and limits important?",
+      "a": "They influence scheduling and prevent one pod from consuming all the node resources.",
+      "tags": [
+        "kubernetes",
+        "resources"
+      ]
+    },
+    {
+      "id": "kubernetes-010",
+      "tier": "B",
+      "q": "Why is etcd important?",
+      "a": "It stores cluster state and acts as the source of truth for Kubernetes.",
+      "tags": [
+        "kubernetes",
+        "etcd"
+      ]
+    },
+    {
+      "id": "kubernetes-011",
+      "tier": "B",
+      "q": "Why do PersistentVolume claims matter for stateful apps?",
+      "a": "They decouple storage provisioning from the pod lifecycle.",
+      "tags": [
+        "kubernetes",
+        "storage"
+      ]
+    },
+    {
+      "id": "kubernetes-012",
+      "tier": "B",
+      "q": "Why is a rolling update safer than replacing all pods at once?",
+      "a": "It limits downtime and lets you detect bad releases early.",
+      "tags": [
+        "kubernetes",
+        "rollout"
+      ]
+    },
+    {
+      "id": "kubernetes-013",
+      "tier": "C",
+      "q": "When would you choose a StatefulSet over a Deployment?",
+      "a": "When pod identity, stable storage, or ordered rollout matters.",
+      "tags": [
+        "kubernetes",
+        "statefulset"
+      ]
+    },
+    {
+      "id": "kubernetes-014",
+      "tier": "C",
+      "q": "When should you use a NetworkPolicy?",
+      "a": "When you need to restrict which pods can talk to one another.",
+      "tags": [
+        "kubernetes",
+        "networkpolicy"
+      ]
+    },
+    {
+      "id": "kubernetes-015",
+      "tier": "C",
+      "q": "What is the tradeoff of HPA?",
+      "a": "It improves elasticity, but scaling decisions depend on good metrics and warmup time.",
+      "tags": [
+        "kubernetes",
+        "hpa"
+      ]
+    },
+    {
+      "id": "kubernetes-016",
+      "tier": "C",
+      "q": "When would you write an operator instead of scripts?",
+      "a": "When a recurring cluster workflow needs continuous reconciliation.",
+      "tags": [
+        "kubernetes",
+        "operator"
+      ]
+    },
+    {
+      "id": "kubernetes-017",
+      "tier": "C",
+      "q": "What tradeoff comes with cluster-wide abstraction?",
+      "a": "It simplifies operations for users but adds another layer of complexity.",
+      "tags": [
+        "kubernetes",
+        "platform"
+      ]
+    },
+    {
+      "id": "kubernetes-018",
+      "tier": "C",
+      "q": "Why are probes and resource limits often tuned together?",
+      "a": "Because slow startup, throttling, or OOM kills can all look like failures otherwise.",
+      "tags": [
+        "kubernetes",
+        "tuning"
+      ]
+    }
+  ]
+}

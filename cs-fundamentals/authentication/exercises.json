@@ -1,0 +1,95 @@
+{
+  "topic": "authentication",
+  "exercises": [
+    {
+      "id": "au-ex-01",
+      "size": "small",
+      "title": "Decode a JWT",
+      "description": "Paste a sample JWT into a decoder and identify the header, payload, and signature parts.",
+      "command": "node -e \"console.log(JSON.parse(Buffer.from(token.split('.')[1],'base64url').toString()))\"",
+      "expected_outcome": "You can read the claims and explain what is and is not trusted.",
+      "prereqs": [
+        "Node.js installed"
+      ],
+      "tags": [
+        "jwt",
+        "claims"
+      ]
+    },
+    {
+      "id": "au-ex-02",
+      "size": "small",
+      "title": "Inspect a session cookie",
+      "description": "Log in to a demo app and inspect the cookie attributes in DevTools.",
+      "command": "open DevTools Application tab",
+      "expected_outcome": "You can identify Secure, HttpOnly, and SameSite flags.",
+      "prereqs": [
+        "browser"
+      ],
+      "tags": [
+        "cookies",
+        "sessions"
+      ]
+    },
+    {
+      "id": "au-ex-03",
+      "size": "medium",
+      "title": "Hash passwords properly",
+      "description": "Write a script that hashes passwords with bcrypt or Argon2 and verifies them.",
+      "command": "python hash_passwords.py",
+      "expected_outcome": "The script stores slow password hashes and validates logins.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "passwords",
+        "bcrypt"
+      ]
+    },
+    {
+      "id": "au-ex-04",
+      "size": "medium",
+      "title": "Simulate an OAuth flow",
+      "description": "Walk through an authorization-code exchange and observe the role of PKCE.",
+      "command": "python oauth_demo.py",
+      "expected_outcome": "You can trace code exchange, token issuance, and PKCE verification.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "oauth",
+        "pkce"
+      ]
+    },
+    {
+      "id": "au-ex-05",
+      "size": "large",
+      "title": "Build a session-based login flow",
+      "description": "Create a tiny app with login, server-side sessions, logout, and protected routes.",
+      "command": "python auth_app.py",
+      "expected_outcome": "Authenticated users can access protected pages and sessions can be revoked.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "sessions",
+        "authn"
+      ]
+    },
+    {
+      "id": "au-ex-06",
+      "size": "large",
+      "title": "Add RBAC to an API",
+      "description": "Implement role checks for a few endpoints and enforce authorization decisions on the server.",
+      "command": "python rbac_api.py",
+      "expected_outcome": "Different users receive different access based on role.",
+      "prereqs": [
+        "Python 3"
+      ],
+      "tags": [
+        "rbac",
+        "authorization"
+      ]
+    }
+  ]
+}
