@@ -19,7 +19,11 @@
   };
 
   const urlState = parseHash();
-  let selectedTopics = new Set(urlState.topics.length ? urlState.topics : topics.map((topic) => topic.slug));
+  let selectedTopics = new Set(
+    urlState.topics.length
+      ? urlState.topics
+      : defaultTopicsForMode(urlState.mode || "due")
+  );
   let mode = urlState.mode || "due";
   let allCards = [];
   let sessionReviewed = 0;
@@ -31,7 +35,13 @@
   els.modePills.forEach((pill) => {
     pill.classList.toggle("active", pill.dataset.mode === mode);
     pill.addEventListener("click", () => {
-      mode = pill.dataset.mode;
+      const nextMode = pill.dataset.mode;
+      const allTopicsSelected = selectedTopics.size === topics.length;
+      if (nextMode === "cram" && allTopicsSelected) {
+        selectedTopics = new Set();
+        renderTopicGrid();
+      }
+      mode = nextMode;
       els.modePills.forEach((entry) => entry.classList.toggle("active", entry === pill));
       persistHash();
       resetQueue();
@@ -70,6 +80,13 @@
         .filter(Boolean),
       mode: params.get("mode"),
     };
+  }
+
+  function defaultTopicsForMode(currentMode) {
+    if (currentMode === "cram") {
+      return [];
+    }
+    return topics.map((topic) => topic.slug);
   }
 
   function persistHash() {
